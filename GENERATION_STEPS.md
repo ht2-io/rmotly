@@ -1,6 +1,8 @@
-# Next Steps: Serverpod Code Generation
+# Serverpod Code Generation Required
 
 This PR creates the User and NotificationTopic models for the Remotly API.
+
+⚠️ **IMPORTANT**: Generated files are gitignored. You must run `serverpod generate` locally or in CI before the code will compile.
 
 ## Models Created
 
@@ -18,7 +20,16 @@ This PR creates the User and NotificationTopic models for the Remotly API.
    - Enable/disable flag
    - Indexed on userId and apiKey
 
-## Required Actions
+## Quick Start (Automated)
+
+Run the provided script from the repository root:
+
+```bash
+chmod +x generate_models.sh
+./generate_models.sh
+```
+
+## Manual Steps
 
 ### 1. Run Serverpod Code Generation
 
@@ -27,10 +38,10 @@ cd remotly_server
 serverpod generate
 ```
 
-This will:
-- Generate model classes in `lib/src/generated/`
-- Update client code in `remotly_client/`
-- Create protocol files
+This generates (not committed to git):
+- Model classes in `lib/src/generated/`
+- Client code in `remotly_client/lib/src/protocol/`
+- Test tools in `test/integration/test_tools/`
 
 ### 2. Create Database Migration
 
@@ -41,7 +52,9 @@ cd remotly_server
 serverpod create-migration
 ```
 
-### 3. Apply Migration
+This creates a migration file in `migrations/` (this SHOULD be committed).
+
+### 3. Apply Migration to Database
 
 ```bash
 cd remotly_server
@@ -74,6 +87,71 @@ dart test
 cd remotly_app
 flutter pub get
 ```
+
+## Model Structure Reference
+
+### User
+
+After generation, the User model will have these properties:
+
+```dart
+class User {
+  int? id;                  // Auto-generated primary key
+  String email;             // Unique email address
+  String? displayName;      // Optional display name
+  String? fcmToken;         // Firebase Cloud Messaging token
+  DateTime createdAt;       // Creation timestamp
+  DateTime updatedAt;       // Last update timestamp
+}
+```
+
+**Database Table**: `users`  
+**Indexes**: 
+- `user_email_idx` - Unique index on email
+
+### NotificationTopic
+
+After generation, the NotificationTopic model will have these properties:
+
+```dart
+class NotificationTopic {
+  int? id;                  // Auto-generated primary key
+  int userId;               // Foreign key to users table
+  String name;              // Topic name
+  String? description;      // Optional description
+  String apiKey;            // Unique API key for webhook auth
+  bool enabled;             // Whether topic is active
+  String config;            // JSON configuration string
+  DateTime createdAt;       // Creation timestamp
+  DateTime updatedAt;       // Last update timestamp
+}
+```
+
+**Database Table**: `notification_topics`  
+**Indexes**:
+- `notification_topic_user_idx` - Index on userId for fast user lookups
+- `notification_topic_api_key_idx` - Unique index on apiKey for authentication
+
+**Relations**:
+- `userId` → `users.id` (many-to-one)
+
+## Configuration JSON Structure
+
+The `config` field in NotificationTopic stores JSON with this structure:
+
+```json
+{
+  "titleTemplate": "{{title}}",
+  "bodyTemplate": "{{message}}",
+  "imageUrlField": "image",
+  "actionUrlField": "url",
+  "priority": "high",
+  "soundName": "default",
+  "channelId": "notifications"
+}
+```
+
+Template variables use `{{fieldName}}` syntax for dynamic content extraction from webhook payloads.
 
 ## Model Structure
 
