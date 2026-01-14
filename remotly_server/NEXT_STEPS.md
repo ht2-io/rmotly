@@ -3,7 +3,7 @@
 ## Status: User Model Created ✅
 
 The User model YAML file has been successfully created at:
-- **Location**: `remotly_server/lib/src/user.yaml`
+- **Location**: `remotly_server/lib/src/models/user.yaml`
 
 ## Required Manual Steps
 
