@@ -1,0 +1,24 @@
+name: Setup Base Widgets
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Run setup script
+        run: |
+          cd remotly_app
+          bash setup_base_widgets.sh
+          
+      - name: Commit files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add remotly_app/lib/shared/widgets/
+          git add remotly_app/test/widget/shared/
+          git commit -m "chore: create widget files from setup script"
+          git push
