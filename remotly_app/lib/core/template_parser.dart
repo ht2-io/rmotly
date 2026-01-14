@@ -35,14 +35,14 @@ class TemplateParser {
         return match.group(0)!;
       }
 
-      final value = _resolveValue(variablePath, variables);
+      final result = _resolveValue(variablePath, variables);
       
-      // If value is null or not found, return the original placeholder
-      if (value == null) {
-        return match.group(0)!;
+      // Check if variable was found (using a special marker for "not found")
+      if (result is _NotFound) {
+        return match.group(0)!; // Keep placeholder unchanged
       }
 
-      return value.toString();
+      return result.toString();
     });
   }
 
@@ -53,16 +53,24 @@ class TemplateParser {
   /// - Nested objects: "user.name", "address.city.name"
   /// - Array access: "items.0", "users.1.name"
   /// - Array length: "items.length"
+  ///
+  /// Returns the value if found, or [_NotFound] if not found.
   dynamic _resolveValue(String path, Map<String, dynamic> variables) {
     final parts = path.split('.');
     dynamic current = variables;
 
-    for (final part in parts) {
+    for (var i = 0; i < parts.length; i++) {
+      final part = parts[i];
+      
       if (current == null) {
-        return null;
+        return const _NotFound();
       }
 
       if (current is Map) {
+        // Check if key exists in map
+        if (!current.containsKey(part)) {
+          return const _NotFound();
+        }
         current = current[part];
       } else if (current is List) {
         // Handle array access by index
@@ -71,21 +79,25 @@ class TemplateParser {
           if (index >= 0 && index < current.length) {
             current = current[index];
           } else {
-            return null; // Out of bounds
+            return const _NotFound(); // Out of bounds
           }
         } else if (part == 'length') {
           // Handle .length property for lists
           return current.length;
         } else {
-          return null; // Invalid list access
+          return const _NotFound(); // Invalid list access
         }
       } else {
-        // Try to access property using reflection-like approach
-        // For basic types, we can't access properties, so return null
-        return null;
+        // Can't navigate further into non-map, non-list types
+        return const _NotFound();
       }
     }
 
     return current;
   }
+}
+
+/// Marker class to distinguish between "value not found" and "value is null".
+class _NotFound {
+  const _NotFound();
 }
