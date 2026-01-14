@@ -1,0 +1,28 @@
+# User model for authentication and user data
+# Stores user information and FCM tokens for push notifications
+
+### A user of the Remotly system
+class: User
+table: users
+
+fields:
+  ### The user's email address
+  email: String
+  
+  ### The user's display name
+  displayName: String?
+  
+  ### Firebase Cloud Messaging token for push notifications
+  fcmToken: String?
+  
+  ### When this user was created
+  createdAt: DateTime
+  
+  ### When this user was last updated
+  updatedAt: DateTime
+
+indexes:
+  user_email_idx:
+    fields: email
+    unique: true
+    type: btree

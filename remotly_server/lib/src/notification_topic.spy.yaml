@@ -1,0 +1,42 @@
+# NotificationTopic model for managing notification channels
+# Users can create topics with unique API keys to receive notifications
+# from external sources via webhook endpoints.
+
+### A notification topic that receives notifications from external sources
+class: NotificationTopic
+table: notification_topics
+
+fields:
+  ### The ID of the user who owns this topic
+  userId: int, relation(parent=users)
+  
+  ### The name of the topic
+  name: String
+  
+  ### Optional description of what this topic is for
+  description: String?
+  
+  ### API key for authenticating incoming notification webhooks
+  apiKey: String
+  
+  ### Whether this topic is currently enabled
+  enabled: bool
+  
+  ### JSON configuration for notification display and processing
+  ### Includes templates, priority, channels, etc.
+  config: String
+  
+  ### When this topic was created
+  createdAt: DateTime
+  
+  ### When this topic was last updated
+  updatedAt: DateTime
+
+indexes:
+  notification_topic_user_idx:
+    fields: userId
+    type: btree
+  notification_topic_api_key_idx:
+    fields: apiKey
+    unique: true
+    type: btree
