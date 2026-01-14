@@ -7,7 +7,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
 | Phase | Status | Progress |
 |-------|--------|----------|
 | Phase 1: Project Setup | Complete | 100% |
-| Phase 2: API Core | Not Started | 0% |
+| Phase 2: API Core | In Progress | 8% |
 | Phase 3: App Core | Not Started | 0% |
 | Phase 4: Features | Not Started | 0% |
 | Phase 5: Integration | Not Started | 0% |
@@ -166,13 +166,13 @@ This document defines all tasks required to build the Remotly system. Tasks are 
     updatedAt: DateTime
   ```
 
-- [ ] **2.1.5** Create Event model
+- [x] **2.1.5** Create Event model
   ```yaml
-  # lib/src/models/event.yaml
+  # lib/src/event.spy.yaml (created)
   class: Event
   table: events
   fields:
-    userId: int, relation(parent=users)
+    userId: int  # Note: relation(parent=users) omitted until User model exists
     sourceType: String
     sourceId: String
     eventType: String
@@ -183,11 +183,16 @@ This document defines all tasks required to build the Remotly system. Tasks are 
     event_user_idx:
       fields: userId
   ```
+  - Model definition created in `remotly_server/lib/src/event.spy.yaml`
+  - Integration tests created in `remotly_server/test/integration/event_model_test.dart`
+  - Manual steps documented in `MANUAL_STEPS.md`
 
 - [ ] **2.1.6** Run code generation
   ```bash
   serverpod generate
   ```
+  - **Blocked:** Requires bash execution (not available in current environment)
+  - See `MANUAL_STEPS.md` for instructions
 
 ### 2.2 Core Services
 
