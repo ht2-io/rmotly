@@ -4,15 +4,17 @@ This PR creates the User and NotificationTopic models for the Remotly API.
 
 ⚠️ **IMPORTANT**: Generated files are gitignored. You must run `serverpod generate` locally or in CI before the code will compile.
 
+⚠️ **FIX REQUIRED**: Model files need to be moved to correct location. See `FIX_REQUIRED.md` or run `./fix_model_locations.sh`
+
 ## Models Created
 
-1. **User Model** (`user.spy.yaml`)
+1. **User Model** (`lib/src/models/user.yaml`)
    - Basic user information
    - Email with unique index
    - FCM token for push notifications
    - Timestamps (createdAt, updatedAt)
 
-2. **NotificationTopic Model** (`notification_topic.spy.yaml`)
+2. **NotificationTopic Model** (`lib/src/models/notification_topic.yaml`)
    - Notification channel management
    - Relation to User model
    - Unique API key for webhook authentication
