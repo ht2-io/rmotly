@@ -7,7 +7,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
 | Phase | Status | Progress |
 |-------|--------|----------|
 | Phase 1: Project Setup | Complete | 100% |
-| Phase 2: API Core | Not Started | 0% |
+| Phase 2: API Core | In Progress | 5% |
 | Phase 3: App Core | Not Started | 0% |
 | Phase 4: Features | Not Started | 0% |
 | Phase 5: Integration | Not Started | 0% |
@@ -114,21 +114,26 @@ This document defines all tasks required to build the Remotly system. Tasks are 
     updatedAt: DateTime
   ```
 
-- [ ] **2.1.2** Create Control model
+- [x] **2.1.2** Create Control model
   ```yaml
-  # lib/src/models/control.yaml
+  # lib/src/control.spy.yaml
   class: Control
   table: controls
   fields:
-    userId: int, relation(parent=users)
+    userId: int
     name: String
     controlType: String
-    actionId: int?, relation(parent=actions)
+    actionId: int?
     config: String  # JSON
     position: int
     createdAt: DateTime
     updatedAt: DateTime
+  indexes:
+    control_user_idx:
+      fields: userId, position
   ```
+  **Status:** Model defined, tests created, documentation added. 
+  Run `serverpod generate` to generate code.
 
 - [ ] **2.1.3** Create Action model
   ```yaml
