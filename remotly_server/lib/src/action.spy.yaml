@@ -4,7 +4,7 @@ class: Action
 table: actions
 fields:
   ### The ID of the user who owns this action.
-  userId: int, relation(parent=user_info)
+  userId: int, relation(parent=users)
   ### The name of the action (e.g., "Toggle Light").
   name: String
   ### Optional description of what the action does.
