@@ -1,0 +1,33 @@
+### An action defines an HTTP request to be executed when triggered by a control.
+### Actions can be manually configured or generated from OpenAPI specifications.
+class: Action
+table: actions
+fields:
+  ### The ID of the user who owns this action.
+  userId: int, relation(parent=user_info)
+  ### The name of the action (e.g., "Toggle Light").
+  name: String
+  ### Optional description of what the action does.
+  description: String?
+  ### HTTP method to use (GET, POST, PUT, DELETE, PATCH).
+  httpMethod: String
+  ### URL template with {{variable}} placeholders.
+  urlTemplate: String
+  ### Optional headers template as JSON string.
+  headersTemplate: String?
+  ### Optional request body template with {{variable}} placeholders.
+  bodyTemplate: String?
+  ### URL of the OpenAPI spec this action was generated from (if applicable).
+  openApiSpecUrl: String?
+  ### The operation ID from the OpenAPI spec (if applicable).
+  openApiOperationId: String?
+  ### Action parameters definition stored as JSON string.
+  parameters: String?
+  ### When the action was created.
+  createdAt: DateTime
+  ### When the action was last updated.
+  updatedAt: DateTime
+indexes:
+  action_user_idx:
+    fields: userId
+    type: btree
