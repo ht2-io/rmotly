@@ -1,0 +1,44 @@
+services:
+  # Development services
+  postgres:
+    image: pgvector/pgvector:pg16
+    ports:
+      - "8090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: remotly
+      POSTGRES_PASSWORD: "mf5Iv4YBBIo4EOLP1gdbQGdB4fUWufQa"
+    volumes:
+      - remotly_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:6.2.6
+    ports:
+      - "8091:6379"
+    command: redis-server --requirepass "SLwaRYlYACotsMBQsR3q-l2GZDN6yN1H"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
+  # Test services
+  postgres_test:
+    image: pgvector/pgvector:pg16
+    ports:
+      - "9090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: remotly_test
+      POSTGRES_PASSWORD: "yVuux268YzSotcU9ul2R4Bw3UH8K8RHU"
+    volumes:
+      - remotly_test_data:/var/lib/postgresql/data
+
+  redis_test:
+    image: redis:6.2.6
+    ports:
+      - "9091:6379"
+    command: redis-server --requirepass "-dK3zvfXTxmUrIen8QXfmUb6NhPRZ0xA"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
+volumes:
+  remotly_data:
+  remotly_test_data:
