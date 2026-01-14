@@ -502,46 +502,122 @@ cd remotly_server && dart test
 
 ## Git Conventions
 
-### Commit Messages
+**See `docs/GIT.md` for comprehensive Git/GitHub best practices guide.**
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
+### Branching Strategy
+
+We use **Trunk-Based Development** with short-lived feature branches:
 
 ```
-<type>(<scope>): <description>
-
-[optional body]
-
-[optional footer]
-```
-
-Types:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style (formatting, semicolons, etc.)
-- `refactor`: Code refactoring
-- `test`: Adding/updating tests
-- `chore`: Build process, dependencies, etc.
-
-Examples:
-```
-feat(dashboard): add drag-and-drop control reordering
-fix(notifications): resolve FCM token refresh issue
-docs(api): update notification endpoint documentation
-refactor(events): extract event validation to separate service
-test(actions): add unit tests for HTTP action executor
-chore(deps): upgrade serverpod to 2.1.0
+main (protected)
+  │
+  ├── feat/dashboard-controls    → merged back to main
+  ├── fix/notification-display   → merged back to main
+  └── feat/openapi-import        → merged back to main
 ```
 
 ### Branch Naming
 
 ```
 <type>/<short-description>
+```
 
-Examples:
-feat/dashboard-controls
-fix/notification-delivery
-refactor/event-service
+| Type | Description | Example |
+|------|-------------|---------|
+| `feat` | New feature | `feat/user-authentication` |
+| `fix` | Bug fix | `fix/login-validation` |
+| `refactor` | Code refactoring | `refactor/control-service` |
+| `docs` | Documentation | `docs/api-endpoints` |
+| `test` | Adding tests | `test/action-executor` |
+| `chore` | Maintenance | `chore/update-dependencies` |
+
+### Commit Messages
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <subject>
+
+[optional body]
+
+[optional footer]
+```
+
+**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
+
+**Scopes:** `api`, `app`, `client`, `models`, `auth`, `controls`, `actions`, `notifications`, `openapi`, `deps`, `config`
+
+**Rules:**
+- Use imperative mood ("add" not "added")
+- Don't capitalize first letter
+- No period at the end
+- Maximum 50 characters
+
+**Examples:**
+```
+feat(controls): add slider control widget
+fix(api): handle null payload in event endpoint
+docs(readme): update installation instructions
+refactor(actions): extract template parser to separate service
+test(auth): add unit tests for login validation
+chore(deps): update serverpod to 2.9.2
+```
+
+**Breaking Changes:**
+```
+feat(api)!: change event endpoint response format
+
+BREAKING CHANGE: The event endpoint now returns a different JSON structure.
+```
+
+### Pull Request Workflow
+
+1. **Create feature branch** from `main`
+2. **Develop** with small, focused commits
+3. **Push** regularly to remote
+4. **Open PR** when ready for review
+5. **Address feedback** within 24 hours
+6. **Merge** after approval (squash preferred)
+7. **Delete** branch after merge
+
+### PR Title Format
+
+Follow commit message format:
+```
+<type>(<scope>): <subject>
+```
+
+### Code Review Comment Prefixes
+
+| Prefix | Meaning | Action Required |
+|--------|---------|-----------------|
+| `blocking:` | Must be fixed | Yes |
+| `suggestion:` | Nice to have | Optional |
+| `question:` | Clarification | Response needed |
+| `nit:` | Minor style | Optional |
+| `praise:` | Good work | None |
+
+### Git Commands Quick Reference
+
+```bash
+# Start new feature
+git checkout main && git pull origin main
+git checkout -b feat/new-feature
+
+# Commit changes
+git add .
+git commit -m "feat(scope): add new feature"
+
+# Push and create PR
+git push -u origin feat/new-feature
+gh pr create
+
+# After PR merged
+git checkout main && git pull origin main
+git branch -d feat/new-feature
+
+# Keep branch updated (rebase preferred)
+git fetch origin && git rebase origin/main
 ```
 
 ## Documentation

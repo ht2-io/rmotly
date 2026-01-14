@@ -83,6 +83,7 @@ remotly/
 │   ├── API.md                 # API documentation
 │   ├── APP.md                 # App documentation
 │   ├── TESTING.md             # Testing guide & best practices
+│   ├── GIT.md                 # Git & GitHub best practices
 │   └── DEPLOYMENT.md          # Deployment guide
 ├── TASKS.md                    # Task definitions and progress
 ├── remotly_app/               # Flutter app (to be created)
@@ -106,6 +107,7 @@ When starting a new session, read these files first:
 2. `.claude/CONVENTIONS.md` - Coding standards, patterns, and development workflow
 3. `docs/ARCHITECTURE.md` - System architecture details
 4. `docs/TESTING.md` - Testing frameworks, patterns, and best practices
+5. `docs/GIT.md` - Git & GitHub conventions, branching strategy, PR workflow
 
 ## Technology Stack
 
@@ -135,20 +137,45 @@ When starting a new session, read these files first:
 - Comprehensive testing (unit, widget, integration, golden)
 - Mocktail for mocking (preferred over Mockito)
 - 80%+ code coverage target for critical paths
-- Git conventional commits
+- Trunk-based development with short-lived feature branches
+- Conventional Commits for all commit messages
+- Squash merge for PRs
 
 See `CONVENTIONS.md` for detailed coding standards and development workflow.
 See `docs/TESTING.md` for testing guide and best practices.
+See `docs/GIT.md` for Git & GitHub best practices.
 
 ## Development Workflow Summary
 
 ```
-1. PLAN        → Understand requirements
-2. TEST (Red)  → Write failing tests first
-3. CODE (Green)→ Implement to pass tests
-4. REFACTOR    → Clean up, keep tests green
-5. REVIEW      → Run all tests, check coverage
-6. COMMIT      → Conventional commit message
+1. BRANCH      → Create feature branch from main
+2. PLAN        → Understand requirements
+3. TEST (Red)  → Write failing tests first
+4. CODE (Green)→ Implement to pass tests
+5. REFACTOR    → Clean up, keep tests green
+6. REVIEW      → Run all tests, check coverage
+7. COMMIT      → Conventional commit message
+8. PUSH & PR   → Push branch, create pull request
+9. MERGE       → Squash merge after approval
+```
+
+### Git Workflow Quick Reference
+
+```bash
+# Start new feature
+git checkout main && git pull origin main
+git checkout -b feat/feature-name
+
+# Commit changes
+git commit -m "feat(scope): add feature"
+
+# Push and create PR
+git push -u origin feat/feature-name
+gh pr create
+
+# After PR merged
+git checkout main && git pull origin main
+git branch -d feat/feature-name
 ```
 
 ### Pre-Commit Checklist
