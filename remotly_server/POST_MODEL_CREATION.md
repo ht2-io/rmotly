@@ -1,12 +1,29 @@
 # Post-Model Creation Steps
 
-## Action Model Created
+## ⚠️ File Location Fix Required
 
-The Action model has been successfully created in `lib/src/action.spy.yaml`.
+**IMPORTANT**: The Action model file needs to be moved to the correct location:
+
+Run the fix script:
+```bash
+cd remotly_server
+chmod +x fix-action-model-location.sh
+./fix-action-model-location.sh
+```
+
+Or manually:
+```bash
+cd remotly_server
+mkdir -p lib/src/models
+mv lib/src/action.spy.yaml lib/src/models/action.yaml
+```
+
+**Expected location**: `lib/src/models/action.yaml`  
+**Current location**: `lib/src/action.spy.yaml` ❌
 
 ## Next Steps Required
 
-To complete the model integration, run the following commands:
+After fixing the file location, run the following commands:
 
 ### 1. Generate Code from Models
 
@@ -88,7 +105,7 @@ If you encounter errors:
 
 **"Table 'users' does not exist"**
 - Create the User model first (task 2.1.1)
-- Or temporarily modify action.spy.yaml to make userId nullable or remove the relation
+- Or temporarily modify action.yaml to make userId nullable or remove the relation
 
 **"serverpod: command not found"**
 ```bash
