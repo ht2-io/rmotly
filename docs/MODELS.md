@@ -9,14 +9,14 @@ Models are defined in YAML files using Serverpod's model definition syntax. Afte
 ## Model Files Location
 
 ```
-remotly_server/lib/src/*.spy.yaml
+remotly_server/lib/src/models/*.yaml
 ```
 
 ## Available Models
 
 ### Control Model
 
-**File:** `lib/src/control.spy.yaml`
+**File:** `lib/src/models/control.yaml`
 
 **Table:** `controls`
 

@@ -14,7 +14,7 @@ docker compose up --build --detach
 
 ### 2. Generate Code
 
-After modifying any model files (`.spy.yaml`), generate the Dart classes:
+After modifying any model files (`.yaml` in `lib/src/models/`), generate the Dart classes:
 
 ```bash
 serverpod generate
@@ -58,14 +58,14 @@ docker compose stop
 
 ## Models
 
-Data models are defined in `.spy.yaml` files in `lib/src/`. See [docs/MODELS.md](../docs/MODELS.md) for detailed model documentation.
+Data models are defined in `.yaml` files in `lib/src/models/`. See [docs/MODELS.md](../docs/MODELS.md) for detailed model documentation.
 
 Current models:
 - **Control** - Dashboard control definitions
 
 ## Development Workflow
 
-1. Modify or create `.spy.yaml` model files in `lib/src/`
+1. Modify or create `.yaml` model files in `lib/src/models/`
 2. Run `serverpod generate` to generate code
 3. Create database migrations if needed
 4. Write tests in `test/integration/`

@@ -114,9 +114,9 @@ This document defines all tasks required to build the Remotly system. Tasks are 
     updatedAt: DateTime
   ```
 
-- [x] **2.1.2** Create Control model
+- [ ] **2.1.2** Create Control model
   ```yaml
-  # lib/src/control.spy.yaml
+  # lib/src/models/control.yaml
   class: Control
   table: controls
   fields:
@@ -132,8 +132,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
     control_user_idx:
       fields: userId, position
   ```
-  **Status:** Model defined, tests created, documentation added. 
-  Run `serverpod generate` to generate code.
+  **Note:** Model file needs to be moved from `lib/src/control.spy.yaml` to `lib/src/models/control.yaml`
 
 - [ ] **2.1.3** Create Action model
   ```yaml

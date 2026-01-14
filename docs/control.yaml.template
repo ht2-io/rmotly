@@ -1,0 +1,39 @@
+# Control model for dashboard controls
+# Controls are user-defined UI elements that trigger events and actions
+#
+# CORRECT LOCATION: remotly_server/lib/src/models/control.yaml
+# This file should be placed at the above location (not in lib/src/ directly)
+#
+class: Control
+table: controls
+
+fields:
+  # The ID of the user who owns this control
+  userId: int
+  
+  # Display name for the control
+  name: String
+  
+  # Type of control: 'button', 'toggle', 'slider', 'input', 'dropdown'
+  controlType: String
+  
+  # Optional reference to the action this control triggers
+  actionId: int?
+  
+  # JSON configuration for the control (type-specific settings)
+  config: String
+  
+  # Position/order of the control on the dashboard
+  position: int
+  
+  # Timestamp when the control was created
+  createdAt: DateTime
+  
+  # Timestamp when the control was last updated
+  updatedAt: DateTime
+
+# Index for efficient user queries
+indexes:
+  control_user_idx:
+    fields: userId, position
+    type: btree
