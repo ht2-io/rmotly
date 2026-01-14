@@ -7,7 +7,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
 | Phase | Status | Progress |
 |-------|--------|----------|
 | Phase 1: Project Setup | Complete | 100% |
-| Phase 2: API Core | Not Started | 0% |
+| Phase 2: API Core | In Progress | 5% |
 | Phase 3: App Core | Not Started | 0% |
 | Phase 4: Features | Not Started | 0% |
 | Phase 5: Integration | Not Started | 0% |
@@ -130,9 +130,9 @@ This document defines all tasks required to build the Remotly system. Tasks are 
     updatedAt: DateTime
   ```
 
-- [ ] **2.1.3** Create Action model
+- [x] **2.1.3** Create Action model
   ```yaml
-  # lib/src/models/action.yaml
+  # lib/src/action.spy.yaml
   class: Action
   table: actions
   fields:
@@ -149,6 +149,8 @@ This document defines all tasks required to build the Remotly system. Tasks are 
     createdAt: DateTime
     updatedAt: DateTime
   ```
+  > ✅ Completed - Action model created in `remotly_server/lib/src/action.spy.yaml`
+  > See `remotly_server/POST_MODEL_CREATION.md` for next steps
 
 - [ ] **2.1.4** Create NotificationTopic model
   ```yaml
