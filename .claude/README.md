@@ -84,7 +84,7 @@ remotly/
 │   ├── APP.md                 # App documentation
 │   ├── TESTING.md             # Testing guide & best practices
 │   ├── GIT.md                 # Git & GitHub best practices
-│   └── DEPLOYMENT.md          # Deployment guide
+│   └── CI_CD.md               # CI/CD workflows and setup
 ├── TASKS.md                    # Task definitions and progress
 ├── remotly_app/               # Flutter app (to be created)
 │   └── test/                  # App tests
@@ -108,6 +108,7 @@ When starting a new session, read these files first:
 3. `docs/ARCHITECTURE.md` - System architecture details
 4. `docs/TESTING.md` - Testing frameworks, patterns, and best practices
 5. `docs/GIT.md` - Git & GitHub conventions, branching strategy, PR workflow
+6. `docs/CI_CD.md` - CI/CD workflows and automation
 
 ## Technology Stack
 

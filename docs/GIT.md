@@ -523,54 +523,27 @@ gh repo create name --public
 
 ### GitHub Actions Workflow
 
-```yaml
-# .github/workflows/ci.yml
-name: CI
+The Remotly project uses GitHub Actions for continuous integration. The workflow is defined in `.github/workflows/ci.yml` and runs on every push to `main` and on all pull requests.
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+#### Workflow Jobs
 
-jobs:
-  analyze:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.27.4'
-      - run: flutter pub get
-        working-directory: remotly_app
-      - run: flutter analyze
-        working-directory: remotly_app
+The CI workflow includes the following jobs:
 
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.27.4'
-      - run: flutter pub get
-        working-directory: remotly_app
-      - run: flutter test --coverage
-        working-directory: remotly_app
+1. **analyze-app** - Analyzes Flutter app code with `flutter analyze`
+2. **analyze-server** - Analyzes Serverpod server code with `dart analyze`
+3. **test-app** - Runs Flutter app tests with coverage reporting
+4. **test-server** - Runs Serverpod server tests with PostgreSQL and Redis services
+5. **build-app** - Builds release APK (runs after app analysis and tests pass)
+6. **build-server** - Compiles Serverpod server (runs after server analysis and tests pass)
 
-  build:
-    runs-on: ubuntu-latest
-    needs: [analyze, test]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.27.4'
-      - run: flutter pub get
-        working-directory: remotly_app
-      - run: flutter build apk --release
-        working-directory: remotly_app
-```
+#### Example Configuration
+
+See `.github/workflows/ci.yml` for the complete workflow configuration.
+
+#### Additional Workflows
+
+- **deployment-aws.yml** - Deploys to AWS on specific branches
+- **deployment-gcp.yml** - Deploys to Google Cloud Platform on specific branches
 
 ---
 
