@@ -77,15 +77,24 @@ remotly/
 ├── .claude/                    # Claude Code context (this directory)
 │   ├── README.md              # This file
 │   ├── settings.json          # Project settings
-│   └── CONVENTIONS.md         # Coding conventions
+│   └── CONVENTIONS.md         # Coding conventions & development workflow
 ├── docs/                       # Documentation
 │   ├── ARCHITECTURE.md        # Detailed architecture
 │   ├── API.md                 # API documentation
 │   ├── APP.md                 # App documentation
+│   ├── TESTING.md             # Testing guide & best practices
 │   └── DEPLOYMENT.md          # Deployment guide
 ├── TASKS.md                    # Task definitions and progress
 ├── remotly_app/               # Flutter app (to be created)
+│   └── test/                  # App tests
+│       ├── unit/              # Unit tests
+│       ├── widget/            # Widget tests
+│       ├── integration/       # Integration tests
+│       └── golden/            # Golden/snapshot tests
 ├── remotly_server/            # Serverpod server (to be created)
+│   └── test/                  # Server tests
+│       ├── unit/              # Unit tests
+│       └── integration/       # Integration tests
 ├── remotly_client/            # Serverpod client (to be created)
 └── remotly_flutter/           # Serverpod Flutter integration (to be created)
 ```
@@ -94,8 +103,9 @@ remotly/
 
 When starting a new session, read these files first:
 1. `TASKS.md` - Current task status and definitions
-2. `.claude/CONVENTIONS.md` - Coding standards and patterns
+2. `.claude/CONVENTIONS.md` - Coding standards, patterns, and development workflow
 3. `docs/ARCHITECTURE.md` - System architecture details
+4. `docs/TESTING.md` - Testing frameworks, patterns, and best practices
 
 ## Technology Stack
 
@@ -121,7 +131,32 @@ When starting a new session, read these files first:
 - Feature-first folder organization
 - Riverpod for dependency injection and state
 - YAML model definitions for Serverpod
-- Comprehensive testing (unit, widget, integration)
+- Test-Driven Development (TDD) workflow
+- Comprehensive testing (unit, widget, integration, golden)
+- Mocktail for mocking (preferred over Mockito)
+- 80%+ code coverage target for critical paths
 - Git conventional commits
 
-See `CONVENTIONS.md` for detailed coding standards.
+See `CONVENTIONS.md` for detailed coding standards and development workflow.
+See `docs/TESTING.md` for testing guide and best practices.
+
+## Development Workflow Summary
+
+```
+1. PLAN        → Understand requirements
+2. TEST (Red)  → Write failing tests first
+3. CODE (Green)→ Implement to pass tests
+4. REFACTOR    → Clean up, keep tests green
+5. REVIEW      → Run all tests, check coverage
+6. COMMIT      → Conventional commit message
+```
+
+### Pre-Commit Checklist
+
+```bash
+flutter test              # All tests pass
+dart format .             # Code formatted
+dart analyze              # No analysis issues
+# For server changes:
+cd remotly_server && serverpod generate && dart test
+```

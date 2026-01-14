@@ -298,71 +298,207 @@ Future<Result<User>> getUser(String id) async {
 
 ## Testing Conventions
 
-### Test File Naming
+**See `docs/TESTING.md` for comprehensive testing guide.**
+
+### Test-Driven Development (TDD)
+
+Follow TDD workflow for all new features:
+1. **Red**: Write a failing test first
+2. **Green**: Write minimal code to pass the test
+3. **Refactor**: Clean up while keeping tests green
+
+### Test Types & Coverage Targets
+
+| Type | Target Coverage | Speed | When to Use |
+|------|-----------------|-------|-------------|
+| Unit | 80%+ | Fast (ms) | Business logic, ViewModels, utilities |
+| Widget | Key widgets | Medium (s) | UI components, interactions |
+| Integration | Critical flows | Slow (min) | End-to-end user journeys |
+| Golden | UI regression | Medium | Visual consistency |
+
+### Test File Organization
 
 ```
 test/
-├── unit/
-│   ├── features/
-│   │   └── dashboard/
-│   │       ├── dashboard_viewmodel_test.dart
-│   │       └── dashboard_repository_test.dart
-│   └── core/
-│       └── utils/
-│           └── validators_test.dart
-├── widget/
+├── unit/                          # Unit tests
+│   ├── core/
+│   │   └── utils/
+│   │       └── template_parser_test.dart
 │   └── features/
 │       └── dashboard/
+│           ├── dashboard_viewmodel_test.dart
+│           └── control_repository_test.dart
+├── widget/                        # Widget tests
+│   └── features/
+│       └── dashboard/
+│           ├── button_control_widget_test.dart
 │           └── dashboard_view_test.dart
-└── integration/
-    └── app_test.dart
+├── integration/                   # Integration tests
+│   ├── dashboard_flow_test.dart
+│   └── test_tools/               # Serverpod generated
+├── golden/                        # Golden/snapshot tests
+│   ├── control_cards_test.dart
+│   └── goldens/                  # Golden image files
+└── fixtures/                      # Shared test data
+    └── test_data.dart
 ```
 
-### Test Structure
+### Mocking with Mocktail (Preferred)
 
 ```dart
+import 'package:mocktail/mocktail.dart';
+
+// Create mock
+class MockEventRepository extends Mock implements EventRepository {}
+
 void main() {
-  group('DashboardViewModel', () {
-    late MockDashboardRepository mockRepository;
-    late DashboardViewModel viewModel;
+  late MockEventRepository mockRepo;
 
-    setUp(() {
-      mockRepository = MockDashboardRepository();
-      viewModel = DashboardViewModel(mockRepository);
-    });
+  setUpAll(() {
+    // Register fallback values for custom types
+    registerFallbackValue(Event(
+      sourceType: '',
+      sourceId: '',
+      eventType: '',
+      timestamp: DateTime.now(),
+    ));
+  });
 
-    tearDown(() {
-      viewModel.dispose();
-    });
+  setUp(() {
+    mockRepo = MockEventRepository();
+  });
 
-    group('loadDashboard', () {
-      test('emits loading then data on success', () async {
-        // Arrange
-        when(() => mockRepository.getDashboard())
-            .thenAnswer((_) async => mockDashboard);
+  test('sends event successfully', () async {
+    // Arrange
+    when(() => mockRepo.sendEvent(any()))
+        .thenAnswer((_) async => EventResponse(success: true));
 
-        // Act
-        await viewModel.loadDashboard();
+    // Act
+    final result = await mockRepo.sendEvent(testEvent);
 
-        // Assert
-        expect(viewModel.state, isA<AsyncData<DashboardState>>());
-      });
+    // Assert
+    expect(result.success, isTrue);
+    verify(() => mockRepo.sendEvent(any())).called(1);
+  });
+}
+```
 
-      test('emits loading then error on failure', () async {
-        // Arrange
-        when(() => mockRepository.getDashboard())
-            .thenThrow(NetworkException('No connection'));
+### AAA Pattern (Arrange-Act-Assert)
 
-        // Act
-        await viewModel.loadDashboard();
+Always structure tests with clear sections:
 
-        // Assert
-        expect(viewModel.state, isA<AsyncError<DashboardState>>());
-      });
+```dart
+test('calculates total correctly', () {
+  // Arrange - Set up test data and dependencies
+  final calculator = PriceCalculator();
+  final items = [Item(price: 10), Item(price: 20)];
+
+  // Act - Execute the code under test
+  final total = calculator.calculateTotal(items);
+
+  // Assert - Verify the results
+  expect(total, 30);
+});
+```
+
+### Serverpod Backend Testing
+
+Use the `withServerpod` helper for integration tests:
+
+```dart
+import 'test_tools/serverpod_test_tools.dart';
+
+void main() {
+  withServerpod('EventEndpoint', (sessionBuilder, endpoints) {
+    test('creates event successfully', () async {
+      // Arrange
+      final session = sessionBuilder.build();
+
+      // Act
+      final result = await endpoints.event.sendEvent(
+        session,
+        controlId: 'ctrl_1',
+        eventType: 'button_press',
+      );
+
+      // Assert
+      expect(result.success, isTrue);
     });
   });
 }
 ```
+
+### Testing Riverpod Providers
+
+```dart
+test('loads controls on initialization', () async {
+  // Arrange
+  final container = ProviderContainer(
+    overrides: [
+      controlRepositoryProvider.overrideWithValue(mockRepository),
+    ],
+  );
+  addTearDown(container.dispose);
+
+  when(() => mockRepository.getControls())
+      .thenAnswer((_) async => [testControl]);
+
+  // Act
+  final viewModel = container.read(dashboardViewModelProvider.notifier);
+  await viewModel.loadDashboard();
+
+  // Assert
+  final state = container.read(dashboardViewModelProvider);
+  expect(state.valueOrNull?.controls.length, 1);
+});
+```
+
+### Test Naming Conventions
+
+```dart
+// Group: Class or feature name
+group('DashboardViewModel', () {
+  // Nested group: Method name (optional)
+  group('loadDashboard', () {
+    // Test: Describe expected behavior
+    test('emits loading state then data on success', () { });
+    test('emits error state when repository throws', () { });
+    test('retries failed request up to 3 times', () { });
+  });
+});
+```
+
+### Running Tests
+
+```bash
+# All tests
+flutter test
+
+# With coverage
+flutter test --coverage
+
+# Specific file
+flutter test test/unit/features/dashboard/dashboard_viewmodel_test.dart
+
+# By name pattern
+flutter test --name "DashboardViewModel"
+
+# Exclude integration tests
+flutter test --exclude-tags integration
+
+# Update golden files
+flutter test --update-goldens
+
+# Serverpod tests
+cd remotly_server && dart test
+```
+
+### What NOT to Test
+
+- Trivial code (simple getters/setters)
+- Framework code (Flutter widgets' internal behavior)
+- Third-party packages
+- Implementation details (test behavior, not how)
 
 ## Git Conventions
 
@@ -448,3 +584,166 @@ class Control {
 // FIXME: Description of bug to fix
 // HACK: Explanation of temporary workaround
 ```
+
+## Development Workflow
+
+### Feature Development Process
+
+Follow this workflow for all new features and bug fixes:
+
+```
+1. PLAN        → Understand requirements, design approach
+2. TEST (Red)  → Write failing tests first
+3. CODE (Green)→ Implement minimal code to pass tests
+4. REFACTOR    → Clean up while keeping tests green
+5. REVIEW      → Self-review, run all tests, check coverage
+6. COMMIT      → Commit with conventional commit message
+```
+
+### Step-by-Step Workflow
+
+#### 1. Before Writing Code
+
+```bash
+# Create feature branch
+git checkout -b feat/feature-name
+
+# Understand the feature requirements
+# - Read related documentation
+# - Check existing code patterns
+# - Identify affected components
+```
+
+#### 2. Write Tests First (TDD)
+
+```bash
+# Create test file
+touch test/unit/features/dashboard/new_feature_test.dart
+
+# Write failing tests that define expected behavior
+flutter test test/unit/features/dashboard/new_feature_test.dart
+# Expected: Tests FAIL (Red phase)
+```
+
+#### 3. Implement the Feature
+
+```dart
+// Write minimal code to make tests pass
+// Follow existing patterns in the codebase
+// Keep it simple - no over-engineering
+```
+
+```bash
+# Run tests again
+flutter test test/unit/features/dashboard/new_feature_test.dart
+# Expected: Tests PASS (Green phase)
+```
+
+#### 4. Refactor & Clean Up
+
+```bash
+# Refactor while keeping tests green
+flutter test  # All tests should still pass
+
+# Check code coverage
+flutter test --coverage
+genhtml coverage/lcov.info -o coverage/html
+# Target: 80%+ coverage on new code
+```
+
+#### 5. Pre-Commit Checklist
+
+Before committing, verify:
+
+```bash
+# 1. All tests pass
+flutter test
+
+# 2. Code is formatted
+dart format .
+
+# 3. No analysis issues
+dart analyze
+
+# 4. Serverpod code generated (if models changed)
+cd remotly_server && serverpod generate
+
+# 5. Server tests pass
+cd remotly_server && dart test
+```
+
+#### 6. Commit & Push
+
+```bash
+# Stage changes
+git add .
+
+# Commit with conventional message
+git commit -m "feat(dashboard): add new control type
+
+- Add slider control widget
+- Implement value change handling
+- Add unit tests for slider behavior
+
+Closes #123"
+
+# Push to remote
+git push -u origin feat/feature-name
+```
+
+### Code Review Checklist
+
+When reviewing code (self or others):
+
+- [ ] Tests exist and cover the new functionality
+- [ ] Tests follow AAA pattern (Arrange-Act-Assert)
+- [ ] Code follows project conventions
+- [ ] No unnecessary complexity or over-engineering
+- [ ] Error handling is appropriate
+- [ ] No security vulnerabilities introduced
+- [ ] Documentation updated if needed
+
+### Quick Reference Commands
+
+```bash
+# Development
+flutter run                          # Run app
+flutter build apk                    # Build APK
+serverpod generate                   # Generate Serverpod code
+
+# Testing
+flutter test                         # All tests
+flutter test --coverage              # With coverage
+flutter test --update-goldens        # Update golden files
+dart test                            # Serverpod tests
+
+# Quality
+dart format .                        # Format code
+dart analyze                         # Static analysis
+dart fix --apply                     # Auto-fix issues
+
+# Git
+git checkout -b feat/name            # New feature branch
+git commit -m "type(scope): msg"     # Conventional commit
+```
+
+### When to Write Which Test Type
+
+| Scenario | Test Type |
+|----------|-----------|
+| New utility function | Unit test |
+| New ViewModel method | Unit test |
+| Repository logic | Unit test |
+| New widget | Widget test |
+| Widget interactions | Widget test |
+| Critical user flow | Integration test |
+| UI appearance | Golden test |
+| API endpoint | Serverpod integration test |
+
+### Continuous Integration
+
+All PRs must pass:
+1. `flutter test` - All Flutter tests
+2. `dart test` - All Serverpod tests
+3. `dart analyze` - No analysis errors
+4. Coverage check - No significant decrease
