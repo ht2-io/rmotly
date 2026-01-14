@@ -285,7 +285,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
 
 ### 3.1 Core Setup
 
-- [ ] **3.1.1** Create app constants
+- [x] **3.1.1** Create app constants
   - API URLs
   - Default values
   - Control types enum
