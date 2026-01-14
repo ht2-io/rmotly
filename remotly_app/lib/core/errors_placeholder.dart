@@ -1,2 +1,2 @@
-// TODO: Delete this file - it was a placeholder during development.
-// The actual exception classes are in lib/core/exceptions.dart
+// This file is intentionally left empty and should be deleted.
+// Use lib/core/exceptions.dart for custom exception classes.
