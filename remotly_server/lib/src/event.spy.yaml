@@ -1,0 +1,31 @@
+# Event model represents events triggered by controls or external sources
+# in the Remotly system. Events can trigger actions and store results.
+class: Event
+table: events
+
+fields:
+  ### The ID of the user who owns this event
+  userId: int
+  
+  ### The type of source that generated the event (e.g., 'control', 'webhook', 'scheduled')
+  sourceType: String
+  
+  ### The ID of the specific source (e.g., control ID, webhook ID)
+  sourceId: String
+  
+  ### The type of event (e.g., 'button_press', 'slider_change', 'toggle_switch')
+  eventType: String
+  
+  ### Optional JSON payload containing event data
+  payload: String?
+  
+  ### Optional JSON result from action execution
+  actionResult: String?
+  
+  ### Timestamp when the event occurred
+  timestamp: DateTime
+
+indexes:
+  event_user_idx:
+    fields: userId
+    type: btree
