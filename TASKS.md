@@ -101,7 +101,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
 
 ### 2.1 Data Models
 
-- [ ] **2.1.1** Create User model
+- [x] **2.1.1** Create User model
   ```yaml
   # lib/src/models/user.yaml
   class: User
