@@ -290,7 +290,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
   - Default values
   - Control types enum
 
-- [ ] **3.1.2** Create custom exceptions
+- [x] **3.1.2** Create custom exceptions
   - NetworkException
   - ValidationException
   - AuthException
