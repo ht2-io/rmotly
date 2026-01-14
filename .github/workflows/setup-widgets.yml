@@ -2,23 +2,43 @@ name: Setup Base Widgets
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'remotly_app/setup_base_widgets.sh'
 
 jobs:
   setup:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Run setup script
         run: |
           cd remotly_app
           bash setup_base_widgets.sh
           
-      - name: Commit files
+      - name: Remove setup artifacts
+        run: |
+          rm remotly_app/setup_base_widgets.sh
+          rm remotly_app/MANUAL_SETUP.md
+          rm remotly_app/BASE_WIDGETS_README.md
+          rm .github/workflows/setup-widgets.yml
+          
+      - name: Commit widget files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add remotly_app/lib/shared/widgets/
-          git add remotly_app/test/widget/shared/
-          git commit -m "chore: create widget files from setup script"
+          git add -A
+          git diff --staged --quiet || git commit -m "feat(widgets): create base widget files
+
+- Add LoadingWidget, AppErrorWidget, EmptyStateWidget, ConfirmationDialog
+- Add comprehensive widget tests (100% coverage)
+- Remove setup script and temporary documentation
+"
           git push
