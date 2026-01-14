@@ -1,13 +1,36 @@
 #!/bin/bash
-# Script to generate Serverpod code for User and NotificationTopic models
+# Script to fix model locations and generate Serverpod code
 # Run this script from the repository root directory
 
 set -e  # Exit on error
 
 echo "==================================="
-echo "Serverpod Code Generation Script"
+echo "Serverpod Model Fix & Generation"
 echo "==================================="
 echo ""
+
+cd remotly_server
+
+# Step 0: Fix model file locations
+echo "Step 0: Fixing model file locations..."
+if [ -f "lib/src/user.spy.yaml" ] || [ -f "lib/src/notification_topic.spy.yaml" ]; then
+    echo "  Creating lib/src/models directory..."
+    mkdir -p lib/src/models
+    
+    if [ -f "lib/src/user.spy.yaml" ]; then
+        echo "  Moving user.spy.yaml -> lib/src/models/user.yaml"
+        mv lib/src/user.spy.yaml lib/src/models/user.yaml
+    fi
+    
+    if [ -f "lib/src/notification_topic.spy.yaml" ]; then
+        echo "  Moving notification_topic.spy.yaml -> lib/src/models/notification_topic.yaml"
+        mv lib/src/notification_topic.spy.yaml lib/src/models/notification_topic.yaml
+    fi
+    
+    echo "✓ Model files moved to correct location"
+else
+    echo "✓ Model files already in correct location"
+fi
 
 # Check if serverpod CLI is installed
 if ! command -v serverpod &> /dev/null; then
@@ -18,9 +41,6 @@ fi
 
 echo "✓ Serverpod CLI found: $(serverpod --version)"
 echo ""
-
-# Navigate to server directory
-cd remotly_server
 
 echo "Step 1: Running serverpod generate..."
 serverpod generate
@@ -79,14 +99,19 @@ fi
 
 echo ""
 echo "==================================="
-echo "✓ Generation completed successfully!"
+echo "✓ Setup completed successfully!"
 echo "==================================="
+echo ""
+echo "Model files are now at:"
+echo "  - lib/src/models/user.yaml"
+echo "  - lib/src/models/notification_topic.yaml"
 echo ""
 echo "Next steps:"
 echo "1. Review generated files in lib/src/generated/"
 echo "2. Review migration file in migrations/"
-echo "3. Update Flutter app dependencies: cd ../remotly_app && flutter pub get"
-echo "4. Start the server: dart bin/main.dart"
+echo "3. Git add the model files: git add lib/src/models/"
+echo "4. Update Flutter app: cd ../remotly_app && flutter pub get"
+echo "5. Start the server: dart bin/main.dart"
 echo ""
 echo "Generated files are in .gitignore and will not be committed."
 echo "Remember to run 'serverpod generate' in CI/CD and local builds."
