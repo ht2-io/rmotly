@@ -65,6 +65,7 @@ Read these files for full context:
 | `docs/API.md` | API endpoint documentation |
 | `docs/TESTING.md` | Testing guide and best practices |
 | `docs/GIT.md` | Git and GitHub conventions |
+| `docs/CI_CD.md` | CI/CD workflows and automation |
 
 ## Architecture Patterns
 

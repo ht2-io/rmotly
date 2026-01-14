@@ -1,0 +1,181 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze-app:
+    name: Analyze Flutter App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.4'
+          channel: 'stable'
+
+      - name: Install dependencies
+        working-directory: remotly_app
+        run: flutter pub get
+
+      - name: Analyze code
+        working-directory: remotly_app
+        run: flutter analyze
+
+  analyze-server:
+    name: Analyze Serverpod Server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.6.2'
+
+      - name: Install dependencies
+        working-directory: remotly_server
+        run: dart pub get
+
+      - name: Analyze code
+        working-directory: remotly_server
+        run: dart analyze
+
+  test-app:
+    name: Test Flutter App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.4'
+          channel: 'stable'
+
+      - name: Install dependencies
+        working-directory: remotly_app
+        run: flutter pub get
+
+      - name: Run tests with coverage
+        working-directory: remotly_app
+        run: flutter test --coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: remotly_app/coverage/lcov.info
+          flags: app
+          name: remotly-app
+          fail_ci_if_error: false
+
+  test-server:
+    name: Test Serverpod Server
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: remotly_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:8
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.6.2'
+
+      - name: Install dependencies
+        working-directory: remotly_server
+        run: dart pub get
+
+      - name: Run tests
+        working-directory: remotly_server
+        run: dart test
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: remotly_test
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+
+  build-app:
+    name: Build Flutter App
+    runs-on: ubuntu-latest
+    needs: [analyze-app, test-app]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.4'
+          channel: 'stable'
+
+      - name: Install dependencies
+        working-directory: remotly_app
+        run: flutter pub get
+
+      - name: Build APK
+        working-directory: remotly_app
+        run: flutter build apk --release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: remotly-app-apk
+          path: remotly_app/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 7
+
+  build-server:
+    name: Build Serverpod Server
+    runs-on: ubuntu-latest
+    needs: [analyze-server, test-server]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.6.2'
+
+      - name: Install dependencies
+        working-directory: remotly_server
+        run: dart pub get
+
+      - name: Compile server
+        working-directory: remotly_server
+        run: dart compile kernel bin/main.dart

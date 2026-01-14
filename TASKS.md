@@ -655,9 +655,9 @@ This document defines all tasks required to build the Remotly system. Tasks are 
   - Set up PostgreSQL
   - Set up Redis
 
-- [ ] **6.6.2** Configure CI/CD
-  - Automated testing
-  - Automated deployment
+- [x] **6.6.2** Configure CI/CD
+  - GitHub Actions workflow for automated testing
+  - Deployment workflows (AWS and GCP) already configured
 
 - [ ] **6.6.3** Prepare app store assets
   - Screenshots
