@@ -1,6 +1,13 @@
 # Remotly Flutter App
 
-A Flutter mobile application for Remotly - a bidirectional event-driven system with user-defined controls and push notifications.
+A Flutter mobile application for Remotly - a bidirectional event-driven system with configurable controls and notifications.
+
+## Features
+
+- **Dashboard Controls**: User-defined controls (buttons, sliders, toggles) that send events to the API
+- **Action Execution**: HTTP requests triggered by events, configured via OpenAPI specs
+- **Push Notifications**: Firebase Cloud Messaging for receiving notifications from external sources
+- **Webhook Endpoint**: REST API for external services to send notifications
 
 ## Project Structure
 
@@ -8,12 +15,16 @@ A Flutter mobile application for Remotly - a bidirectional event-driven system w
 lib/
 ├── core/
 │   ├── exceptions.dart      # Custom exception classes
+│   ├── template_parser.dart # Template string parsing utility
+│   ├── utils.dart           # Utility exports
 │   └── providers/           # Riverpod providers
 ├── features/                # Feature modules (Clean Architecture)
 └── shared/                  # Shared widgets and services
 ```
 
-## Custom Exceptions
+## Core Utilities
+
+### Custom Exceptions
 
 The app uses custom exception classes for consistent error handling:
 
@@ -39,31 +50,36 @@ try {
 }
 ```
 
-## Getting Started
+### TemplateParser
 
-This project uses Serverpod for the backend API.
+A utility class for parsing template strings with `{{variable}}` substitution. Supports:
+- Simple variable replacement: `{{name}}`
+- Nested object access: `{{user.name}}`
+- Array operations: `{{items.0}}`, `{{items.length}}`
+
+See [TEMPLATE_PARSER.md](../docs/TEMPLATE_PARSER.md) for detailed documentation and examples.
+
+## Getting Started
 
 ### Prerequisites
 
-- Flutter SDK 3.24.0+
-- Dart SDK 3.5.0+
-- Serverpod server running
-
-### Documentation
-
-- Serverpod docs: [https://docs.serverpod.dev](https://docs.serverpod.dev)
-- Project tasks: See `TASKS.md` in the root directory
-- Coding conventions: See `.claude/CONVENTIONS.md` in the root directory
-- Testing guide: See `docs/TESTING.md` in the root directory
+- Flutter 3.27.4+
+- Dart 3.6.2+
+- Serverpod API server running
 
 ### Running the App
 
-1. Make sure the Serverpod server is running
-2. Run the Flutter app:
+1. Ensure the Serverpod server is running:
+   ```bash
+   cd remotly_server
+   dart bin/main.dart
+   ```
 
-```bash
-flutter run
-```
+2. Run the Flutter app:
+   ```bash
+   cd remotly_app
+   flutter run
+   ```
 
 ### Running Tests
 
@@ -76,6 +92,7 @@ flutter test --coverage
 
 # Run specific test file
 flutter test test/exceptions_test.dart
+flutter test test/template_parser_test.dart
 ```
 
 ### Code Quality
@@ -100,9 +117,21 @@ This app follows Clean Architecture with MVVM pattern:
 
 The app uses **Riverpod** for state management. All providers are defined with the `Provider` suffix.
 
+## Documentation
+
+- [Architecture](../docs/ARCHITECTURE.md) - System architecture overview
+- [API Documentation](../docs/API.md) - API endpoints and usage
+- [Testing Guide](../docs/TESTING.md) - Testing patterns and best practices
+- [TemplateParser](../docs/TEMPLATE_PARSER.md) - Template parsing utility documentation
+
 ## Contributing
 
 1. Follow the coding conventions in `.claude/CONVENTIONS.md`
 2. Write tests for new features (TDD approach)
 3. Run tests and ensure they pass before committing
 4. Use conventional commit messages: `type(scope): description`
+
+## Learn More
+
+A great starting point for learning Serverpod is the documentation site:
+[https://docs.serverpod.dev](https://docs.serverpod.dev).
