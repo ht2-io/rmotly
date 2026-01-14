@@ -4,3 +4,4 @@
 export 'shared/widgets/loading_widget.dart';
 export 'shared/widgets/error_widget.dart';
 export 'shared/widgets/empty_state_widget.dart';
+export 'shared/widgets/confirmation_dialog.dart';

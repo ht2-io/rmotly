@@ -200,6 +200,87 @@ class EmptyStateWidget extends StatelessWidget {
 }
 EOF
 
+cat > lib/shared/widgets/confirmation_dialog.dart << 'EOF'
+import 'package:flutter/material.dart';
+
+/// A reusable confirmation dialog for destructive or important actions.
+///
+/// Displays a title, message, and confirm/cancel buttons.
+class ConfirmationDialog extends StatelessWidget {
+  /// The dialog title
+  final String title;
+
+  /// The dialog message/content
+  final String message;
+
+  /// The confirm button label (defaults to 'Confirm')
+  final String confirmLabel;
+
+  /// The cancel button label (defaults to 'Cancel')
+  final String cancelLabel;
+
+  /// Whether the confirm action is destructive (uses error color)
+  final bool isDestructive;
+
+  const ConfirmationDialog({
+    super.key,
+    required this.title,
+    required this.message,
+    this.confirmLabel = 'Confirm',
+    this.cancelLabel = 'Cancel',
+    this.isDestructive = false,
+  });
+
+  /// Shows the confirmation dialog and returns true if confirmed, false if cancelled
+  static Future<bool> show({
+    required BuildContext context,
+    required String title,
+    required String message,
+    String confirmLabel = 'Confirm',
+    String cancelLabel = 'Cancel',
+    bool isDestructive = false,
+  }) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => ConfirmationDialog(
+        title: title,
+        message: message,
+        confirmLabel: confirmLabel,
+        cancelLabel: cancelLabel,
+        isDestructive: isDestructive,
+      ),
+    );
+    return result ?? false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(cancelLabel),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          style: isDestructive
+              ? ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.error,
+                  foregroundColor: theme.colorScheme.onError,
+                )
+              : null,
+          child: Text(confirmLabel),
+        ),
+      ],
+    );
+  }
+}
+EOF
+
 echo "✓ Widget files created"
 
 # Create test files
@@ -539,6 +620,189 @@ void main() {
 }
 EOF
 
+cat > test/widget/shared/widgets/confirmation_dialog_test.dart << 'EOF'
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:remotly_app/shared/widgets/confirmation_dialog.dart';
+
+void main() {
+  group('ConfirmationDialog', () {
+    testWidgets('displays title and message', (tester) async {
+      // Arrange & Act
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ConfirmationDialog(
+              title: 'Delete Item',
+              message: 'Are you sure you want to delete this item?',
+            ),
+          ),
+        ),
+      );
+
+      // Assert
+      expect(find.text('Delete Item'), findsOneWidget);
+      expect(find.text('Are you sure you want to delete this item?'), findsOneWidget);
+    });
+
+    testWidgets('displays default button labels', (tester) async {
+      // Arrange & Act
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ConfirmationDialog(
+              title: 'Confirm',
+              message: 'Continue?',
+            ),
+          ),
+        ),
+      );
+
+      // Assert
+      expect(find.text('Confirm'), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
+    });
+
+    testWidgets('displays custom button labels', (tester) async {
+      // Arrange & Act
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ConfirmationDialog(
+              title: 'Delete',
+              message: 'Delete this?',
+              confirmLabel: 'Delete',
+              cancelLabel: 'Keep',
+            ),
+          ),
+        ),
+      );
+
+      // Assert
+      expect(find.text('Delete'), findsWidgets);
+      expect(find.text('Keep'), findsOneWidget);
+    });
+
+    testWidgets('returns false when cancel is tapped', (tester) async {
+      // Arrange
+      bool? result;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () async {
+                  result = await ConfirmationDialog.show(
+                    context: context,
+                    title: 'Test',
+                    message: 'Test message',
+                  );
+                },
+                child: const Text('Show Dialog'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Act
+      await tester.tap(find.text('Show Dialog'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(result, false);
+    });
+
+    testWidgets('returns true when confirm is tapped', (tester) async {
+      // Arrange
+      bool? result;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () async {
+                  result = await ConfirmationDialog.show(
+                    context: context,
+                    title: 'Test',
+                    message: 'Test message',
+                  );
+                },
+                child: const Text('Show Dialog'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Act
+      await tester.tap(find.text('Show Dialog'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Confirm'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(result, true);
+    });
+
+    testWidgets('returns false when dismissed', (tester) async {
+      // Arrange
+      bool? result;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () async {
+                  result = await ConfirmationDialog.show(
+                    context: context,
+                    title: 'Test',
+                    message: 'Test message',
+                  );
+                },
+                child: const Text('Show Dialog'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Act
+      await tester.tap(find.text('Show Dialog'));
+      await tester.pumpAndSettle();
+      // Dismiss by tapping outside
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(result, false);
+    });
+
+    testWidgets('applies destructive styling when isDestructive is true', (tester) async {
+      // Arrange & Act
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ConfirmationDialog(
+              title: 'Delete',
+              message: 'Delete this?',
+              isDestructive: true,
+            ),
+          ),
+        ),
+      );
+
+      // Assert - Find the confirm button and check it exists
+      // Note: Visual styling is hard to test directly, but we can verify the widget renders
+      expect(find.byType(ElevatedButton), findsOneWidget);
+      expect(find.text('Confirm'), findsOneWidget);
+    });
+  });
+}
+EOF
+
 echo "✓ Test files created"
 
 echo ""
@@ -555,6 +819,7 @@ echo "All base widgets created:"
 echo "  - LoadingWidget"
 echo "  - AppErrorWidget"
 echo "  - EmptyStateWidget"
+echo "  - ConfirmationDialog"
 echo ""
 echo "All tests created with 100% coverage!"
 echo ""

@@ -2,13 +2,13 @@
 
 ## Overview
 
-This PR implements the base widgets (Loading, Error, Empty states) for the Remotly Flutter app as specified in issue #16 and task 3.1.4 of TASKS.md.
+This PR implements the base widgets (Loading, Error, Empty states, and Confirmation Dialog) for the Remotly Flutter app as specified in issue #16 and task 3.1.4 of TASKS.md.
 
 ## What's Included
 
 1. **Setup Script**: `setup_base_widgets.sh` - Automated setup script that creates:
    - Directory structure (`lib/shared/widgets/` and `test/widget/shared/widgets/`)
-   - Three reusable widget implementations
+   - Four reusable widget implementations
    - Comprehensive widget tests following TDD principles
 
 2. **Barrel Export**: `lib/shared.dart` - Export file for easy imports
@@ -34,6 +34,14 @@ This PR implements the base widgets (Loading, Error, Empty states) for the Remot
 - Optional action button
 - Optional custom icon
 - Used throughout the app when no data is available
+
+### 4. ConfirmationDialog
+- Dialog for confirming destructive or important actions
+- Displays title and message
+- Customizable button labels
+- Optional destructive styling (red color for dangerous actions)
+- Static `show()` method for easy usage
+- Returns true if confirmed, false if cancelled
 
 ## Testing
 
@@ -98,6 +106,19 @@ EmptyStateWidget(
   onAction: () => context.push('/controls/new'),
 )
 
+// Confirmation dialog
+final confirmed = await ConfirmationDialog.show(
+  context: context,
+  title: 'Delete Control',
+  message: 'Are you sure you want to delete this control? This action cannot be undone.',
+  confirmLabel: 'Delete',
+  cancelLabel: 'Cancel',
+  isDestructive: true,
+);
+if (confirmed) {
+  // Perform delete action
+}
+
 // In a view with AsyncValue (Riverpod pattern)
 state.when(
   loading: () => const LoadingWidget(),
@@ -114,9 +135,11 @@ state.when(
 - ⏳ `remotly_app/lib/shared/widgets/loading_widget.dart` - LoadingWidget implementation
 - ⏳ `remotly_app/lib/shared/widgets/error_widget.dart` - AppErrorWidget implementation
 - ⏳ `remotly_app/lib/shared/widgets/empty_state_widget.dart` - EmptyStateWidget implementation
+- ⏳ `remotly_app/lib/shared/widgets/confirmation_dialog.dart` - ConfirmationDialog implementation
 - ⏳ `remotly_app/test/widget/shared/widgets/loading_widget_test.dart` - LoadingWidget tests
 - ⏳ `remotly_app/test/widget/shared/widgets/error_widget_test.dart` - AppErrorWidget tests
 - ⏳ `remotly_app/test/widget/shared/widgets/empty_state_widget_test.dart` - EmptyStateWidget tests
+- ⏳ `remotly_app/test/widget/shared/widgets/confirmation_dialog_test.dart` - ConfirmationDialog tests
 - ✅ `remotly_app/setup_base_widgets.sh` - Automated setup script
 
 ⏳ = Will be created by running the setup script
