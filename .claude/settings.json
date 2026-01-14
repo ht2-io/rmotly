@@ -1,0 +1,11 @@
+{
+  "projectName": "Remotly",
+  "description": "A Flutter Android app and Dart API for bidirectional event-driven communication with configurable controls, notifications, and OpenAPI-based HTTP actions",
+  "preferredLanguages": ["dart"],
+  "conventions": {
+    "architecture": "Clean Architecture with MVVM",
+    "stateManagement": "Riverpod",
+    "testing": "Unit tests with mockito, widget tests, integration tests",
+    "codeStyle": "Dart effective style guide"
+  }
+}
