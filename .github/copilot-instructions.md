@@ -1,21 +1,14 @@
 # Remotly Project - GitHub Copilot Instructions
 
-These instructions provide context for all GitHub Copilot interactions in this repository.
-
 ## Project Overview
 
-**Remotly** is a bidirectional event-driven system consisting of:
+**Remotly** is a bidirectional event-driven system:
 
-1. **Flutter Android App** (`remotly_app/`) - User-facing mobile application
-2. **Serverpod API** (`remotly_server/`) - Dart backend server
-3. **Generated Client** (`remotly_client/`) - Auto-generated API client
-
-### Key Features
-
-- **Dashboard Controls**: User-defined controls (buttons, sliders, toggles) that send events to the API
-- **Action Execution**: HTTP requests triggered by events, configured via OpenAPI specs
-- **Push Notifications**: Firebase Cloud Messaging for receiving notifications from external sources
-- **Webhook Endpoint**: REST API for external services to send notifications
+| Component | Location | Description |
+|-----------|----------|-------------|
+| Flutter App | `remotly_app/` | Android mobile application |
+| Serverpod API | `remotly_server/` | Dart backend server |
+| Generated Client | `remotly_client/` | Auto-generated API client (DO NOT EDIT) |
 
 ## Technology Stack
 
@@ -23,149 +16,154 @@ These instructions provide context for all GitHub Copilot interactions in this r
 |-----------|------------|---------|
 | Mobile Framework | Flutter | 3.27.4 |
 | Language | Dart | 3.6.2 |
-| Backend Framework | Serverpod | 2.9.2 |
+| Backend | Serverpod | 2.9.2 |
 | Database | PostgreSQL | 17 |
 | Cache | Redis | 8 |
 | State Management | Riverpod | 2.4+ |
-| Navigation | GoRouter | 13+ |
-| Testing (Mock) | Mocktail | 1.0+ |
+| Testing | Mocktail | 1.0+ |
 
-## Directory Structure
+## Critical File Locations
 
-```
-remotly/
-├── remotly_app/           # Flutter mobile app
-│   ├── lib/
-│   │   ├── core/         # Shared utilities, constants
-│   │   ├── features/     # Feature modules (Clean Architecture)
-│   │   └── shared/       # Shared widgets, services
-│   └── test/             # App tests
-├── remotly_server/        # Serverpod backend
-│   ├── lib/src/
-│   │   ├── endpoints/    # API endpoints
-│   │   ├── services/     # Business logic
-│   │   └── models/       # YAML model definitions
-│   └── test/             # Server tests
-├── remotly_client/        # Generated API client
-├── docs/                  # Documentation
-└── .github/               # GitHub configuration
-    ├── agents/           # Custom Copilot agents
-    └── skills/           # Copilot skills
-```
+### Serverpod Models
 
-## Key Documentation
-
-Read these files for full context:
-
-| File | Description |
-|------|-------------|
-| `TASKS.md` | Task definitions and progress tracking |
-| `.claude/CONVENTIONS.md` | Coding standards and patterns |
-| `docs/ARCHITECTURE.md` | System architecture |
-| `docs/API.md` | API endpoint documentation |
-| `docs/TESTING.md` | Testing guide and best practices |
-| `docs/GIT.md` | Git and GitHub conventions |
-| `docs/CI_CD.md` | CI/CD workflows and automation |
-
-## Architecture Patterns
-
-### Flutter App (Clean Architecture + MVVM)
+**IMPORTANT**: Model YAML files MUST be in `remotly_server/lib/src/models/`
 
 ```
-lib/features/{feature}/
-├── data/
-│   ├── repositories/     # Repository implementations
-│   └── data_sources/     # API/local data sources
-├── domain/
-│   ├── entities/         # Business entities
-│   └── repositories/     # Repository interfaces
-└── presentation/
-    ├── views/            # UI screens
-    ├── view_models/      # State management (Riverpod)
-    └── widgets/          # Feature-specific widgets
+✅ remotly_server/lib/src/models/user.yaml
+✅ remotly_server/lib/src/models/control.yaml
+✅ remotly_server/lib/src/models/action.yaml
+
+❌ remotly_server/lib/src/user.yaml (WRONG - missing models/ directory)
+❌ remotly_server/lib/src/models/user.spy.yaml (WRONG - bad extension)
 ```
 
-### Serverpod API
+### Flutter App Structure
 
 ```
-lib/src/
-├── endpoints/            # API endpoints (public interface)
-├── services/             # Business logic (internal)
-├── models/               # YAML model definitions
-└── generated/            # Auto-generated code (do not edit)
+remotly_app/lib/
+├── core/              # Utilities, constants, exceptions
+├── features/          # Feature modules (Clean Architecture)
+│   └── {feature}/
+│       ├── data/      # Repositories, data sources
+│       ├── domain/    # Entities, interfaces
+│       └── presentation/  # Views, view models, widgets
+└── shared/            # Shared widgets, services
 ```
 
-## Coding Conventions
+## Build & Validation Commands
+
+### Flutter App
+
+```bash
+cd remotly_app
+flutter pub get              # Install dependencies
+dart format .                # Format code (REQUIRED before commit)
+dart analyze                 # Static analysis (must pass)
+flutter test                 # Run tests (must pass)
+flutter test --coverage      # Run with coverage report
+flutter build apk            # Build Android APK
+```
+
+### Serverpod Server
+
+```bash
+cd remotly_server
+serverpod generate           # Generate code from YAML models
+dart analyze                 # Static analysis
+dart test                    # Run server tests
+dart bin/main.dart           # Start development server
+```
+
+### Database Migrations
+
+After modifying model YAML files:
+
+```bash
+cd remotly_server
+serverpod generate           # Step 1: Generate code
+serverpod create-migration   # Step 2: Create migration
+serverpod apply-migrations   # Step 3: Apply to database
+dart bin/main.dart           # Step 4: Verify server starts
+```
+
+## Coding Standards
 
 ### Dart Style
 - Follow [Effective Dart](https://dart.dev/effective-dart)
-- Use `lowerCamelCase` for variables, functions, constants
-- Use `UpperCamelCase` for classes, enums, types
-- Use `snake_case` for file names
-- Run `dart format .` before committing
-
-### State Management (Riverpod)
-```dart
-// Providers suffixed with 'Provider'
-final controlRepositoryProvider = Provider<ControlRepository>((ref) => ...);
-final dashboardViewModelProvider = StateNotifierProvider<...>((ref) => ...);
-```
+- `lowerCamelCase`: variables, functions, constants
+- `UpperCamelCase`: classes, enums, types
+- `snake_case`: file names
 
 ### Testing
-- Use **Mocktail** for mocking (not Mockito)
-- Follow **TDD**: Red → Green → Refactor
-- Use **AAA pattern**: Arrange-Act-Assert
-- Target **80%+ coverage** on new code
+- Use **Mocktail** for mocking (NOT Mockito)
+- Follow TDD: write tests first
+- AAA pattern: Arrange-Act-Assert
+- Target 80%+ coverage
 
-### Git
-- **Trunk-based development** with short-lived feature branches
-- **Conventional Commits**: `type(scope): description`
-- **Squash merge** for PRs
-- Branch naming: `feat/`, `fix/`, `refactor/`, `docs/`, `test/`, `chore/`
+### Git Commits
+- Conventional Commits: `type(scope): description`
+- Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
+- Scopes: `app`, `api`, `models`, `controls`, `actions`, `notifications`
 
-## Common Commands
+## Key Documentation
 
+| File | Purpose |
+|------|---------|
+| `TASKS.md` | Task definitions and progress |
+| `.claude/CONVENTIONS.md` | Detailed coding standards |
+| `docs/ARCHITECTURE.md` | System architecture |
+| `docs/TESTING.md` | Testing guide |
+| `docs/GIT.md` | Git conventions |
+| `docs/CI_CD.md` | CI/CD workflows |
+
+## Custom Agents
+
+| Agent | Purpose | Location |
+|-------|---------|----------|
+| `flutter-dev` | Flutter app development | `.github/agents/flutter-dev.agent.md` |
+| `serverpod-dev` | Serverpod API development | `.github/agents/serverpod-dev.agent.md` |
+| `docs-specialist` | Documentation only | `.github/agents/docs-specialist.agent.md` |
+
+## Common Errors & Solutions
+
+### "serverpod command not found"
 ```bash
-# Flutter App
-cd remotly_app
-flutter run                    # Run app
-flutter test                   # Run tests
-flutter test --coverage        # Run with coverage
-dart format .                  # Format code
-dart analyze                   # Static analysis
-
-# Serverpod
-cd remotly_server
-serverpod generate             # Generate code from models
-dart bin/main.dart             # Start server
-dart test                      # Run server tests
-serverpod create-migration     # Create DB migration
-serverpod apply-migrations     # Apply migrations
-
-# Git
-git checkout -b feat/name      # New feature branch
-git commit -m "type(scope): msg"  # Conventional commit
+dart pub global activate serverpod_cli
+export PATH="$PATH:$HOME/.pub-cache/bin"
 ```
 
-## Custom Agents Available
+### "Database connection failed"
+- Check PostgreSQL is running: `sudo systemctl status postgresql`
+- Verify credentials in `remotly_server/config/development.yaml`
 
-| Agent | Use For |
-|-------|---------|
-| `flutter-dev` | Flutter app features, UI, state management |
-| `serverpod-dev` | API endpoints, services, database models |
-| `docs-specialist` | Documentation updates only |
+### "Model not generating"
+- Ensure YAML file is in `lib/src/models/` directory
+- Ensure file has `.yaml` extension (not `.spy.yaml`)
+- Run `serverpod generate` from `remotly_server/` directory
 
-## Skills Available
+### Flutter analyze errors
+```bash
+cd remotly_app
+dart fix --apply    # Auto-fix issues
+dart format .       # Format code
+```
 
-| Skill | Use For |
-|-------|---------|
-| `flutter-testing` | Writing and running Flutter tests |
-| `serverpod-generate` | Model changes and code generation |
+## Do NOT
 
-## Important Notes
+- Edit files in `remotly_server/lib/src/generated/`
+- Edit files in `remotly_client/lib/src/protocol/`
+- Use Mockito (use Mocktail)
+- Skip running tests before committing
+- Create model files outside `lib/src/models/`
+- Use file extensions other than `.yaml` for models
+- Commit without running `dart format .`
 
-- **Do not edit** files in `lib/src/generated/` or `remotly_client/lib/src/protocol/`
-- **Run `serverpod generate`** after any model YAML changes
-- **Run tests** before committing: `flutter test` and `dart test`
-- **Follow existing patterns** in the codebase
-- **Update TASKS.md** when completing tasks
+## Validation Checklist
+
+Before completing any task:
+
+- [ ] Code formatted: `dart format .`
+- [ ] Analysis passes: `dart analyze`
+- [ ] Tests pass: `flutter test` or `dart test`
+- [ ] Server starts (if models changed): `dart bin/main.dart`
+- [ ] TASKS.md updated (if completing a task)
