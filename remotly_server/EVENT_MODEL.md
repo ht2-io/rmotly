@@ -6,7 +6,9 @@ The Event model represents events in the Remotly system. Events are triggered by
 
 ## Model Definition
 
-**Location:** `remotly_server/lib/src/event.spy.yaml`
+**Location:** `remotly_server/lib/src/models/event.yaml`
+
+> **Note:** If the file is currently at `lib/src/event.spy.yaml`, it must be moved to `lib/src/models/event.yaml` before running `serverpod generate`.
 
 ```yaml
 class: Event

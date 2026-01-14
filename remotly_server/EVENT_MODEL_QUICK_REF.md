@@ -58,6 +58,9 @@ await Event.db.deleteRow(session, event);
 ## Setup Commands
 
 ```bash
+# 0. Fix file location (REQUIRED FIRST)
+cd remotly_server/lib/src && mkdir -p models && mv event.spy.yaml models/event.yaml
+
 # 1. Generate code
 cd remotly_server && serverpod generate
 
@@ -73,7 +76,7 @@ dart test test/integration/event_model_test.dart
 
 ## Files
 
-- **Definition:** `remotly_server/lib/src/event.spy.yaml`
+- **Definition:** `remotly_server/lib/src/models/event.yaml`
 - **Tests:** `remotly_server/test/integration/event_model_test.dart`
 - **Generated:** `remotly_server/lib/src/generated/event.dart` (after generate)
 - **Docs:** `remotly_server/EVENT_MODEL.md`

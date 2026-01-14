@@ -168,7 +168,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
 
 - [x] **2.1.5** Create Event model
   ```yaml
-  # lib/src/event.spy.yaml (created)
+  # lib/src/models/event.yaml (requires moving from lib/src/event.spy.yaml)
   class: Event
   table: events
   fields:
@@ -183,12 +183,16 @@ This document defines all tasks required to build the Remotly system. Tasks are 
     event_user_idx:
       fields: userId
   ```
-  - Model definition created in `remotly_server/lib/src/event.spy.yaml`
+  - Model definition created (needs to be moved to correct location)
+  - **Action required:** Move `lib/src/event.spy.yaml` to `lib/src/models/event.yaml`
   - Integration tests created in `remotly_server/test/integration/event_model_test.dart`
   - Manual steps documented in `MANUAL_STEPS.md`
 
 - [ ] **2.1.6** Run code generation
   ```bash
+  # First fix file location:
+  cd remotly_server/lib/src && mkdir -p models && mv event.spy.yaml models/event.yaml
+  # Then generate:
   serverpod generate
   ```
   - **Blocked:** Requires bash execution (not available in current environment)

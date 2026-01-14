@@ -4,6 +4,21 @@ This file documents the manual steps that need to be executed to complete the Ev
 
 ## Steps to Complete
 
+### 0. Fix File Location and Name (REQUIRED FIRST)
+
+The Event model file needs to be moved to the correct location with the correct extension:
+
+```bash
+cd remotly_server/lib/src
+mkdir -p models
+mv event.spy.yaml models/event.yaml
+```
+
+**Current location:** `lib/src/event.spy.yaml` ❌  
+**Correct location:** `lib/src/models/event.yaml` ✅
+
+This must be done before running `serverpod generate`.
+
 ### 1. Generate Serverpod Code
 
 Navigate to the server directory and run code generation:
@@ -111,7 +126,7 @@ Press `Ctrl+C` to stop the server after verification.
 
 ## Files Created
 
-- `remotly_server/lib/src/event.spy.yaml` - Event model definition
+- `remotly_server/lib/src/models/event.yaml` - Event model definition (after moving from `lib/src/event.spy.yaml`)
 - `remotly_server/test/integration/event_model_test.dart` - Integration tests
 
 ## Files Generated (after serverpod generate)

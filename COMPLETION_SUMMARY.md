@@ -2,12 +2,19 @@
 
 ## Issue #5: Create Event Model for Serverpod
 
-**Status:** ✅ Model Definition Complete (Awaiting Code Generation)
+**Status:** ⚠️ Model Definition Complete (Requires File Location Fix + Code Generation)
+
+## Important: File Location Issue
+
+**Current location:** `remotly_server/lib/src/event.spy.yaml` ❌  
+**Required location:** `remotly_server/lib/src/models/event.yaml` ✅
+
+The file must be moved and renamed before running `serverpod generate`. See "Required Fix" section below.
 
 ## What Was Delivered
 
 ### 1. Event Model Definition ✅
-**File:** `remotly_server/lib/src/event.spy.yaml`
+**File:** `remotly_server/lib/src/models/event.yaml` (needs to be moved to this location)
 
 Complete YAML definition including:
 - All 7 required fields (userId, sourceType, sourceId, eventType, payload, actionResult, timestamp)
@@ -49,6 +56,24 @@ Tests follow existing patterns from `greeting_endpoint_test.dart` and use the `w
 - Phase 2 progress updated to 8%
 - Implementation notes added
 
+## Required Fix
+
+### File Location and Naming Correction
+
+**Issue:** The Event model file was created in the wrong location with the wrong extension.
+
+**Current:** `remotly_server/lib/src/event.spy.yaml` ❌  
+**Required:** `remotly_server/lib/src/models/event.yaml` ✅
+
+**Fix commands:**
+```bash
+cd remotly_server/lib/src
+mkdir -p models
+mv event.spy.yaml models/event.yaml
+```
+
+This must be done before running `serverpod generate`.
+
 ## Technical Decisions
 
 ### 1. User Relation Deferred
@@ -56,15 +81,19 @@ The specification calls for `userId: int, relation(parent=users)`, but the User 
 
 **Rationale:** Prevents circular dependencies and follows incremental development approach.
 
-### 2. Model File Location
-Placed in `lib/src/event.spy.yaml` following the existing pattern (`greeting.spy.yaml` is in `lib/src/`).
+### 2. Model File Location (CORRECTED)
+~~Placed in `lib/src/event.spy.yaml` following the existing pattern (`greeting.spy.yaml` is in `lib/src/`).~~
 
-**Rationale:** Consistency with existing codebase structure.
+**Correction:** Should be in `lib/src/models/event.yaml` per Serverpod conventions and skill documentation. The `models/` directory is the correct location for model definitions.
 
-### 3. File Extension
-Used `.spy.yaml` extension matching existing `greeting.spy.yaml`.
+**Rationale:** Follows Serverpod best practices and makes models easily discoverable.
 
-**Rationale:** Maintains consistency with current project configuration.
+### 3. File Extension (CORRECTED)
+~~Used `.spy.yaml` extension matching existing `greeting.spy.yaml`.~~
+
+**Correction:** Should use `.yaml` extension (not `.spy.yaml`).
+
+**Rationale:** Standard Serverpod convention. The `.spy` prefix is outdated.
 
 ### 4. Index Strategy
 Single index on `userId` only (not a compound index with timestamp).
@@ -74,6 +103,13 @@ Single index on `userId` only (not a compound index with timestamp).
 ## What Remains (Requires Manual Execution)
 
 Due to environment limitations (bash tool not available), the following steps must be executed manually:
+
+### Step 0: Fix File Location (REQUIRED FIRST)
+```bash
+cd remotly_server/lib/src
+mkdir -p models
+mv event.spy.yaml models/event.yaml
+```
 
 ### Step 1: Generate Code
 ```bash
@@ -119,7 +155,7 @@ Confirms the server starts without errors.
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `remotly_server/lib/src/event.spy.yaml` | Model definition | ✅ Created |
+| `remotly_server/lib/src/models/event.yaml` | Model definition | ⚠️ Created (needs move from `lib/src/event.spy.yaml`) |
 | `remotly_server/test/integration/event_model_test.dart` | Integration tests | ✅ Created |
 | `MANUAL_STEPS.md` | Execution guide | ✅ Created |
 | `remotly_server/EVENT_MODEL.md` | Model documentation | ✅ Created |
