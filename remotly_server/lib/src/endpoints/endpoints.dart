@@ -4,7 +4,7 @@
 library;
 
 export 'notification_endpoint.dart';
-export 'notification_stream_endpoint.dart';
+export 'notification_stream_endpoint.dart' hide AuthenticationException;
 export 'push_subscription_endpoint.dart';
 export 'sse_endpoint.dart';
 export 'webhook_endpoint.dart';
