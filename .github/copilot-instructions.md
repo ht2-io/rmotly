@@ -1,5 +1,20 @@
 # Remotly Project - GitHub Copilot Instructions
 
+## Model Preferences
+
+Use the following AI models for Copilot tasks:
+
+| Task Type | Preferred Model | Alternative |
+|-----------|-----------------|-------------|
+| Code generation | **GPT 5.2 Codex** | Claude Sonnet |
+| Complex reasoning | **Claude Sonnet** | GPT 5.2 Codex |
+| Documentation | **Claude Sonnet** | GPT 5.2 Codex |
+| Simple edits | **GPT 5.2 Codex** | Claude Sonnet |
+
+**Selection Guidelines:**
+- Use **GPT 5.2 Codex** for: boilerplate code, YAML models, simple widgets, database queries
+- Use **Claude Sonnet** for: architecture decisions, complex business logic, documentation prose, nuanced error handling
+
 ## Project Overview
 
 **Remotly** is a bidirectional event-driven system:

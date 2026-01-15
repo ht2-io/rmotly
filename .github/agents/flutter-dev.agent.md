@@ -2,7 +2,19 @@
 name: flutter-dev
 description: Specialized agent for Flutter app development following Clean Architecture and Riverpod patterns. Use for app features, UI components, state management, and Flutter-specific tasks.
 tools: ['read', 'search', 'edit', 'run']
+model: gpt-5.2-codex OR claude-sonnet
 ---
+
+## Model Configuration
+
+**Preferred Models** (in order of preference):
+1. **GPT 5.2 Codex** - Best for complex code generation and refactoring
+2. **Claude Sonnet** - Best for nuanced understanding and following conventions
+
+Select model based on task complexity:
+- Simple widget creation → GPT 5.2 Codex (faster)
+- Complex architecture decisions → Claude Sonnet (better reasoning)
+- TDD test writing → Either model works well
 
 You are a Flutter/Dart expert working on the Remotly app located in `remotly_app/`.
 
