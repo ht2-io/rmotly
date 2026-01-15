@@ -309,10 +309,11 @@ This document defines all tasks required to build the Remotly system. Tasks are 
   - `Stream<Notification> streamNotifications()` - WebSocket stream
   - Real-time notifications when app is foreground
 
-- [ ] **2.3.7** Create PushSubscriptionEndpoint
-  - `registerEndpoint(endpoint, p256dh, auth)` - Register UnifiedPush endpoint
-  - `unregisterEndpoint(endpoint)`
-  - `listSubscriptions()`
+- [x] **2.3.7** Create PushSubscriptionEndpoint
+  - `registerEndpoint(endpoint, p256dh, auth, deliveryMethod)` - Register UnifiedPush endpoint
+  - `unregisterEndpoint(endpoint)` - Remove endpoint
+  - `listSubscriptions()` - List user's subscriptions
+  - `updateSubscription(subscriptionId, enabled)` - Toggle subscription status
 
 - [ ] **2.3.8** Create SSEEndpoint (Fallback)
   - Server-Sent Events endpoint for restricted networks

@@ -4,5 +4,6 @@
 library;
 
 export 'notification_stream_endpoint.dart';
+export 'push_subscription_endpoint.dart';
 export 'sse_endpoint.dart';
 export 'webhook_endpoint.dart';
