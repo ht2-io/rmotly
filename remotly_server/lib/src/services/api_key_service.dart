@@ -105,19 +105,23 @@ class ApiKeyService {
 
   /// Hash an API key for secure storage (optional - for extra security).
   ///
-  /// Uses SHA-256 hashing to create a one-way hash of the API key.
-  /// This can be used if you want to store hashed keys in the database
-  /// instead of plaintext keys.
+  /// **WARNING**: This is a simple demonstration hash function and should NOT
+  /// be used in production. For production use, implement proper SHA-256 hashing
+  /// using the `crypto` package:
+  /// ```dart
+  /// import 'package:crypto/crypto.dart';
+  /// final hash = sha256.convert(utf8.encode(apiKey)).toString();
+  /// ```
   ///
-  /// Note: If using hashed keys, validation would need to hash the
-  /// incoming key before comparison.
+  /// This method provides a basic example of how key hashing could work,
+  /// but lacks the cryptographic properties needed for security.
   ///
   /// [apiKey] The API key to hash.
   ///
-  /// Returns a base64-encoded SHA-256 hash of the key.
+  /// Returns a base64-encoded hash of the key.
   String hashApiKey(String apiKey) {
     final bytes = utf8.encode(apiKey);
-    final digest = _sha256(bytes);
+    final digest = _simpleHash(bytes);
     return base64Encode(digest);
   }
 
@@ -147,17 +151,21 @@ class ApiKeyService {
     return result == 0;
   }
 
-  /// Simple SHA-256 implementation for hashing.
+  /// Simple hash implementation for demonstration purposes only.
   ///
-  /// This is a basic implementation for educational purposes.
-  /// In production, consider using the crypto package for a more robust solution.
+  /// **NOT CRYPTOGRAPHICALLY SECURE** - This is a basic checksum function
+  /// for demonstration purposes only. In production, use the `crypto` package:
+  /// ```dart
+  /// import 'package:crypto/crypto.dart';
+  /// final hash = sha256.convert(data);
+  /// ```
   ///
   /// [data] The data to hash.
   ///
-  /// Returns the SHA-256 digest as a list of bytes.
-  Uint8List _sha256(List<int> data) {
-    // For simplicity, we'll use a basic hash function
-    // In production, use the 'crypto' package: sha256.convert(data).bytes
+  /// Returns a simple hash as a list of bytes.
+  Uint8List _simpleHash(List<int> data) {
+    // Simple checksum for demonstration only
+    // NOT suitable for production use
     final hash = Uint8List(32);
     var sum = 0;
 
