@@ -23,6 +23,9 @@ fields:
   openApiOperationId: String?
   ### Optional parameters definition as JSON string
   parameters: String?
+  ### Encrypted credentials for authentication (API keys, tokens, etc.)
+  ### Format: encrypted JSON map of credential key-value pairs
+  encryptedCredentials: String?
   ### Timestamp when the action was created
   createdAt: DateTime
   ### Timestamp when the action was last updated
