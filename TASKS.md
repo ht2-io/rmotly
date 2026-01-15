@@ -6,12 +6,12 @@ This document defines all tasks required to build the Remotly system. Tasks are 
 
 | Phase | Status | Progress |
 |-------|--------|----------|
-| Phase 1: Project Setup | Complete | 100% |
-| Phase 2: API Core | Not Started | 0% |
-| Phase 3: App Core | Not Started | 0% |
+| Phase 1: Project Setup | In Progress | 67% |
+| Phase 2: API Core | In Progress | 19% |
+| Phase 3: App Core | In Progress | 31% |
 | Phase 4: Features | Not Started | 0% |
 | Phase 5: Integration | Not Started | 0% |
-| Phase 6: Polish | Not Started | 0% |
+| Phase 6: Polish | In Progress | 4% |
 
 ---
 
@@ -69,31 +69,35 @@ This document defines all tasks required to build the Remotly system. Tasks are 
   - Define route structure
   - Set up navigation service
 
-### 1.3 Firebase Setup (Deferred)
+### 1.3 Self-Hosted Push Notification Setup
 
-- [ ] **1.3.1** Create Firebase project
-  - Go to Firebase Console
-  - Create new project "Remotly"
+> **Note:** Replacing Firebase with self-hosted UnifiedPush + ntfy for privacy and independence. See `docs/PUSH_NOTIFICATION_DESIGN.md` for full architecture.
 
-- [ ] **1.3.2** Configure Android app in Firebase
-  - Register Android app
-  - Download `google-services.json`
-  - Add to `android/app/`
+- [ ] **1.3.1** Generate VAPID keys for WebPush
+  ```bash
+  npx web-push generate-vapid-keys
+  ```
+  - Store keys in environment variables
+  - Add to server configuration
 
-- [ ] **1.3.3** Enable Cloud Messaging
-  - Enable FCM in Firebase Console
-  - Note server key for API
-
-- [ ] **1.3.4** Add Firebase dependencies to Flutter
-  - firebase_core
-  - firebase_messaging
+- [ ] **1.3.2** Add push notification dependencies to Flutter
+  - unifiedpush (UnifiedPush connector)
   - flutter_local_notifications
+  - flutter_client_sse (SSE fallback)
 
-- [ ] **1.3.5** Initialize Firebase in app
-  - Add initialization code to main.dart
+- [ ] **1.3.3** Add push notification dependencies to Server
+  - web_push (WebPush RFC8030/8291/8292)
+  - pointycastle (encryption)
+
+- [ ] **1.3.4** Configure docker-compose for ntfy
+  - Add ntfy service to docker-compose.yml
+  - Configure environment variables
+  - Set up health checks
+
+- [ ] **1.3.5** Initialize push service in app
+  - Register UnifiedPush handlers
   - Configure notification channels (Android)
-
-> **Note:** Firebase setup requires manual configuration in Firebase Console. This will be done when implementing notifications in Phase 4.
+  - Set up SSE fallback
 
 ---
 
@@ -184,7 +188,43 @@ This document defines all tasks required to build the Remotly system. Tasks are 
       fields: userId
   ```
 
-- [ ] **2.1.6** Run code generation
+- [ ] **2.1.6** Create PushSubscription model
+  ```yaml
+  # lib/src/models/push_subscription.yaml
+  class: PushSubscription
+  table: push_subscriptions
+  fields:
+    userId: int, relation(parent=users)
+    endpoint: String          # UnifiedPush/WebPush endpoint
+    p256dh: String?           # WebPush encryption key
+    authSecret: String?       # WebPush auth secret
+    deliveryMethod: String    # 'webpush', 'sse', 'websocket'
+    enabled: bool
+    lastUsed: DateTime?
+    failureCount: int
+    createdAt: DateTime
+    updatedAt: DateTime
+  ```
+
+- [ ] **2.1.7** Create NotificationQueue model
+  ```yaml
+  # lib/src/models/notification_queue.yaml
+  class: NotificationQueue
+  table: notification_queue
+  fields:
+    userId: int, relation(parent=users)
+    topicId: int?, relation(parent=notification_topics)
+    title: String
+    body: String
+    data: String?             # JSON payload
+    status: String            # 'pending', 'sent', 'delivered', 'failed'
+    attempts: int
+    priority: String          # 'low', 'normal', 'high'
+    createdAt: DateTime
+    expiresAt: DateTime
+  ```
+
+- [ ] **2.1.8** Run code generation
   ```bash
   serverpod generate
   ```
@@ -202,17 +242,28 @@ This document defines all tasks required to build the Remotly system. Tasks are 
   - Response handling
   - Error handling and retries
 
-- [ ] **2.2.3** Create NotificationService
-  - FCM integration
-  - Notification payload building
-  - Topic-based delivery
+- [ ] **2.2.3** Create PushService (WebPush + UnifiedPush)
+  - WebPush encryption (RFC8291)
+  - VAPID authentication (RFC8292)
+  - Send to UnifiedPush endpoints
+  - Retry logic with exponential backoff
 
-- [ ] **2.2.4** Create OpenApiParserService
+- [ ] **2.2.4** Create NotificationStreamService (Serverpod Streaming)
+  - Real-time WebSocket streaming for foreground
+  - User subscription management
+  - Pub/sub pattern for notification dispatch
+
+- [ ] **2.2.5** Create NotificationService
+  - Three-tier delivery (WebSocket → WebPush → SSE)
+  - Notification queue management
+  - Delivery status tracking
+
+- [ ] **2.2.6** Create OpenApiParserService
   - Fetch and parse OpenAPI specs
   - Extract operations
   - Generate action templates
 
-- [ ] **2.2.5** Create ApiKeyService
+- [ ] **2.2.7** Create ApiKeyService
   - Generate secure API keys
   - Validate API keys
   - Key rotation
@@ -254,6 +305,20 @@ This document defines all tasks required to build the Remotly system. Tasks are 
   - `parseSpec(url)`
   - `listOperations(specUrl)`
 
+- [ ] **2.3.6** Create NotificationStreamEndpoint (Serverpod Streaming)
+  - `Stream<Notification> streamNotifications()` - WebSocket stream
+  - Real-time notifications when app is foreground
+
+- [ ] **2.3.7** Create PushSubscriptionEndpoint
+  - `registerEndpoint(endpoint, p256dh, auth)` - Register UnifiedPush endpoint
+  - `unregisterEndpoint(endpoint)`
+  - `listSubscriptions()`
+
+- [ ] **2.3.8** Create SSEEndpoint (Fallback)
+  - Server-Sent Events endpoint for restricted networks
+  - HTTP/2 compatible
+  - Auto-reconnection support
+
 ### 2.4 Webhook Route
 
 - [ ] **2.4.1** Create webhook route handler
@@ -275,9 +340,10 @@ This document defines all tasks required to build the Remotly system. Tasks are 
   - Email/password authentication
   - Session management
 
-- [ ] **2.5.2** Implement FCM token registration
-  - Token storage per user
-  - Token refresh handling
+- [ ] **2.5.2** Implement push subscription management
+  - Store UnifiedPush endpoints per user
+  - Handle endpoint rotation
+  - Clean up stale subscriptions
 
 ---
 
@@ -296,8 +362,8 @@ This document defines all tasks required to build the Remotly system. Tasks are 
   - AuthException
   - ActionExecutionException
 
-- [ ] **3.1.3** Create utility classes
-  - TemplateParser (for {{variable}} substitution)
+- [x] **3.1.3** Create utility classes
+  - TemplateParser (for {{variable}} substitution) ✓
   - Validators
   - DateFormatters
 
@@ -464,7 +530,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
   - Set default values
   - Configure variable bindings
 
-### 4.5 Notifications Feature
+### 4.5 Notifications Feature (UnifiedPush + Self-Hosted)
 
 - [ ] **4.5.1** Create notification topic entity
   - NotificationTopic class
@@ -474,30 +540,47 @@ This document defines all tasks required to build the Remotly system. Tasks are 
   - CRUD operations
   - API key management
 
-- [ ] **4.5.3** Create FCM service
-  - Initialize FCM
-  - Handle token refresh
-  - Process incoming notifications
+- [ ] **4.5.3** Create UnifiedPush service
+  - Initialize UnifiedPush connector
+  - Register with user-selected distributor
+  - Handle endpoint changes
+  - Process incoming encrypted notifications
   - Show local notifications
 
-- [ ] **4.5.4** Create topics view model
+- [ ] **4.5.4** Create notification stream service (WebSocket)
+  - Connect to Serverpod streaming endpoint
+  - Handle real-time notifications in foreground
+  - Automatic reconnection
+
+- [ ] **4.5.5** Create SSE fallback service
+  - Connect to SSE endpoint
+  - Handle notifications when WebSocket unavailable
+  - Auto-reconnect on connection loss
+
+- [ ] **4.5.6** Create topics view model
   - Load topics
   - Enable/disable topics
+  - Manage push subscriptions
 
-- [ ] **4.5.5** Create topics list view
+- [ ] **4.5.7** Create topics list view
   - List of topics
   - Webhook URL copy
   - API key reveal/copy
   - Enable/disable toggle
 
-- [ ] **4.5.6** Create topic editor view
+- [ ] **4.5.8** Create topic editor view
   - Name and description
   - Notification template configuration
   - Priority and sound settings
 
-- [ ] **4.5.7** Create test notification feature
+- [ ] **4.5.9** Create push settings view
+  - Select UnifiedPush distributor
+  - Show current endpoint status
+  - Test notification button
+
+- [ ] **4.5.10** Create test notification feature
   - Send test notification from API
-  - Verify delivery
+  - Verify delivery through all tiers
 
 ### 4.6 Settings Feature
 
@@ -548,12 +631,18 @@ This document defines all tasks required to build the Remotly system. Tasks are 
   - Receive webhook
   - Validate API key
   - Parse payload
-  - Send FCM notification
+  - Queue notification
 
-- [ ] **5.2.2** Implement notification display
-  - Foreground notification handling
-  - Background notification handling
+- [ ] **5.2.2** Implement three-tier notification delivery
+  - Tier 1: WebSocket stream (foreground)
+  - Tier 2: WebPush via UnifiedPush (background)
+  - Tier 3: SSE fallback (restricted networks)
+
+- [ ] **5.2.3** Implement notification display
+  - Foreground notification handling (WebSocket)
+  - Background notification handling (UnifiedPush)
   - Notification tap handling
+  - Deep linking support
 
 ### 5.3 End-to-End Testing
 
@@ -650,23 +739,40 @@ This document defines all tasks required to build the Remotly system. Tasks are 
 
 ### 6.6 Deployment
 
-- [ ] **6.6.1** Set up production server
-  - Configure Serverpod for production
-  - Set up PostgreSQL
-  - Set up Redis
+- [ ] **6.6.1** Create docker-compose.yml
+  - PostgreSQL 17 service
+  - Redis 8 service
+  - Serverpod API service
+  - ntfy push server service
+  - Health checks and dependencies
+  - Volume persistence
 
-- [x] **6.6.2** Configure CI/CD
+- [ ] **6.6.2** Create docker-compose.prod.yml
+  - Traefik reverse proxy
+  - Automatic HTTPS (Let's Encrypt)
+  - Production environment variables
+
+- [ ] **6.6.3** Create Dockerfile for Serverpod
+  - Multi-stage build
+  - Optimized for production
+
+- [x] **6.6.4** Configure CI/CD
   - GitHub Actions workflow for automated testing
   - Deployment workflows (AWS and GCP) already configured
 
-- [ ] **6.6.3** Prepare app store assets
+- [ ] **6.6.5** Prepare app store assets
   - Screenshots
   - Description
   - Privacy policy
 
-- [ ] **6.6.4** Submit to Google Play Store
+- [ ] **6.6.6** Submit to Google Play Store
   - Create developer account
   - Submit for review
+
+- [ ] **6.6.7** Write deployment documentation
+  - Single command deployment guide
+  - Environment variables reference
+  - Self-hosting guide
 
 ---
 
@@ -724,5 +830,8 @@ git push -u origin feat/feature-name
 
 - All model definitions use YAML for Serverpod code generation
 - JSON fields are stored as strings and serialized/deserialized in code
-- FCM requires real Android device for testing (not emulator)
 - OpenAPI parsing should support both OpenAPI 3.0 and Swagger 2.0
+- **Self-hosted architecture**: No Firebase dependency - uses UnifiedPush + ntfy
+- **Single command deployment**: `docker-compose up -d` deploys entire stack
+- **Push notification design**: See `docs/PUSH_NOTIFICATION_DESIGN.md` for full architecture
+- **Three-tier notifications**: WebSocket (foreground) → WebPush (background) → SSE (fallback)
