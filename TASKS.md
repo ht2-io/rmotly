@@ -770,10 +770,14 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
   - Create developer account
   - Submit for review
 
-- [ ] **6.6.7** Write deployment documentation
+- [x] **6.6.7** Write deployment documentation
   - Single command deployment guide
   - Environment variables reference
   - Self-hosting guide
+  - VPS deployment guide
+  - Cloud deployment (AWS/GCP)
+  - Production checklist
+  - Troubleshooting section
 
 ---
 
