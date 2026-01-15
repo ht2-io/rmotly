@@ -188,7 +188,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
       fields: userId
   ```
 
-- [ ] **2.1.6** Create PushSubscription model
+- [x] **2.1.6** Create PushSubscription model
   ```yaml
   # lib/src/models/push_subscription.yaml
   class: PushSubscription

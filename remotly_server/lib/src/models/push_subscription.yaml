@@ -1,0 +1,34 @@
+# PushSubscription model for Remotly
+# Stores UnifiedPush/WebPush subscription data for push notification delivery
+class: PushSubscription
+table: push_subscriptions
+fields:
+  ### Foreign key to the user who owns this subscription
+  userId: int, relation(parent=users)
+  ### UnifiedPush/WebPush endpoint URL
+  endpoint: String
+  ### WebPush encryption key (base64-encoded, optional for non-WebPush methods)
+  p256dh: String?
+  ### WebPush auth secret (base64-encoded, optional for non-WebPush methods)
+  authSecret: String?
+  ### Delivery method: 'webpush', 'sse', 'websocket'
+  deliveryMethod: String
+  ### Whether the subscription is enabled
+  enabled: bool
+  ### Timestamp when the subscription was last successfully used
+  lastUsed: DateTime?
+  ### Number of consecutive delivery failures
+  failureCount: int
+  ### Timestamp when the subscription was created
+  createdAt: DateTime
+  ### Timestamp when the subscription was last updated
+  updatedAt: DateTime
+
+indexes:
+  push_sub_user_idx:
+    fields: userId
+    type: btree
+  push_sub_endpoint_idx:
+    fields: endpoint
+    type: btree
+    unique: true
