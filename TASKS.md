@@ -1,6 +1,6 @@
-# Remotly - Task Definitions
+# Rmotly - Task Definitions
 
-This document defines all tasks required to build the Remotly system. Tasks are organized by phase and component.
+This document defines all tasks required to build the Rmotly system. Tasks are organized by phase and component.
 
 ## Project Status
 
@@ -26,7 +26,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
 
 - [x] **1.1.2** Create Serverpod project
   ```bash
-  serverpod create remotly
+  serverpod create rmotly
   ```
 
 - [x] **1.1.3** Configure PostgreSQL database
@@ -46,7 +46,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
 
 - [x] **1.2.1** Create Flutter project
   ```bash
-  flutter create remotly_app
+  flutter create rmotly_app
   ```
 
 - [x] **1.2.2** Set up project structure (Clean Architecture)
@@ -786,7 +786,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
 serverpod generate
 
 # Start development server
-cd remotly_server && dart bin/main.dart
+cd rmotly_server && dart bin/main.dart
 
 # Run database migrations
 serverpod create-migration

@@ -1,0 +1,30 @@
+# NotificationTopic model for Rmotly
+# Represents a notification topic for receiving external webhooks
+class: NotificationTopic
+table: notification_topics
+fields:
+  ### Foreign key to the user who owns this topic
+  userId: int, relation(parent=users)
+  ### Display name for the topic
+  name: String
+  ### Optional description of what notifications this topic receives
+  description: String?
+  ### API key for authenticating webhook requests
+  apiKey: String
+  ### Whether the topic is enabled
+  enabled: bool
+  ### Topic configuration as JSON string (notification template, priority, etc.)
+  config: String
+  ### Timestamp when the topic was created
+  createdAt: DateTime
+  ### Timestamp when the topic was last updated
+  updatedAt: DateTime
+
+indexes:
+  topic_user_idx:
+    fields: userId
+    type: btree
+  topic_api_key_idx:
+    fields: apiKey
+    type: btree
+    unique: true

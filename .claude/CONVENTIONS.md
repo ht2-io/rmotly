@@ -1,6 +1,6 @@
-# Remotly - Coding Conventions
+# Rmotly - Coding Conventions
 
-This document defines the coding standards and patterns for the Remotly project.
+This document defines the coding standards and patterns for the Rmotly project.
 
 ## Dart Style Guide
 
@@ -490,7 +490,7 @@ flutter test --exclude-tags integration
 flutter test --update-goldens
 
 # Serverpod tests
-cd remotly_server && dart test
+cd rmotly_server && dart test
 ```
 
 ### What NOT to Test
@@ -742,10 +742,10 @@ dart format .
 dart analyze
 
 # 4. Serverpod code generated (if models changed)
-cd remotly_server && serverpod generate
+cd rmotly_server && serverpod generate
 
 # 5. Server tests pass
-cd remotly_server && dart test
+cd rmotly_server && dart test
 ```
 
 #### 6. Commit & Push

@@ -1,5 +1,5 @@
 ---
-applyTo: "remotly_app/**"
+applyTo: "rmotly_app/**"
 ---
 
 # Flutter App Development Instructions
@@ -7,7 +7,7 @@ applyTo: "remotly_app/**"
 ## Project Structure (Clean Architecture)
 
 ```
-remotly_app/lib/
+rmotly_app/lib/
 ├── core/                          # Shared utilities
 │   ├── constants/                 # App-wide constants
 │   ├── errors/                    # Custom exceptions
@@ -36,7 +36,7 @@ remotly_app/lib/
 Tests MUST mirror the source structure:
 
 ```
-remotly_app/test/
+rmotly_app/test/
 ├── unit/                          # Unit tests
 │   ├── core/
 │   │   └── utils/
@@ -160,7 +160,7 @@ class ControlCard extends StatelessWidget {
 Before committing Flutter app changes:
 
 ```bash
-cd remotly_app
+cd rmotly_app
 flutter pub get          # Get dependencies
 dart format .            # Format code
 dart analyze             # Check for issues

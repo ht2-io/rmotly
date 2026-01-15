@@ -1,6 +1,6 @@
 # Git & GitHub Best Practices
 
-This document defines Git and GitHub conventions for the Remotly project.
+This document defines Git and GitHub conventions for the Rmotly project.
 
 ## Table of Contents
 
@@ -523,7 +523,7 @@ gh repo create name --public
 
 ### GitHub Actions Workflow
 
-The Remotly project uses GitHub Actions for continuous integration. The workflow is defined in `.github/workflows/ci.yml` and runs on every push to `main` and on all pull requests.
+The Rmotly project uses GitHub Actions for continuous integration. The workflow is defined in `.github/workflows/ci.yml` and runs on every push to `main` and on all pull requests.
 
 #### Workflow Jobs
 

@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Remotly** is a bidirectional event-driven system with three components:
+**Rmotly** is a bidirectional event-driven system with three components:
 
 | Component | Location | Description |
 |-----------|----------|-------------|
-| Flutter App | `remotly_app/` | Android mobile application |
-| Serverpod API | `remotly_server/` | Dart backend server |
-| Generated Client | `remotly_client/` | Auto-generated API client (DO NOT EDIT) |
+| Flutter App | `rmotly_app/` | Android mobile application |
+| Serverpod API | `rmotly_server/` | Dart backend server |
+| Generated Client | `rmotly_client/` | Auto-generated API client (DO NOT EDIT) |
 
 The system enables users to create custom controls (buttons, sliders, toggles) that trigger remote HTTP actions, and receive notifications from external sources through configurable webhook topics.
 
@@ -19,7 +19,7 @@ The system enables users to create custom controls (buttons, sliders, toggles) t
 ### Flutter App
 
 ```bash
-cd remotly_app
+cd rmotly_app
 flutter pub get              # Install dependencies
 dart format .                # Format code (REQUIRED before commit)
 dart analyze                 # Static analysis (must pass)
@@ -33,7 +33,7 @@ flutter build apk            # Build Android APK
 ### Serverpod Server
 
 ```bash
-cd remotly_server
+cd rmotly_server
 serverpod generate           # Generate code from YAML models
 dart analyze                 # Static analysis
 dart test                    # Run server tests
@@ -43,7 +43,7 @@ dart bin/main.dart           # Start development server
 ### After Modifying Model YAML Files
 
 ```bash
-cd remotly_server
+cd rmotly_server
 serverpod generate           # Step 1: Generate code
 serverpod create-migration   # Step 2: Create migration
 serverpod apply-migrations   # Step 3: Apply to database
@@ -72,7 +72,7 @@ External webhook → API processes → FCM dispatches → App displays notificat
 ### Flutter App (Clean Architecture + MVVM)
 
 ```
-remotly_app/lib/
+rmotly_app/lib/
 ├── core/              # Utilities, constants, exceptions, providers
 ├── features/          # Feature modules
 │   └── {feature}/
@@ -85,7 +85,7 @@ remotly_app/lib/
 ### Serverpod Server
 
 ```
-remotly_server/lib/src/
+rmotly_server/lib/src/
 ├── endpoints/         # API endpoint classes
 ├── services/          # Business logic services
 ├── models/            # YAML model definitions (*.yaml)
@@ -102,20 +102,20 @@ Uses **Riverpod** with StateNotifier pattern:
 
 ### Serverpod Models
 
-**Model YAML files MUST be in `remotly_server/lib/src/models/` with `.yaml` extension:**
+**Model YAML files MUST be in `rmotly_server/lib/src/models/` with `.yaml` extension:**
 
 ```
-✅ remotly_server/lib/src/models/user.yaml
-✅ remotly_server/lib/src/models/control.yaml
+✅ rmotly_server/lib/src/models/user.yaml
+✅ rmotly_server/lib/src/models/control.yaml
 
-❌ remotly_server/lib/src/user.yaml (WRONG - missing models/ directory)
-❌ remotly_server/lib/src/models/user.spy.yaml (WRONG - bad extension)
+❌ rmotly_server/lib/src/user.yaml (WRONG - missing models/ directory)
+❌ rmotly_server/lib/src/models/user.spy.yaml (WRONG - bad extension)
 ```
 
 ### Do NOT Edit
 
-- `remotly_server/lib/src/generated/` - Serverpod generated code
-- `remotly_client/lib/src/protocol/` - Auto-generated client protocol
+- `rmotly_server/lib/src/generated/` - Serverpod generated code
+- `rmotly_client/lib/src/protocol/` - Auto-generated client protocol
 
 ### Testing
 

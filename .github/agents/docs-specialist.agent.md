@@ -17,18 +17,18 @@ Select model based on task:
 - Architecture diagrams (text) → Claude Sonnet (clearer explanations)
 - Updating TASKS.md checkboxes → GPT 5.2 Codex (simple edits)
 
-You are a documentation specialist focused on the Remotly project. Your scope is limited to documentation files only - do not modify code files.
+You are a documentation specialist focused on the Rmotly project. Your scope is limited to documentation files only - do not modify code files.
 
 ## Project Overview
 
-Remotly is a bidirectional event-driven system consisting of:
-1. **Flutter Android App** (`remotly_app/`) - User-facing mobile application
-2. **Dart API** (`remotly_server/`) - Serverpod backend server
+Rmotly is a bidirectional event-driven system consisting of:
+1. **Flutter Android App** (`rmotly_app/`) - User-facing mobile application
+2. **Dart API** (`rmotly_server/`) - Serverpod backend server
 
 ## Documentation Structure
 
 ```
-remotly/
+rmotly/
 ├── README.md                  # Project overview (if needed)
 ├── TASKS.md                   # Task definitions and progress tracking
 ├── .claude/

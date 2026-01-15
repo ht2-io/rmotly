@@ -1,0 +1,98 @@
+services:
+  # Development services
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: rmotly-postgres
+    ports:
+      - "8090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: rmotly
+      POSTGRES_PASSWORD: "mf5Iv4YBBIo4EOLP1gdbQGdB4fUWufQa"
+    volumes:
+      - rmotly_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:8-alpine
+    container_name: rmotly-redis
+    ports:
+      - "8091:6379"
+    command: redis-server --requirepass "SLwaRYlYACotsMBQsR3q-l2GZDN6yN1H"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    volumes:
+      - rmotly_redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "SLwaRYlYACotsMBQsR3q-l2GZDN6yN1H", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ntfy - Self-hosted push notification server
+  # Acts as UnifiedPush distributor for mobile apps
+  # See: https://docs.ntfy.sh/
+  ntfy:
+    image: binwiederhier/ntfy
+    container_name: rmotly-ntfy
+    command:
+      - serve
+    environment:
+      - TZ=UTC
+      - NTFY_BASE_URL=http://localhost:8093
+      - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
+      - NTFY_CACHE_DURATION=24h
+      - NTFY_ATTACHMENT_CACHE_DIR=/var/cache/ntfy/attachments
+      - NTFY_ENABLE_LOGIN=false
+      - NTFY_UPSTREAM_BASE_URL=https://ntfy.sh
+    volumes:
+      - ntfy_cache:/var/cache/ntfy
+      - ntfy_etc:/etc/ntfy
+    ports:
+      - "8093:80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  # Test services
+  postgres_test:
+    image: pgvector/pgvector:pg16
+    container_name: rmotly-postgres-test
+    ports:
+      - "9090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: rmotly_test
+      POSTGRES_PASSWORD: "yVuux268YzSotcU9ul2R4Bw3UH8K8RHU"
+    volumes:
+      - rmotly_test_data:/var/lib/postgresql/data
+    profiles:
+      - test
+
+  redis_test:
+    image: redis:8-alpine
+    container_name: rmotly-redis-test
+    ports:
+      - "9091:6379"
+    command: redis-server --requirepass "-dK3zvfXTxmUrIen8QXfmUb6NhPRZ0xA"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    profiles:
+      - test
+
+volumes:
+  rmotly_data:
+  rmotly_redis:
+  rmotly_test_data:
+  ntfy_cache:
+  ntfy_etc:

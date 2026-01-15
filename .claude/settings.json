@@ -1,5 +1,5 @@
 {
-  "projectName": "Remotly",
+  "projectName": "Rmotly",
   "description": "A Flutter Android app and Dart API for bidirectional event-driven communication with configurable controls, notifications, and OpenAPI-based HTTP actions",
   "preferredLanguages": ["dart"],
   "conventions": {

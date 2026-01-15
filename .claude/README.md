@@ -1,10 +1,10 @@
-# Remotly - Claude Code Project Context
+# Rmotly - Claude Code Project Context
 
-This directory contains context and documentation for Claude Code sessions working on the Remotly project.
+This directory contains context and documentation for Claude Code sessions working on the Rmotly project.
 
 ## Project Overview
 
-**Remotly** is a bidirectional event-driven system consisting of:
+**Rmotly** is a bidirectional event-driven system consisting of:
 1. **Flutter Android App** - User-facing mobile application
 2. **Dart API (Serverpod)** - Backend server handling events and actions
 
@@ -73,7 +73,7 @@ This directory contains context and documentation for Claude Code sessions worki
 ## Directory Structure
 
 ```
-remotly/
+rmotly/
 ├── .claude/                    # Claude Code context (this directory)
 │   ├── README.md              # This file
 │   ├── settings.json          # Project settings
@@ -86,18 +86,18 @@ remotly/
 │   ├── GIT.md                 # Git & GitHub best practices
 │   └── CI_CD.md               # CI/CD workflows and setup
 ├── TASKS.md                    # Task definitions and progress
-├── remotly_app/               # Flutter app (to be created)
+├── rmotly_app/               # Flutter app (to be created)
 │   └── test/                  # App tests
 │       ├── unit/              # Unit tests
 │       ├── widget/            # Widget tests
 │       ├── integration/       # Integration tests
 │       └── golden/            # Golden/snapshot tests
-├── remotly_server/            # Serverpod server (to be created)
+├── rmotly_server/            # Serverpod server (to be created)
 │   └── test/                  # Server tests
 │       ├── unit/              # Unit tests
 │       └── integration/       # Integration tests
-├── remotly_client/            # Serverpod client (to be created)
-└── remotly_flutter/           # Serverpod Flutter integration (to be created)
+├── rmotly_client/            # Serverpod client (to be created)
+└── rmotly_flutter/           # Serverpod Flutter integration (to be created)
 ```
 
 ## Key Files for Context
@@ -186,5 +186,5 @@ flutter test              # All tests pass
 dart format .             # Code formatted
 dart analyze              # No analysis issues
 # For server changes:
-cd remotly_server && serverpod generate && dart test
+cd rmotly_server && serverpod generate && dart test
 ```

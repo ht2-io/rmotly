@@ -36,7 +36,7 @@ jobs:
           aws-region: us-west-2
 
       - name: Create passwords file
-        working-directory: remotly_server
+        working-directory: rmotly_server
         shell: bash
         env:
           SERVERPOD_PASSWORDS: ${{ secrets.SERVERPOD_PASSWORDS }}
@@ -46,19 +46,19 @@ jobs:
           ls config/
 
       - name: Get Dart packages
-        working-directory: remotly_server
+        working-directory: rmotly_server
         run: dart pub get
 
       - name: Compile server
-        working-directory: remotly_server
+        working-directory: rmotly_server
         run: dart compile kernel bin/main.dart
 
       - name: Create CodeDeploy Deployment
         id: deploy
         env:
-          PROJECT_NAME: remotly
-          AWS_NAME: remotly
-          DEPLOYMENT_BUCKET: remotly-deployment-1248676
+          PROJECT_NAME: rmotly
+          AWS_NAME: rmotly
+          DEPLOYMENT_BUCKET: rmotly-deployment-1248676
           TARGET: ${{ github.event.inputs.target }}
         run: |
           # Deploy server to AWS

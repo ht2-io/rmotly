@@ -1,0 +1,34 @@
+# Action model for Rmotly
+# Represents an HTTP action that can be triggered by controls
+class: Action
+table: actions
+fields:
+  ### Foreign key to the user who owns this action
+  userId: int, relation(parent=users)
+  ### Display name for the action
+  name: String
+  ### Optional description of what the action does
+  description: String?
+  ### HTTP method (GET, POST, PUT, DELETE, PATCH)
+  httpMethod: String
+  ### URL template with {{variable}} placeholders
+  urlTemplate: String
+  ### Optional headers template as JSON string
+  headersTemplate: String?
+  ### Optional body template with {{variable}} placeholders
+  bodyTemplate: String?
+  ### Optional OpenAPI spec URL for documentation
+  openApiSpecUrl: String?
+  ### Optional OpenAPI operation ID if imported from spec
+  openApiOperationId: String?
+  ### Optional parameters definition as JSON string
+  parameters: String?
+  ### Timestamp when the action was created
+  createdAt: DateTime
+  ### Timestamp when the action was last updated
+  updatedAt: DateTime
+
+indexes:
+  action_user_idx:
+    fields: userId
+    type: btree

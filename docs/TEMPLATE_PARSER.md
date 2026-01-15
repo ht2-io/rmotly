@@ -9,7 +9,7 @@ The `TemplateParser` utility class provides template string parsing with variabl
 The TemplateParser is part of the core utilities:
 
 ```dart
-import 'package:remotly_app/core/utils.dart';
+import 'package:rmotly_app/core/utils.dart';
 ```
 
 ## Basic Usage
@@ -266,7 +266,7 @@ The TemplateParser includes comprehensive unit tests covering:
 
 Run tests with:
 ```bash
-cd remotly_app
+cd rmotly_app
 flutter test test/template_parser_test.dart
 ```
 

@@ -1,4 +1,4 @@
-# Remotly Project - GitHub Copilot Instructions
+# Rmotly Project - GitHub Copilot Instructions
 
 ## Model Preferences
 
@@ -17,13 +17,13 @@ Use the following AI models for Copilot tasks:
 
 ## Project Overview
 
-**Remotly** is a bidirectional event-driven system:
+**Rmotly** is a bidirectional event-driven system:
 
 | Component | Location | Description |
 |-----------|----------|-------------|
-| Flutter App | `remotly_app/` | Android mobile application |
-| Serverpod API | `remotly_server/` | Dart backend server |
-| Generated Client | `remotly_client/` | Auto-generated API client (DO NOT EDIT) |
+| Flutter App | `rmotly_app/` | Android mobile application |
+| Serverpod API | `rmotly_server/` | Dart backend server |
+| Generated Client | `rmotly_client/` | Auto-generated API client (DO NOT EDIT) |
 
 ## Technology Stack
 
@@ -41,21 +41,21 @@ Use the following AI models for Copilot tasks:
 
 ### Serverpod Models
 
-**IMPORTANT**: Model YAML files MUST be in `remotly_server/lib/src/models/`
+**IMPORTANT**: Model YAML files MUST be in `rmotly_server/lib/src/models/`
 
 ```
-✅ remotly_server/lib/src/models/user.yaml
-✅ remotly_server/lib/src/models/control.yaml
-✅ remotly_server/lib/src/models/action.yaml
+✅ rmotly_server/lib/src/models/user.yaml
+✅ rmotly_server/lib/src/models/control.yaml
+✅ rmotly_server/lib/src/models/action.yaml
 
-❌ remotly_server/lib/src/user.yaml (WRONG - missing models/ directory)
-❌ remotly_server/lib/src/models/user.spy.yaml (WRONG - bad extension)
+❌ rmotly_server/lib/src/user.yaml (WRONG - missing models/ directory)
+❌ rmotly_server/lib/src/models/user.spy.yaml (WRONG - bad extension)
 ```
 
 ### Flutter App Structure
 
 ```
-remotly_app/lib/
+rmotly_app/lib/
 ├── core/              # Utilities, constants, exceptions
 ├── features/          # Feature modules (Clean Architecture)
 │   └── {feature}/
@@ -70,7 +70,7 @@ remotly_app/lib/
 ### Flutter App
 
 ```bash
-cd remotly_app
+cd rmotly_app
 flutter pub get              # Install dependencies
 dart format .                # Format code (REQUIRED before commit)
 dart analyze                 # Static analysis (must pass)
@@ -82,7 +82,7 @@ flutter build apk            # Build Android APK
 ### Serverpod Server
 
 ```bash
-cd remotly_server
+cd rmotly_server
 serverpod generate           # Generate code from YAML models
 dart analyze                 # Static analysis
 dart test                    # Run server tests
@@ -94,7 +94,7 @@ dart bin/main.dart           # Start development server
 After modifying model YAML files:
 
 ```bash
-cd remotly_server
+cd rmotly_server
 serverpod generate           # Step 1: Generate code
 serverpod create-migration   # Step 2: Create migration
 serverpod apply-migrations   # Step 3: Apply to database
@@ -149,24 +149,24 @@ export PATH="$PATH:$HOME/.pub-cache/bin"
 
 ### "Database connection failed"
 - Check PostgreSQL is running: `sudo systemctl status postgresql`
-- Verify credentials in `remotly_server/config/development.yaml`
+- Verify credentials in `rmotly_server/config/development.yaml`
 
 ### "Model not generating"
 - Ensure YAML file is in `lib/src/models/` directory
 - Ensure file has `.yaml` extension (not `.spy.yaml`)
-- Run `serverpod generate` from `remotly_server/` directory
+- Run `serverpod generate` from `rmotly_server/` directory
 
 ### Flutter analyze errors
 ```bash
-cd remotly_app
+cd rmotly_app
 dart fix --apply    # Auto-fix issues
 dart format .       # Format code
 ```
 
 ## Do NOT
 
-- Edit files in `remotly_server/lib/src/generated/`
-- Edit files in `remotly_client/lib/src/protocol/`
+- Edit files in `rmotly_server/lib/src/generated/`
+- Edit files in `rmotly_client/lib/src/protocol/`
 - Use Mockito (use Mocktail)
 - Skip running tests before committing
 - Create model files outside `lib/src/models/`

@@ -1,8 +1,8 @@
-# Remotly App Documentation
+# Rmotly App Documentation
 
 ## Overview
 
-The Remotly Flutter app provides a mobile interface for:
+The Rmotly Flutter app provides a mobile interface for:
 - Creating and managing dashboard controls
 - Configuring actions based on OpenAPI specifications
 - Managing notification topics
@@ -136,7 +136,7 @@ NotificationTopic(
 
 Each topic generates a unique webhook URL:
 ```
-https://api.remotly.app/api/notify/{topicId}
+https://api.rmotly.app/api/notify/{topicId}
 ```
 
 And an API key for authentication:
@@ -157,7 +157,7 @@ rmt_key_xxxxxxxxxxxxxxxxxxxxxxxx
 ### Project Structure
 
 ```
-remotly_app/
+rmotly_app/
 ├── lib/
 │   ├── main.dart
 │   ├── app.dart
@@ -259,7 +259,7 @@ Using Riverpod for dependency injection and state management:
 ```dart
 // Providers
 final apiClientProvider = Provider<Client>((ref) {
-  return Client('https://api.remotly.app/');
+  return Client('https://api.rmotly.app/');
 });
 
 final controlRepositoryProvider = Provider<ControlRepository>((ref) {

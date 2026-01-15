@@ -1,8 +1,8 @@
-# Remotly - Push Notification System Design
+# Rmotly - Push Notification System Design
 
 ## Executive Summary
 
-This document outlines a self-hosted push notification architecture for Remotly that avoids dependency on Firebase Cloud Messaging (FCM) while supporting modern protocols and techniques.
+This document outlines a self-hosted push notification architecture for Rmotly that avoids dependency on Firebase Cloud Messaging (FCM) while supporting modern protocols and techniques.
 
 ### Key Requirements
 
@@ -61,7 +61,7 @@ Per [Tutanota's implementation](https://f-droid.org/en/2018/09/03/replacing-gcm-
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                        REMOTLY NOTIFICATION SYSTEM                       │
+│                        RMOTLY NOTIFICATION SYSTEM                       │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │  ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐  │
@@ -91,7 +91,7 @@ Per [Tutanota's implementation](https://f-droid.org/en/2018/09/03/replacing-gcm-
 **How**: [Serverpod 2.1+ Streaming Methods](https://docs.serverpod.dev/concepts/streams)
 
 ```dart
-// Server: remotly_server/lib/src/endpoints/notification_stream_endpoint.dart
+// Server: rmotly_server/lib/src/endpoints/notification_stream_endpoint.dart
 class NotificationStreamEndpoint extends Endpoint {
   /// Stream notifications to connected client
   Stream<NotificationEvent> streamNotifications(Session session) async* {
@@ -105,7 +105,7 @@ class NotificationStreamEndpoint extends Endpoint {
   }
 }
 
-// Client: remotly_app
+// Client: rmotly_app
 final stream = client.notificationStream.streamNotifications();
 await for (final notification in stream) {
   _showLocalNotification(notification);
@@ -125,7 +125,7 @@ await for (final notification in stream) {
 **How**: [UnifiedPush](https://unifiedpush.org/) with WebPush encryption
 
 ```
-External Webhook                    Remotly API                      User's Device
+External Webhook                    Rmotly API                      User's Device
       │                                  │                                │
       │ POST /api/notify/{topicId}       │                                │
       │─────────────────────────────────>│                                │
@@ -145,7 +145,7 @@ External Webhook                    Remotly API                      User's Devi
 **Server Implementation**:
 
 ```dart
-// remotly_server/lib/src/services/push_service.dart
+// rmotly_server/lib/src/services/push_service.dart
 import 'package:web_push/web_push.dart';
 
 class PushService {
@@ -160,7 +160,7 @@ class PushService {
   }) async {
     final webPush = WebPush(
       vapidKeys: _vapidKey,
-      subject: 'mailto:noreply@remotly.app',
+      subject: 'mailto:noreply@rmotly.app',
     );
 
     await webPush.sendNotification(
@@ -177,7 +177,7 @@ class PushService {
 **Flutter Client Implementation**:
 
 ```dart
-// remotly_app/lib/core/services/push_service.dart
+// rmotly_app/lib/core/services/push_service.dart
 import 'package:unifiedpush/unifiedpush.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -203,7 +203,7 @@ class PushService {
   static Future<void> register() async {
     // Register with UnifiedPush (user chooses distributor)
     await UnifiedPush.registerApp(
-      'remotly-notifications',
+      'rmotly-notifications',
       features: ['webpush'], // Request WebPush support
     );
   }
@@ -230,8 +230,8 @@ class PushService {
       payload.body,
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          'remotly_notifications',
-          'Remotly Notifications',
+          'rmotly_notifications',
+          'Rmotly Notifications',
           importance: Importance.high,
           priority: Priority.high,
         ),
@@ -284,7 +284,7 @@ client.subscribeToSSE(
 ### Push Subscription (Server)
 
 ```yaml
-# remotly_server/lib/src/models/push_subscription.yaml
+# rmotly_server/lib/src/models/push_subscription.yaml
 class: PushSubscription
 table: push_subscriptions
 fields:
@@ -320,7 +320,7 @@ indexes:
 ### Notification Queue (Server)
 
 ```yaml
-# remotly_server/lib/src/models/notification_queue.yaml
+# rmotly_server/lib/src/models/notification_queue.yaml
 class: NotificationQueue
 table: notification_queue
 fields:
@@ -359,13 +359,13 @@ indexes:
 
 ## Complete Self-Hosted Deployment
 
-The entire Remotly stack is deployable with a single `docker-compose up -d` command.
+The entire Rmotly stack is deployable with a single `docker-compose up -d` command.
 
 ### Full docker-compose.yml
 
 ```yaml
 # docker-compose.yml
-# Deploy entire Remotly stack: docker-compose up -d
+# Deploy entire Rmotly stack: docker-compose up -d
 
 version: '3.8'
 
@@ -376,17 +376,17 @@ services:
 
   postgres:
     image: postgres:17-alpine
-    container_name: remotly-postgres
+    container_name: rmotly-postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-remotly}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-remotly}
-      POSTGRES_DB: ${POSTGRES_DB:-remotly}
+      POSTGRES_USER: ${POSTGRES_USER:-rmotly}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rmotly}
+      POSTGRES_DB: ${POSTGRES_DB:-rmotly}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U remotly"]
+      test: ["CMD-SHELL", "pg_isready -U rmotly"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -394,7 +394,7 @@ services:
 
   redis:
     image: redis:8-alpine
-    container_name: remotly-redis
+    container_name: rmotly-redis
     command: redis-server --appendonly yes
     volumes:
       - redis-data:/data
@@ -408,20 +408,20 @@ services:
     restart: unless-stopped
 
   # ===================
-  # Remotly API Server
+  # Rmotly API Server
   # ===================
 
-  remotly-api:
+  rmotly-api:
     build:
-      context: ./remotly_server
+      context: ./rmotly_server
       dockerfile: Dockerfile
-    container_name: remotly-api
+    container_name: rmotly-api
     environment:
       SERVERPOD_DATABASE_HOST: postgres
       SERVERPOD_DATABASE_PORT: 5432
-      SERVERPOD_DATABASE_NAME: ${POSTGRES_DB:-remotly}
-      SERVERPOD_DATABASE_USER: ${POSTGRES_USER:-remotly}
-      SERVERPOD_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-remotly}
+      SERVERPOD_DATABASE_NAME: ${POSTGRES_DB:-rmotly}
+      SERVERPOD_DATABASE_USER: ${POSTGRES_USER:-rmotly}
+      SERVERPOD_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-rmotly}
       SERVERPOD_REDIS_HOST: redis
       SERVERPOD_REDIS_PORT: 6379
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY}
@@ -445,7 +445,7 @@ services:
 
   ntfy:
     image: binwiederhier/ntfy
-    container_name: remotly-ntfy
+    container_name: rmotly-ntfy
     command: serve
     environment:
       NTFY_BASE_URL: ${NTFY_BASE_URL:-http://localhost:8093}
@@ -473,7 +473,7 @@ volumes:
 
 networks:
   default:
-    name: remotly-network
+    name: rmotly-network
 ```
 
 ### Deployment Commands
@@ -484,9 +484,9 @@ npx web-push generate-vapid-keys
 
 # Create .env file with keys
 cat > .env << EOF
-POSTGRES_USER=remotly
+POSTGRES_USER=rmotly
 POSTGRES_PASSWORD=your-secure-password
-POSTGRES_DB=remotly
+POSTGRES_DB=rmotly
 VAPID_PUBLIC_KEY=your-vapid-public-key
 VAPID_PRIVATE_KEY=your-vapid-private-key
 NTFY_BASE_URL=https://push.yourdomain.com
@@ -511,7 +511,7 @@ docker-compose down
 services:
   traefik:
     image: traefik:v3.0
-    container_name: remotly-traefik
+    container_name: rmotly-traefik
     command:
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
@@ -526,7 +526,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - traefik-certs:/letsencrypt
 
-  remotly-api:
+  rmotly-api:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.api.rule=Host(`api.${DOMAIN}`)"
@@ -552,7 +552,7 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ### Server Configuration
 
 ```yaml
-# remotly_server/config/development.yaml
+# rmotly_server/config/development.yaml
 push:
   # Self-hosted ntfy server (optional)
   ntfyServer: http://localhost:8093
@@ -560,7 +560,7 @@ push:
   # VAPID keys for WebPush (generate once)
   vapidPublicKey: ${VAPID_PUBLIC_KEY}
   vapidPrivateKey: ${VAPID_PRIVATE_KEY}
-  vapidSubject: mailto:noreply@remotly.app
+  vapidSubject: mailto:noreply@rmotly.app
 
   # Fallback options
   enableSseFallback: true

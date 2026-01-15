@@ -1,6 +1,6 @@
 ---
 name: flutter-testing
-description: Use when writing, running, or debugging Flutter tests. Provides testing patterns, commands, and best practices for the Remotly app.
+description: Use when writing, running, or debugging Flutter tests. Provides testing patterns, commands, and best practices for the Rmotly app.
 ---
 
 # Flutter Testing Skill
@@ -8,7 +8,7 @@ description: Use when writing, running, or debugging Flutter tests. Provides tes
 ## Test Directory Structure
 
 ```
-remotly_app/test/
+rmotly_app/test/
 ├── unit/                          # Unit tests (fast, isolated)
 │   ├── core/
 │   │   └── utils/
@@ -35,7 +35,7 @@ remotly_app/test/
 
 ```bash
 # Run all tests
-cd remotly_app && flutter test
+cd rmotly_app && flutter test
 
 # Run with coverage report
 flutter test --coverage

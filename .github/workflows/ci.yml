@@ -21,11 +21,11 @@ jobs:
           channel: 'stable'
 
       - name: Install dependencies
-        working-directory: remotly_app
+        working-directory: rmotly_app
         run: flutter pub get
 
       - name: Analyze code
-        working-directory: remotly_app
+        working-directory: rmotly_app
         run: flutter analyze
 
   analyze-server:
@@ -41,11 +41,11 @@ jobs:
           sdk: '3.6.2'
 
       - name: Install dependencies
-        working-directory: remotly_server
+        working-directory: rmotly_server
         run: dart pub get
 
       - name: Analyze code
-        working-directory: remotly_server
+        working-directory: rmotly_server
         run: dart analyze
 
   test-app:
@@ -62,19 +62,19 @@ jobs:
           channel: 'stable'
 
       - name: Install dependencies
-        working-directory: remotly_app
+        working-directory: rmotly_app
         run: flutter pub get
 
       - name: Run tests with coverage
-        working-directory: remotly_app
+        working-directory: rmotly_app
         run: flutter test --coverage
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          files: remotly_app/coverage/lcov.info
+          files: rmotly_app/coverage/lcov.info
           flags: app
-          name: remotly-app
+          name: rmotly-app
           fail_ci_if_error: false
 
   test-server:
@@ -86,7 +86,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: remotly_test
+          POSTGRES_DB: rmotly_test
         ports:
           - 5432:5432
         options: >-
@@ -115,18 +115,18 @@ jobs:
           sdk: '3.6.2'
 
       - name: Install dependencies
-        working-directory: remotly_server
+        working-directory: rmotly_server
         run: dart pub get
 
       - name: Run tests
-        working-directory: remotly_server
+        working-directory: rmotly_server
         run: dart test
         env:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: remotly_test
+          POSTGRES_DB: rmotly_test
           REDIS_HOST: localhost
           REDIS_PORT: 6379
 
@@ -145,18 +145,18 @@ jobs:
           channel: 'stable'
 
       - name: Install dependencies
-        working-directory: remotly_app
+        working-directory: rmotly_app
         run: flutter pub get
 
       - name: Build APK
-        working-directory: remotly_app
+        working-directory: rmotly_app
         run: flutter build apk --release
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: remotly-app-apk
-          path: remotly_app/build/app/outputs/flutter-apk/app-release.apk
+          name: rmotly-app-apk
+          path: rmotly_app/build/app/outputs/flutter-apk/app-release.apk
           retention-days: 7
 
   build-server:
@@ -173,9 +173,9 @@ jobs:
           sdk: '3.6.2'
 
       - name: Install dependencies
-        working-directory: remotly_server
+        working-directory: rmotly_server
         run: dart pub get
 
       - name: Compile server
-        working-directory: remotly_server
+        working-directory: rmotly_server
         run: dart compile kernel bin/main.dart

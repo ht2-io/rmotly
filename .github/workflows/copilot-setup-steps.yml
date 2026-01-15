@@ -32,15 +32,15 @@ jobs:
 
       # Get Flutter dependencies for all packages
       - name: Get dependencies (server)
-        working-directory: remotly_server
+        working-directory: rmotly_server
         run: dart pub get
 
       - name: Get dependencies (client)
-        working-directory: remotly_client
+        working-directory: rmotly_client
         run: dart pub get
 
       - name: Get dependencies (app)
-        working-directory: remotly_app
+        working-directory: rmotly_app
         run: flutter pub get
 
       # Pre-download Serverpod CLI if needed

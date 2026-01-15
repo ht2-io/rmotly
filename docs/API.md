@@ -1,8 +1,8 @@
-# Remotly API Documentation
+# Rmotly API Documentation
 
 ## Overview
 
-The Remotly API is built with Serverpod and provides endpoints for:
+The Rmotly API is built with Serverpod and provides endpoints for:
 - Event management (sending/receiving events)
 - Notification topics (creating and managing notification channels)
 - Actions (defining and executing HTTP actions)
@@ -12,7 +12,7 @@ The Remotly API is built with Serverpod and provides endpoints for:
 ## Base URL
 
 ```
-Production: https://api.remotly.app
+Production: https://api.rmotly.app
 Development: http://localhost:8080
 ```
 
@@ -24,7 +24,7 @@ The Flutter app uses Serverpod's built-in authentication with JWT tokens.
 
 ```dart
 // Client initialization
-final client = Client('https://api.remotly.app/')
+final client = Client('https://api.rmotly.app/')
   ..connectivityMonitor = FlutterConnectivityMonitor();
 
 // Authentication
@@ -36,7 +36,7 @@ await client.auth.signIn(email, password);
 External services use Bearer tokens (topic API keys):
 
 ```bash
-curl -X POST https://api.remotly.app/api/notify/topic_123 \
+curl -X POST https://api.rmotly.app/api/notify/topic_123 \
   -H "Authorization: Bearer your_topic_api_key" \
   -H "Content-Type: application/json" \
   -d '{"title": "Alert", "message": "Hello!"}'
@@ -138,7 +138,7 @@ Authorization: Bearer {topic_api_key}
   },
   "priority": "high",
   "image": "https://example.com/image.png",
-  "actionUrl": "remotly://orders/12345"
+  "actionUrl": "rmotly://orders/12345"
 }
 ```
 
@@ -186,7 +186,7 @@ POST /api/topics
   "id": "topic_abc123",
   "name": "Order Alerts",
   "apiKey": "rmt_key_xxxxxxxxxxxxxxxxxxxxxxxx",
-  "webhookUrl": "https://api.remotly.app/api/notify/topic_abc123",
+  "webhookUrl": "https://api.rmotly.app/api/notify/topic_abc123",
   "createdAt": "2025-01-14T10:30:00Z"
 }
 ```

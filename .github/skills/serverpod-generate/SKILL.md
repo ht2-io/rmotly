@@ -17,7 +17,7 @@ Run `serverpod generate` after:
 
 Models are defined in YAML files at:
 ```
-remotly_server/lib/src/models/*.yaml
+rmotly_server/lib/src/models/*.yaml
 ```
 
 ## Model Definition Syntax
@@ -105,20 +105,20 @@ fields:
 ### Basic Generation
 
 ```bash
-cd remotly_server
+cd rmotly_server
 serverpod generate
 ```
 
 This generates:
 - Model classes in `lib/src/generated/`
-- Client code in `remotly_client/`
+- Client code in `rmotly_client/`
 - Protocol files
 
 ### Full Workflow After Model Changes
 
 ```bash
 # 1. Navigate to server directory
-cd remotly_server
+cd rmotly_server
 
 # 2. Generate code
 serverpod generate
@@ -140,7 +140,7 @@ dart bin/main.dart
 After changing model fields that affect the database:
 
 ```bash
-cd remotly_server
+cd rmotly_server
 serverpod create-migration
 ```
 
@@ -173,16 +173,16 @@ After running generation:
 
 ```bash
 # Verify model was generated
-ls remotly_server/lib/src/generated/
+ls rmotly_server/lib/src/generated/
 
 # Verify client was updated
-ls remotly_client/lib/src/protocol/
+ls rmotly_client/lib/src/protocol/
 ```
 
 ### 2. Start Server
 
 ```bash
-cd remotly_server
+cd rmotly_server
 dart bin/main.dart
 ```
 
@@ -195,14 +195,14 @@ Serverpod listening on port 8080
 ### 3. Run Server Tests
 
 ```bash
-cd remotly_server
+cd rmotly_server
 dart test
 ```
 
 ### 4. Update Flutter App Dependencies
 
 ```bash
-cd remotly_app
+cd rmotly_app
 flutter pub get
 ```
 
@@ -232,7 +232,7 @@ flutter pub get
 
 ```bash
 # Check database is accessible
-psql -U remotly_user -d remotly -h localhost
+psql -U rmotly_user -d rmotly -h localhost
 
 # Check Redis is running
 redis-cli ping
@@ -297,7 +297,7 @@ indexes:
 
 ```bash
 # Generate code
-cd remotly_server && serverpod generate
+cd rmotly_server && serverpod generate
 
 # Create migration
 serverpod create-migration

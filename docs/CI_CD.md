@@ -1,6 +1,6 @@
 # CI/CD Documentation
 
-This document describes the Continuous Integration and Continuous Deployment (CI/CD) setup for the Remotly project.
+This document describes the Continuous Integration and Continuous Deployment (CI/CD) setup for the Rmotly project.
 
 ## Table of Contents
 
@@ -14,7 +14,7 @@ This document describes the Continuous Integration and Continuous Deployment (CI
 
 ## Overview
 
-The Remotly project uses GitHub Actions for automated testing, building, and deployment. The CI/CD setup ensures code quality and enables reliable deployments.
+The Rmotly project uses GitHub Actions for automated testing, building, and deployment. The CI/CD setup ensures code quality and enables reliable deployments.
 
 ### Workflows
 
@@ -141,7 +141,7 @@ The test-server job uses the following environment variables for database connec
 | `POSTGRES_PORT` | 5432 | PostgreSQL port |
 | `POSTGRES_USER` | postgres | PostgreSQL username |
 | `POSTGRES_PASSWORD` | postgres | PostgreSQL password |
-| `POSTGRES_DB` | remotly_test | Test database name |
+| `POSTGRES_DB` | rmotly_test | Test database name |
 | `REDIS_HOST` | localhost | Redis host |
 | `REDIS_PORT` | 6379 | Redis port |
 
@@ -264,7 +264,7 @@ Install the required tools:
 ### Run Flutter App Tests Locally
 
 ```bash
-cd remotly_app
+cd rmotly_app
 flutter pub get
 flutter analyze
 flutter test --coverage
@@ -278,14 +278,14 @@ docker run -d --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgre
 docker run -d --name redis -p 6379:6379 redis:8
 
 # Run tests
-cd remotly_server
+cd rmotly_server
 dart pub get
 dart analyze
 export POSTGRES_HOST=localhost
 export POSTGRES_PORT=5432
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=postgres
-export POSTGRES_DB=remotly_test
+export POSTGRES_DB=rmotly_test
 export REDIS_HOST=localhost
 export REDIS_PORT=6379
 dart test
@@ -299,11 +299,11 @@ docker rm postgres redis
 
 ```bash
 # Build Flutter app
-cd remotly_app
+cd rmotly_app
 flutter build apk --release
 
 # Compile Serverpod server
-cd remotly_server
+cd rmotly_server
 dart compile kernel bin/main.dart
 ```
 

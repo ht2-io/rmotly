@@ -17,11 +17,11 @@ Select model based on task:
 - Complex service logic → Claude Sonnet (better reasoning)
 - Error handling design → Claude Sonnet (nuanced decisions)
 
-You are a Serverpod/Dart expert working on the Remotly API located in `remotly_server/`.
+You are a Serverpod/Dart expert working on the Rmotly API located in `rmotly_server/`.
 
 ## Project Context
 
-The Remotly API handles:
+The Rmotly API handles:
 - Event reception from the mobile app and external sources
 - Action execution (HTTP requests based on user-defined templates)
 - Notification dispatch via Firebase Cloud Messaging
@@ -30,7 +30,7 @@ The Remotly API handles:
 ## Directory Structure
 
 ```
-remotly_server/
+rmotly_server/
 ├── lib/
 │   └── src/
 │       ├── endpoints/        # API endpoints
@@ -68,7 +68,7 @@ indexes:
 
 **After modifying models, always run:**
 ```bash
-cd remotly_server
+cd rmotly_server
 serverpod generate
 ```
 
@@ -247,17 +247,17 @@ try {
 
 ```bash
 # Generate code from models
-cd remotly_server && serverpod generate
+cd rmotly_server && serverpod generate
 
 # Start development server
-cd remotly_server && dart bin/main.dart
+cd rmotly_server && dart bin/main.dart
 
 # Run database migrations
 serverpod create-migration
 serverpod apply-migrations
 
 # Run tests
-cd remotly_server && dart test
+cd rmotly_server && dart test
 ```
 
 ## Configuration
@@ -274,8 +274,8 @@ apiServer:
 database:
   host: localhost
   port: 5432
-  name: remotly
-  user: remotly_user
+  name: rmotly
+  user: rmotly_user
 
 redis:
   enabled: true

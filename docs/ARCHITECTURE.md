@@ -1,8 +1,8 @@
-# Remotly - System Architecture
+# Rmotly - System Architecture
 
 ## Overview
 
-Remotly is a bidirectional event-driven system that enables users to:
+Rmotly is a bidirectional event-driven system that enables users to:
 1. Create custom controls in a mobile app that trigger remote actions
 2. Receive notifications from external sources through configurable topics
 3. Define actions based on OpenAPI specifications
@@ -26,7 +26,7 @@ Remotly is a bidirectional event-driven system that enables users to:
                     └─────────────────┼─────────────────┘
                                       │
                     ┌─────────────────▼─────────────────┐
-                    │         Remotly API Server        │
+                    │         Rmotly API Server        │
                     │           (Serverpod)             │
                     │                                   │
                     │  ┌─────────────────────────────┐  │
@@ -60,7 +60,7 @@ Remotly is a bidirectional event-driven system that enables users to:
                          └────────────┼────────────┘
                                       │
                     ┌─────────────────▼─────────────────┐
-                    │        Remotly Mobile App         │
+                    │        Rmotly Mobile App         │
                     │            (Flutter)              │
                     │                                   │
                     │  ┌─────────────────────────────┐  │

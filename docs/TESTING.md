@@ -1,6 +1,6 @@
-# Remotly - Testing Guide
+# Rmotly - Testing Guide
 
-This document outlines testing frameworks, patterns, and best practices for the Remotly project.
+This document outlines testing frameworks, patterns, and best practices for the Rmotly project.
 
 ## Testing Philosophy
 
@@ -357,7 +357,7 @@ void main() {
 
 ## Mocking Libraries
 
-### Mocktail (Recommended for Remotly)
+### Mocktail (Recommended for Rmotly)
 
 No code generation required, simpler API.
 
@@ -623,7 +623,7 @@ xdg-open coverage/html/index.html  # Linux
 ### Serverpod Tests
 
 ```bash
-cd remotly_server
+cd rmotly_server
 
 # Run all tests
 dart test
@@ -686,7 +686,7 @@ jobs:
       - uses: dart-lang/setup-dart@v1
 
       - name: Run Serverpod tests
-        working-directory: remotly_server
+        working-directory: rmotly_server
         run: dart test
 ```
 

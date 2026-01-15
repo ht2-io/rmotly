@@ -1,5 +1,5 @@
 ---
-applyTo: "remotly_server/**"
+applyTo: "rmotly_server/**"
 ---
 
 # Serverpod Development Instructions
@@ -9,16 +9,16 @@ applyTo: "remotly_server/**"
 **CRITICAL**: Serverpod model files MUST follow these rules:
 
 ### File Location
-Models MUST be placed in `remotly_server/lib/src/models/` directory.
+Models MUST be placed in `rmotly_server/lib/src/models/` directory.
 
 ```
-✅ CORRECT: remotly_server/lib/src/models/user.yaml
-✅ CORRECT: remotly_server/lib/src/models/control.yaml
-✅ CORRECT: remotly_server/lib/src/models/action.yaml
+✅ CORRECT: rmotly_server/lib/src/models/user.yaml
+✅ CORRECT: rmotly_server/lib/src/models/control.yaml
+✅ CORRECT: rmotly_server/lib/src/models/action.yaml
 
-❌ WRONG: remotly_server/lib/src/user.yaml
-❌ WRONG: remotly_server/lib/src/models/user.spy.yaml
-❌ WRONG: remotly_server/user.yaml
+❌ WRONG: rmotly_server/lib/src/user.yaml
+❌ WRONG: rmotly_server/lib/src/models/user.spy.yaml
+❌ WRONG: rmotly_server/user.yaml
 ```
 
 ### File Extension
@@ -36,7 +36,7 @@ Models MUST use `.yaml` extension (NOT `.spy.yaml`, `.model.yaml`, or any other 
 ### Model YAML Structure
 
 ```yaml
-# Example: remotly_server/lib/src/models/user.yaml
+# Example: rmotly_server/lib/src/models/user.yaml
 class: User
 table: users
 fields:
@@ -57,7 +57,7 @@ indexes:
 ALWAYS run these commands after model changes:
 
 ```bash
-cd remotly_server
+cd rmotly_server
 serverpod generate
 ```
 
@@ -75,7 +75,7 @@ dart bin/main.dart
 ## Directory Structure
 
 ```
-remotly_server/
+rmotly_server/
 ├── lib/
 │   └── src/
 │       ├── endpoints/        # API endpoint classes

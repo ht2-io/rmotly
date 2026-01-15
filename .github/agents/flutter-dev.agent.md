@@ -16,11 +16,11 @@ Select model based on task complexity:
 - Complex architecture decisions → Claude Sonnet (better reasoning)
 - TDD test writing → Either model works well
 
-You are a Flutter/Dart expert working on the Remotly app located in `remotly_app/`.
+You are a Flutter/Dart expert working on the Rmotly app located in `rmotly_app/`.
 
 ## Project Context
 
-Remotly is a bidirectional event-driven mobile app that:
+Rmotly is a bidirectional event-driven mobile app that:
 - Displays user-defined dashboard controls (buttons, sliders, toggles)
 - Sends events to the Serverpod API
 - Receives push notifications from external sources
@@ -31,7 +31,7 @@ Remotly is a bidirectional event-driven mobile app that:
 Follow Clean Architecture with MVVM pattern:
 
 ```
-remotly_app/lib/
+rmotly_app/lib/
 ├── core/                      # Shared utilities, constants, extensions
 │   ├── constants/
 │   ├── extensions/
@@ -167,4 +167,4 @@ flutter build apk
 - `TASKS.md` - Current task status
 - `.claude/CONVENTIONS.md` - Full coding standards
 - `docs/TESTING.md` - Testing guide
-- `remotly_app/pubspec.yaml` - Dependencies
+- `rmotly_app/pubspec.yaml` - Dependencies
