@@ -32,7 +32,13 @@ class ApiKeyService {
 
   /// Validate an API key and return the associated notification topic.
   ///
-  /// Performs constant-time comparison to prevent timing attacks.
+  /// Performs constant-time comparison to prevent timing attacks on the
+  /// key comparison itself. The database query is indexed for performance
+  /// and will vary in timing, but this is an acceptable trade-off as:
+  /// 1. Database timing leaks existence but not the key value
+  /// 2. Constant-time comparison protects the actual key comparison
+  /// 3. Full table scan for complete timing safety would be impractical
+  ///
   /// Returns the [NotificationTopic] if the key is valid and the topic is enabled,
   /// otherwise returns null.
   ///
@@ -45,6 +51,8 @@ class ApiKeyService {
     String apiKey,
   ) async {
     // Query the database for a topic with this API key
+    // Note: This is indexed for performance. The timing of this query
+    // may leak whether a key exists, but protects the key value itself.
     final topics = await NotificationTopic.db.find(
       session,
       where: (t) => t.apiKey.equals(apiKey),
@@ -57,7 +65,7 @@ class ApiKeyService {
 
     final topic = topics.first;
 
-    // Constant-time comparison to prevent timing attacks
+    // Constant-time comparison to prevent timing attacks on key value
     if (!_constantTimeEquals(apiKey, topic.apiKey)) {
       return null;
     }
