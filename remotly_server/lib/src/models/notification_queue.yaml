@@ -1,0 +1,33 @@
+# NotificationQueue model for Remotly
+# Represents queued notifications before delivery
+class: NotificationQueue
+table: notification_queue
+fields:
+  ### Foreign key to the user receiving the notification
+  userId: int, relation(parent=users)
+  ### Optional foreign key to the notification topic (if from webhook)
+  topicId: int?, relation(parent=notification_topics)
+  ### Notification title
+  title: String
+  ### Notification body text
+  body: String
+  ### Optional JSON payload for additional data
+  data: String?
+  ### Notification status: 'pending', 'sent', 'delivered', 'failed'
+  status: String
+  ### Number of delivery attempts
+  attempts: int
+  ### Notification priority: 'low', 'normal', 'high'
+  priority: String
+  ### Timestamp when the notification was created
+  createdAt: DateTime
+  ### Timestamp when the notification expires
+  expiresAt: DateTime
+
+indexes:
+  notif_queue_user_idx:
+    fields: userId
+    type: btree
+  notif_queue_status_idx:
+    fields: status
+    type: btree
