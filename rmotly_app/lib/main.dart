@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
+import 'core/adapters/action_adapter.dart';
+import 'core/adapters/control_adapter.dart';
+import 'core/adapters/notification_topic_adapter.dart';
 import 'core/providers/api_client_provider.dart';
 import 'shared/services/auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Hive
+  await Hive.initFlutter();
+
+  // Register Hive type adapters
+  Hive.registerAdapter(ControlAdapter());
+  Hive.registerAdapter(ActionAdapter());
+  Hive.registerAdapter(NotificationTopicAdapter());
 
   runApp(
     const ProviderScope(
