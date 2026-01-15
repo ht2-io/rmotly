@@ -280,7 +280,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Account created! Check your email for verification.'),
+            content:
+                Text('Account created! Check your email for verification.'),
           ),
         );
         context.go('/login');

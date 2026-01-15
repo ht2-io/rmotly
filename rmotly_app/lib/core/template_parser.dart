@@ -36,7 +36,7 @@ class TemplateParser {
       }
 
       final result = _resolveValue(variablePath, variables);
-      
+
       // Check if variable was found (using a special marker for "not found")
       if (result is _NotFound) {
         return match.group(0)!; // Keep placeholder unchanged
@@ -61,7 +61,7 @@ class TemplateParser {
 
     for (var i = 0; i < parts.length; i++) {
       final part = parts[i];
-      
+
       if (current == null) {
         return const _NotFound();
       }

@@ -70,7 +70,8 @@ void main() {
 
     test('handles API endpoint construction', () {
       // Arrange - Building REST API endpoint
-      const template = 'https://api.example.com/v{{version}}/{{resource}}/{{id}}/{{action}}';
+      const template =
+          'https://api.example.com/v{{version}}/{{resource}}/{{id}}/{{action}}';
 
       final variables = {
         'version': 2,
