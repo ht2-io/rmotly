@@ -287,10 +287,11 @@ class WebhookHandler {
 class WebhookEndpoint extends Endpoint {
   /// Get webhook URL for a topic
   Future<String> getWebhookUrl(Session session, int topicId) async {
-    final userId = await session.auth.authenticatedUserId;
-    if (userId == null) {
+    final authInfo = await session.authenticated;
+    if (authInfo == null) {
       throw StateError('User not authenticated');
     }
+    final userId = authInfo.userId;
 
     // TODO: Verify topic belongs to user
     // final topic = await NotificationTopic.db.findById(session, topicId);
@@ -310,10 +311,11 @@ class WebhookEndpoint extends Endpoint {
     String title = 'Test Notification',
     String body = 'This is a test webhook notification.',
   }) async {
-    final userId = await session.auth.authenticatedUserId;
-    if (userId == null) {
+    final authInfo = await session.authenticated;
+    if (authInfo == null) {
       throw StateError('User not authenticated');
     }
+    final userId = authInfo.userId;
 
     // TODO: Verify topic and create test notification
     return {

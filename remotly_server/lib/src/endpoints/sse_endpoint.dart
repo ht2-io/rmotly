@@ -192,10 +192,11 @@ class SseEndpoint extends Endpoint {
   ///
   /// Returns the SSE endpoint URL and authentication token.
   Future<Map<String, dynamic>> getConnectionInfo(Session session) async {
-    final userId = await session.auth.authenticatedUserId;
-    if (userId == null) {
+    final authInfo = await session.authenticated;
+    if (authInfo == null) {
       throw StateError('User not authenticated');
     }
+    final userId = authInfo.userId;
 
     // Generate a temporary token for SSE connection
     // TODO: Implement proper token generation
@@ -214,10 +215,11 @@ class SseEndpoint extends Endpoint {
   /// This is used when the client connects and wants to retrieve
   /// any notifications that were queued while disconnected.
   Future<List<Map<String, dynamic>>> getQueuedNotifications(Session session) async {
-    final userId = await session.auth.authenticatedUserId;
-    if (userId == null) {
+    final authInfo = await session.authenticated;
+    if (authInfo == null) {
       throw StateError('User not authenticated');
     }
+    final userId = authInfo.userId;
 
     final notificationService = NotificationService();
     final queued = notificationService.getSseQueue(userId);

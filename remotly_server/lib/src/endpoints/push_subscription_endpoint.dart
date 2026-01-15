@@ -56,14 +56,15 @@ class PushSubscriptionEndpoint extends Endpoint {
     required String deliveryMethod,
   }) async {
     // Authenticate user
-    final userId = await session.auth.authenticatedUserId;
-    if (userId == null) {
+    final authInfo = await session.authenticated;
+    if (authInfo == null) {
       session.log(
         'Unauthenticated push subscription registration rejected',
         level: LogLevel.warning,
       );
       throw AuthenticationException('User not authenticated');
     }
+    final userId = authInfo.userId;
 
     // Validate endpoint
     if (endpoint.trim().isEmpty) {
@@ -111,14 +112,15 @@ class PushSubscriptionEndpoint extends Endpoint {
   /// Throws [AuthenticationException] if user is not authenticated.
   Future<bool> unregisterEndpoint(Session session, String endpoint) async {
     // Authenticate user
-    final userId = await session.auth.authenticatedUserId;
-    if (userId == null) {
+    final authInfo = await session.authenticated;
+    if (authInfo == null) {
       session.log(
         'Unauthenticated push subscription unregistration rejected',
         level: LogLevel.warning,
       );
       throw AuthenticationException('User not authenticated');
     }
+    final userId = authInfo.userId;
 
     if (endpoint.trim().isEmpty) {
       throw ArgumentError('Endpoint cannot be empty');
@@ -146,14 +148,15 @@ class PushSubscriptionEndpoint extends Endpoint {
   /// Throws [AuthenticationException] if user is not authenticated.
   Future<List<PushSubscriptionInfo>> listSubscriptions(Session session) async {
     // Authenticate user
-    final userId = await session.auth.authenticatedUserId;
-    if (userId == null) {
+    final authInfo = await session.authenticated;
+    if (authInfo == null) {
       session.log(
         'Unauthenticated subscription list request rejected',
         level: LogLevel.warning,
       );
       throw AuthenticationException('User not authenticated');
     }
+    final userId = authInfo.userId;
 
     session.log(
       'Listing subscriptions for user $userId',
@@ -181,14 +184,15 @@ class PushSubscriptionEndpoint extends Endpoint {
     bool? enabled,
   }) async {
     // Authenticate user
-    final userId = await session.auth.authenticatedUserId;
-    if (userId == null) {
+    final authInfo = await session.authenticated;
+    if (authInfo == null) {
       session.log(
         'Unauthenticated subscription update rejected',
         level: LogLevel.warning,
       );
       throw AuthenticationException('User not authenticated');
     }
+    final userId = authInfo.userId;
 
     if (enabled == null) {
       throw ArgumentError('At least one parameter must be provided to update');

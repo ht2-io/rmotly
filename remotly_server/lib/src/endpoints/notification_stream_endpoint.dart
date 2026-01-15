@@ -29,14 +29,15 @@ class NotificationStreamEndpoint extends Endpoint {
   /// Throws [AuthenticationException] if user is not authenticated.
   Stream<StreamNotification> streamNotifications(Session session) async* {
     // Get authenticated user
-    final userId = await session.auth.authenticatedUserId;
-    if (userId == null) {
+    final authInfo = await session.authenticated;
+    if (authInfo == null) {
       session.log(
         'Unauthenticated stream request rejected',
         level: LogLevel.warning,
       );
       throw AuthenticationException('User not authenticated');
     }
+    final userId = authInfo.userId;
 
     session.log(
       'Starting notification stream for user $userId',
@@ -69,12 +70,12 @@ class NotificationStreamEndpoint extends Endpoint {
   ///
   /// Returns the number of active WebSocket connections for this user.
   Future<int> getConnectionCount(Session session) async {
-    final userId = await session.auth.authenticatedUserId;
-    if (userId == null) {
+    final authInfo = await session.authenticated;
+    if (authInfo == null) {
       throw AuthenticationException('User not authenticated');
     }
 
-    return notificationStreamService.getConnectionCount(userId);
+    return notificationStreamService.getConnectionCount(authInfo.userId);
   }
 
   /// Send a test notification to the authenticated user.
@@ -86,10 +87,11 @@ class NotificationStreamEndpoint extends Endpoint {
     String title = 'Test Notification',
     String body = 'This is a test notification from Remotly.',
   }) async {
-    final userId = await session.auth.authenticatedUserId;
-    if (userId == null) {
+    final authInfo = await session.authenticated;
+    if (authInfo == null) {
       throw AuthenticationException('User not authenticated');
     }
+    final userId = authInfo.userId;
 
     final notification = StreamNotification(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
