@@ -56,7 +56,7 @@ class PushSubscriptionEndpoint extends Endpoint {
     required String deliveryMethod,
   }) async {
     // Authenticate user
-    final userId = await session.auth.authenticatedUserId;
+    final userId = (await session.authenticated)?.userId;
     if (userId == null) {
       session.log(
         'Unauthenticated push subscription registration rejected',
@@ -111,7 +111,7 @@ class PushSubscriptionEndpoint extends Endpoint {
   /// Throws [AuthenticationException] if user is not authenticated.
   Future<bool> unregisterEndpoint(Session session, String endpoint) async {
     // Authenticate user
-    final userId = await session.auth.authenticatedUserId;
+    final userId = (await session.authenticated)?.userId;
     if (userId == null) {
       session.log(
         'Unauthenticated push subscription unregistration rejected',
@@ -146,7 +146,7 @@ class PushSubscriptionEndpoint extends Endpoint {
   /// Throws [AuthenticationException] if user is not authenticated.
   Future<List<PushSubscriptionInfo>> listSubscriptions(Session session) async {
     // Authenticate user
-    final userId = await session.auth.authenticatedUserId;
+    final userId = (await session.authenticated)?.userId;
     if (userId == null) {
       session.log(
         'Unauthenticated subscription list request rejected',
@@ -181,7 +181,7 @@ class PushSubscriptionEndpoint extends Endpoint {
     bool? enabled,
   }) async {
     // Authenticate user
-    final userId = await session.auth.authenticatedUserId;
+    final userId = (await session.authenticated)?.userId;
     if (userId == null) {
       session.log(
         'Unauthenticated subscription update rejected',

@@ -57,7 +57,7 @@ class ControlEndpoint extends Endpoint {
     int? position,
   }) async {
     // Authenticate user
-    final userId = await session.auth.authenticatedUserId;
+    final userId = (await session.authenticated)?.userId;
     if (userId == null) {
       session.log(
         'Unauthenticated control creation rejected',
@@ -130,7 +130,7 @@ class ControlEndpoint extends Endpoint {
   /// Throws [AuthenticationException] if user is not authenticated.
   Future<List<Control>> listControls(Session session) async {
     // Authenticate user
-    final userId = await session.auth.authenticatedUserId;
+    final userId = (await session.authenticated)?.userId;
     if (userId == null) {
       session.log(
         'Unauthenticated control list request rejected',
@@ -165,7 +165,7 @@ class ControlEndpoint extends Endpoint {
   /// Throws [AuthenticationException] if user is not authenticated.
   Future<Control?> getControl(Session session, int controlId) async {
     // Authenticate user
-    final userId = await session.auth.authenticatedUserId;
+    final userId = (await session.authenticated)?.userId;
     if (userId == null) {
       session.log(
         'Unauthenticated control get request rejected',
@@ -221,7 +221,7 @@ class ControlEndpoint extends Endpoint {
     String? config,
   }) async {
     // Authenticate user
-    final userId = await session.auth.authenticatedUserId;
+    final userId = (await session.authenticated)?.userId;
     if (userId == null) {
       session.log(
         'Unauthenticated control update rejected',
@@ -305,7 +305,7 @@ class ControlEndpoint extends Endpoint {
   /// Throws [AuthenticationException] if user is not authenticated.
   Future<bool> deleteControl(Session session, int controlId) async {
     // Authenticate user
-    final userId = await session.auth.authenticatedUserId;
+    final userId = (await session.authenticated)?.userId;
     if (userId == null) {
       session.log(
         'Unauthenticated control deletion rejected',
@@ -360,7 +360,7 @@ class ControlEndpoint extends Endpoint {
     List<int> controlIds,
   ) async {
     // Authenticate user
-    final userId = await session.auth.authenticatedUserId;
+    final userId = (await session.authenticated)?.userId;
     if (userId == null) {
       session.log(
         'Unauthenticated control reorder rejected',
