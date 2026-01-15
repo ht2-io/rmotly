@@ -43,8 +43,20 @@ class EncryptionService {
       return envKey;
     }
 
-    // For development, generate a key (DO NOT USE IN PRODUCTION)
-    // In production, this should throw an error requiring explicit configuration
+    // Check if running in production
+    final isProduction = const bool.fromEnvironment('dart.vm.product');
+    if (isProduction) {
+      throw StateError(
+        'RMOTLY_ENCRYPTION_KEY environment variable is required in production. '
+        'Generate a key with: dart run lib/src/services/encryption_service.dart generate-key',
+      );
+    }
+
+    // For development only, generate a temporary key
+    // WARNING: This key is not persisted and will change on restart
+    print('⚠️  WARNING: Using temporary encryption key for development');
+    print('⚠️  Set RMOTLY_ENCRYPTION_KEY environment variable for production');
+    
     final random = Random.secure();
     final keyBytes = Uint8List.fromList(
       List<int>.generate(32, (i) => random.nextInt(256)),

@@ -208,13 +208,21 @@ class RateLimitService {
     final now = DateTime.now();
     final windowStart = now.subtract(config.window);
 
+    // Collect keys to remove
+    final keysToRemove = <String>[];
+
     // Remove expired requests
     _requests.forEach((key, requests) {
       requests.removeWhere((t) => t.isBefore(windowStart));
+      if (requests.isEmpty) {
+        keysToRemove.add(key);
+      }
     });
 
     // Remove empty entries
-    _requests.removeWhere((key, requests) => requests.isEmpty);
+    for (final key in keysToRemove) {
+      _requests.remove(key);
+    }
   }
 
   /// Dispose of the rate limiter

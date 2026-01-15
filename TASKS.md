@@ -11,7 +11,7 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 | Phase 3: App Core | In Progress | 31% |
 | Phase 4: Features | Not Started | 0% |
 | Phase 5: Integration | Not Started | 0% |
-| Phase 6: Polish | In Progress | 4% |
+| Phase 6: Polish | In Progress | 17% |
 
 ---
 
@@ -694,18 +694,18 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 
 ### 6.3 Security
 
-- [ ] **6.3.1** Implement secure storage for credentials
-  - Encrypt action credentials
-  - Secure API key storage
+- [x] **6.3.1** Implement secure storage for credentials
+  - Encrypt action credentials (EncryptionService with AES-256-GCM)
+  - Secure API key storage (SecureStorageService for Flutter)
 
-- [ ] **6.3.2** Implement rate limiting on API
-  - Per-user limits
-  - Per-topic limits
+- [x] **6.3.2** Implement rate limiting on API
+  - Per-user limits (RateLimitService implemented)
+  - Per-topic limits (Webhook endpoint has rate limiting)
 
-- [ ] **6.3.3** Security audit
-  - Review authentication flow
-  - Review data validation
-  - Review API security
+- [x] **6.3.3** Security audit
+  - Review authentication flow (documented in SECURITY_AUDIT.md)
+  - Review data validation (documented in SECURITY_AUDIT.md)
+  - Review API security (documented in SECURITY_AUDIT.md)
 
 ### 6.4 Documentation
 
