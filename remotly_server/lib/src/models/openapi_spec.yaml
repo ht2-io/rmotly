@@ -1,0 +1,15 @@
+# OpenAPI specification metadata
+class: OpenApiSpec
+fields:
+  ### Title of the API
+  title: String
+  ### Version of the API
+  version: String?
+  ### Description of the API
+  description: String?
+  ### Base URL for the API
+  baseUrl: String?
+  ### OpenAPI spec version (e.g., '2.0', '3.0', '3.1')
+  specVersion: String
+  ### List of operations in the specification
+  operations: List<OpenApiOperation>

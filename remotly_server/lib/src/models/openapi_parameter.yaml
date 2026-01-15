@@ -1,0 +1,15 @@
+# A parameter from an OpenAPI operation
+class: OpenApiParameter
+fields:
+  ### Name of the parameter
+  name: String
+  ### Location of the parameter (path, query, header, cookie)
+  location: String
+  ### Description of the parameter
+  description: String?
+  ### Whether the parameter is required
+  required: bool
+  ### Data type of the parameter
+  type: String
+  ### Format of the parameter (e.g., int32, date-time)
+  format: String?

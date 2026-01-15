@@ -1,0 +1,17 @@
+# An operation (endpoint) from an OpenAPI spec
+class: OpenApiOperation
+fields:
+  ### Unique identifier for the operation
+  operationId: String
+  ### HTTP method (GET, POST, PUT, DELETE, etc.)
+  method: String
+  ### Path of the operation
+  path: String
+  ### Short summary of the operation
+  summary: String?
+  ### Detailed description of the operation
+  description: String?
+  ### List of parameters for the operation
+  parameters: List<OpenApiParameter>
+  ### Tags associated with the operation
+  tags: List<String>
