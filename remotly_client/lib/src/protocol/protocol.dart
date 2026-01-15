@@ -16,7 +16,9 @@ import 'control.dart' as _i4;
 import 'event.dart' as _i5;
 import 'notification_topic.dart' as _i6;
 import 'user.dart' as _i7;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i8;
+import 'package:remotly_client/src/services/subscription_manager_service.dart'
+    as _i8;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i9;
 export 'greeting.dart';
 export 'action.dart';
 export 'control.dart';
@@ -74,8 +76,22 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i7.User?>()) {
       return (data != null ? _i7.User.fromJson(data) : null) as T;
     }
+    if (t == List<_i8.PushSubscriptionInfo>) {
+      return (data as List)
+          .map((e) => deserialize<_i8.PushSubscriptionInfo>(e))
+          .toList() as T;
+    }
+    if (t == Map<String, dynamic>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
+    }
+    if (t == List<Map<String, dynamic>>) {
+      return (data as List)
+          .map((e) => deserialize<Map<String, dynamic>>(e))
+          .toList() as T;
+    }
     try {
-      return _i8.Protocol().deserialize<T>(data, t);
+      return _i9.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -102,7 +118,7 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i7.User) {
       return 'User';
     }
-    className = _i8.Protocol().getClassNameForObject(data);
+    className = _i9.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth.$className';
     }
@@ -135,7 +151,7 @@ class Protocol extends _i1.SerializationManager {
     }
     if (dataClassName.startsWith('serverpod_auth.')) {
       data['className'] = dataClassName.substring(15);
-      return _i8.Protocol().deserializeByClassName(data);
+      return _i9.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }
