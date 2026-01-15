@@ -4,6 +4,7 @@
 library;
 
 export 'action_executor_service.dart';
+export 'api_key_service.dart';
 export 'event_service.dart';
 export 'notification_service.dart';
 export 'notification_stream_service.dart';
