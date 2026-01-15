@@ -136,6 +136,48 @@ Conventional Commits format: `type(scope): description`
 - **NotificationTopic**: Webhook channel with API key authentication
 - **Event**: Occurrence flowing through the system (from controls or webhooks)
 
+## GitHub Copilot Coding Agent
+
+This repository uses GitHub Copilot coding agent for automated task implementation.
+
+### Assigning Copilot to Issues
+
+**Correct syntax** (use GitHub CLI):
+```bash
+gh issue edit <issue_number> --add-assignee "@copilot"
+```
+
+**Example:**
+```bash
+gh issue edit 123 --add-assignee "@copilot"
+```
+
+**Automated assignment:** Issues labeled `copilot` are automatically assigned via `.github/workflows/assign-copilot.yml`
+
+### Copilot Environment Setup
+
+The `.github/workflows/copilot-setup-steps.yml` configures Copilot's environment:
+- Flutter 3.24.0 SDK
+- Dart SDK
+- All project dependencies
+- Serverpod CLI
+
+This runs **before** the firewall is enabled, allowing external downloads from `storage.googleapis.com`.
+
+### Firewall Allowlist
+
+If Copilot is blocked from accessing URLs, either:
+1. Add the host to `copilot-setup-steps.yml` (preferred)
+2. Add to custom allowlist: **Repository Settings → Copilot → Coding agent → Custom allowlist**
+
+### What NOT to Use
+
+```bash
+# These do NOT work:
+gh api /repos/.../assignees -f "assignees[]=copilot-swe-agent"  # Wrong assignee name
+gh api /repos/.../assignees -f "assignees[]=Copilot"            # API doesn't support this
+```
+
 ## Documentation
 
 | File | Purpose |
