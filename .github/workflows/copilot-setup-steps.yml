@@ -1,0 +1,56 @@
+name: Copilot Setup Steps
+
+# This workflow configures the development environment for GitHub Copilot coding agent.
+# Setup steps run BEFORE the firewall is enabled, allowing external downloads.
+# See: https://docs.github.com/en/copilot/customizing-copilot/customizing-the-development-environment-for-copilot-coding-agent
+
+on: workflow_dispatch
+
+jobs:
+  # Job MUST be named 'copilot-setup-steps' to be recognized by Copilot
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install Flutter SDK
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+
+      # Verify Flutter installation
+      - name: Verify Flutter
+        run: |
+          flutter --version
+          dart --version
+
+      # Get Flutter dependencies for all packages
+      - name: Get dependencies (server)
+        working-directory: remotly_server
+        run: dart pub get
+
+      - name: Get dependencies (client)
+        working-directory: remotly_client
+        run: dart pub get
+
+      - name: Get dependencies (app)
+        working-directory: remotly_app
+        run: flutter pub get
+
+      # Pre-download Serverpod CLI if needed
+      - name: Activate Serverpod CLI
+        run: dart pub global activate serverpod_cli
+
+      - name: Setup complete
+        run: |
+          echo "Flutter SDK installed"
+          echo "Dart SDK installed"
+          echo "Dependencies fetched"
+          echo "Serverpod CLI activated"
+          echo "Copilot coding agent environment is ready!"
