@@ -845,13 +845,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
-  rmotly_client:
-    dependency: "direct main"
-    description:
-      path: "../rmotly_client"
-      relative: true
-    source: path
-    version: "0.0.0"
   riverpod:
     dependency: transitive
     description:
@@ -884,6 +877,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.6.3"
+  rmotly_client:
+    dependency: "direct main"
+    description:
+      path: "../rmotly_client"
+      relative: true
+    source: path
+    version: "0.0.0"
   rxdart:
     dependency: transitive
     description:
