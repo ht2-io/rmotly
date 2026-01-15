@@ -1,0 +1,10 @@
+# EventResponse model for Remotly
+# Response object for event creation operations
+class: EventResponse
+fields:
+  ### Whether the event was successfully created
+  success: bool
+  ### ID of the created event (if successful)
+  eventId: int?
+  ### Error message (if unsuccessful)
+  error: String?
