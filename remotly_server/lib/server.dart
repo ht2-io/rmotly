@@ -1,5 +1,6 @@
 import 'package:remotly_server/src/birthday_reminder.dart';
 import 'package:serverpod/serverpod.dart';
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 
 import 'package:remotly_server/src/web/routes/root.dart';
 
@@ -13,6 +14,35 @@ import 'src/generated/endpoints.dart';
 void run(List<String> args) async {
   // Initialize Serverpod and connect it with your generated code.
   final pod = Serverpod(args, Protocol(), Endpoints());
+
+  // Initialize the authentication module.
+  // This sets up session management, user info caching, and auth handlers.
+  auth.AuthConfig.set(auth.AuthConfig(
+    // Send validation email when users sign up
+    sendValidationEmail: (session, email, validationCode) async {
+      // TODO: Implement email sending via SMTP or email service
+      print('Validation code for $email: $validationCode');
+      return true;
+    },
+    // Send password reset email
+    sendPasswordResetEmail: (session, userInfo, validationCode) async {
+      // TODO: Implement password reset email
+      print('Password reset code for ${userInfo.email}: $validationCode');
+      return true;
+    },
+    // Callback when user is created
+    onUserCreated: (session, userInfo) async {
+      session.log('New user created: ${userInfo.id} (${userInfo.email})');
+    },
+    // Callback when user signs in
+    onUserUpdated: (session, userInfo) async {
+      session.log('User updated: ${userInfo.id}');
+    },
+    // Maximum password length (to prevent DoS)
+    maxPasswordLength: 128,
+    // Minimum password length
+    minPasswordLength: 8,
+  ));
 
   // Setup a default page at the web root.
   pod.webServer.addRoute(RouteRoot(), '/');
