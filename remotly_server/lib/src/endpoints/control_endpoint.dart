@@ -412,13 +412,21 @@ class ControlEndpoint extends Endpoint {
     }
 
     // Create a map for quick lookup
-    final controlMap = {for (var c in controls) c.id!: c};
+    final controlMap = <int, Control>{};
+    for (var c in controls) {
+      if (c.id != null) {
+        controlMap[c.id!] = c;
+      }
+    }
 
     // Update positions
     final updatedControls = <Control>[];
     for (var i = 0; i < controlIds.length; i++) {
       final controlId = controlIds[i];
-      final control = controlMap[controlId]!;
+      final control = controlMap[controlId];
+      if (control == null) {
+        throw StateError('Control $controlId not found in fetched results');
+      }
       control.position = i;
       control.updatedAt = DateTime.now();
       updatedControls.add(control);
