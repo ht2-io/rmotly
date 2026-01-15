@@ -114,7 +114,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
     updatedAt: DateTime
   ```
 
-- [ ] **2.1.2** Create Control model
+- [x] **2.1.2** Create Control model
   ```yaml
   # lib/src/models/control.yaml
   class: Control
@@ -130,7 +130,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
     updatedAt: DateTime
   ```
 
-- [ ] **2.1.3** Create Action model
+- [x] **2.1.3** Create Action model
   ```yaml
   # lib/src/models/action.yaml
   class: Action
@@ -150,7 +150,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
     updatedAt: DateTime
   ```
 
-- [ ] **2.1.4** Create NotificationTopic model
+- [x] **2.1.4** Create NotificationTopic model
   ```yaml
   # lib/src/models/notification_topic.yaml
   class: NotificationTopic
@@ -166,7 +166,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
     updatedAt: DateTime
   ```
 
-- [ ] **2.1.5** Create Event model
+- [x] **2.1.5** Create Event model
   ```yaml
   # lib/src/models/event.yaml
   class: Event
@@ -301,7 +301,7 @@ This document defines all tasks required to build the Remotly system. Tasks are 
   - Validators
   - DateFormatters
 
-- [ ] **3.1.4** Create base widgets
+- [x] **3.1.4** Create base widgets
   - LoadingWidget
   - ErrorWidget
   - EmptyStateWidget
