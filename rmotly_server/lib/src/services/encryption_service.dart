@@ -3,7 +3,6 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:pointycastle/export.dart';
 
 /// Service for encrypting and decrypting sensitive data such as action credentials.
 ///
