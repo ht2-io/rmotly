@@ -1,0 +1,22 @@
+# ActionTestResult model for Remotly
+# Represents the result of testing an action execution
+class: ActionTestResult
+fields:
+  ### Whether the test execution was successful
+  success: bool
+  ### Error message if test failed
+  error: String?
+  ### HTTP status code from the response
+  statusCode: int?
+  ### Response body from the test execution
+  responseBody: String?
+  ### Response headers as JSON string
+  responseHeaders: String?
+  ### Execution time in milliseconds
+  executionTimeMs: int
+  ### Resolved URL after variable substitution
+  resolvedUrl: String?
+  ### Resolved headers after variable substitution
+  resolvedHeaders: String?
+  ### Resolved body after variable substitution
+  resolvedBody: String?
