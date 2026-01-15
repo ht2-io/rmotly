@@ -9,6 +9,8 @@ environment:
 dependencies:
   serverpod: 2.9.2
   serverpod_auth_server: 2.9.2
+  webpush_encryption: ^1.0.0  # WebPush RFC8291/8188 encryption implementation
+  pointycastle: ^3.7.0        # Cryptography for WebPush
 
 dev_dependencies:
   lints: '>=3.0.0 <7.0.0'
