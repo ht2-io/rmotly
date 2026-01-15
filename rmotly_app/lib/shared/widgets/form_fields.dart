@@ -163,6 +163,21 @@ class PasswordFormField extends StatefulWidget {
 class _PasswordFormFieldState extends State<PasswordFormField> {
   bool _obscureText = true;
 
+  Widget? _buildSuffixIcon() {
+    if (!widget.showVisibilityToggle) return null;
+
+    return IconButton(
+      icon: Icon(
+        _obscureText ? Icons.visibility : Icons.visibility_off,
+      ),
+      onPressed: () {
+        setState(() {
+          _obscureText = !_obscureText;
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return OptimizedTextFormField(
@@ -170,35 +185,13 @@ class _PasswordFormFieldState extends State<PasswordFormField> {
       focusNode: widget.focusNode,
       decoration: widget.decoration?.copyWith(
             prefixIcon: const Icon(Icons.lock),
-            suffixIcon: widget.showVisibilityToggle
-                ? IconButton(
-                    icon: Icon(
-                      _obscureText ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText;
-                      });
-                    },
-                  )
-                : null,
+            suffixIcon: _buildSuffixIcon(),
           ) ??
           InputDecoration(
             labelText: 'Password',
             hintText: 'Enter your password',
             prefixIcon: const Icon(Icons.lock),
-            suffixIcon: widget.showVisibilityToggle
-                ? IconButton(
-                    icon: Icon(
-                      _obscureText ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText;
-                      });
-                    },
-                  )
-                : null,
+            suffixIcon: _buildSuffixIcon(),
           ),
       obscureText: _obscureText,
       autocorrect: false,
