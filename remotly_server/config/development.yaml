@@ -56,3 +56,17 @@ sessionLogs:
 #futureCall:
 #  concurrencyLimit: 1 # Defaults to 1, a negative or null value removes the limit
 #  scanInterval: 5000 # Unit in milliseconds, defaults to 5000
+
+# WebPush VAPID configuration for self-hosted push notifications.
+# Generate keys with: dart run bin/generate_vapid_keys.dart
+# See docs/PUSH_NOTIFICATION_DESIGN.md for architecture details.
+vapid:
+  subject: 'mailto:admin@localhost'
+  # Development keys - DO NOT use in production
+  publicKey: 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
+  privateKey: 'UUxI4O8-FbRouADVXGXRV1Nv7bQZwA7UcL1QQXDJ3Gg'
+
+# ntfy push server configuration
+ntfy:
+  baseUrl: 'http://localhost:8093'
+  defaultTopic: 'remotly'
