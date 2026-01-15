@@ -12,7 +12,8 @@
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
 import 'package:remotly_client/src/protocol/greeting.dart' as _i3;
-import 'protocol.dart' as _i4;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i4;
+import 'protocol.dart' as _i5;
 
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
@@ -32,6 +33,14 @@ class EndpointGreeting extends _i1.EndpointRef {
       );
 }
 
+class Modules {
+  Modules(Client client) {
+    auth = _i4.Caller(client);
+  }
+
+  late final _i4.Caller auth;
+}
+
 class Client extends _i1.ServerpodClientShared {
   Client(
     String host, {
@@ -48,7 +57,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i4.Protocol(),
+          _i5.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,
@@ -59,13 +68,17 @@ class Client extends _i1.ServerpodClientShared {
               disconnectStreamsOnLostInternetConnection,
         ) {
     greeting = EndpointGreeting(this);
+    modules = Modules(this);
   }
 
   late final EndpointGreeting greeting;
+
+  late final Modules modules;
 
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {'greeting': greeting};
 
   @override
-  Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {};
+  Map<String, _i1.ModuleEndpointCaller> get moduleLookup =>
+      {'auth': modules.auth};
 }
