@@ -10,7 +10,8 @@ import 'package:rmotly_client/rmotly_client.dart';
 final sessionManagerProvider = Provider<SessionManager>((ref) {
   // TODO: Update this URL based on environment
   final baseUrl = 'http://$localhost:8080/';
-  final client = Client(baseUrl)..connectivityMonitor = FlutterConnectivityMonitor();
+  final client = Client(baseUrl)
+    ..connectivityMonitor = FlutterConnectivityMonitor();
 
   return SessionManager(caller: client.modules.auth);
 });

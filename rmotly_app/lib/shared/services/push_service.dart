@@ -43,7 +43,8 @@ class PushNotification {
     DeliveryMethod method,
   ) {
     return PushNotification(
-      id: json['id'] as String? ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      id: json['id'] as String? ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
       title: json['title'] as String? ?? '',
       body: json['body'] as String? ?? json['message'] as String? ?? '',
       data: json['data'] as Map<String, dynamic>?,
@@ -101,7 +102,8 @@ class PushServiceState {
 class PushService extends StateNotifier<PushServiceState> {
   PushService() : super(const PushServiceState());
 
-  final _notificationController = StreamController<PushNotification>.broadcast();
+  final _notificationController =
+      StreamController<PushNotification>.broadcast();
 
   /// Stream of received notifications
   Stream<PushNotification> get notifications => _notificationController.stream;
@@ -163,7 +165,8 @@ class PushService extends StateNotifier<PushServiceState> {
 
     try {
       final json = jsonDecode(message) as Map<String, dynamic>;
-      final notification = PushNotification.fromJson(json, DeliveryMethod.webpush);
+      final notification =
+          PushNotification.fromJson(json, DeliveryMethod.webpush);
 
       _notificationController.add(notification);
       await _showLocalNotification(notification);
@@ -215,7 +218,8 @@ class PushService extends StateNotifier<PushServiceState> {
 
   /// Handle notification received via WebSocket
   void onWebSocketNotification(Map<String, dynamic> data) {
-    final notification = PushNotification.fromJson(data, DeliveryMethod.websocket);
+    final notification =
+        PushNotification.fromJson(data, DeliveryMethod.websocket);
     _notificationController.add(notification);
 
     // In foreground, we might want to show an in-app notification

@@ -375,7 +375,8 @@ void main() {
     group('Real-World Use Cases', () {
       test('parses URL template', () {
         // Arrange
-        const template = 'https://api.example.com/users/{{userId}}/posts/{{postId}}';
+        const template =
+            'https://api.example.com/users/{{userId}}/posts/{{postId}}';
         final variables = {
           'userId': '123',
           'postId': '456',
@@ -420,7 +421,8 @@ void main() {
 
       test('parses notification body with nested data', () {
         // Arrange
-        const template = 'New order from {{customer.name}}: {{items.length}} items';
+        const template =
+            'New order from {{customer.name}}: {{items.length}} items';
         final variables = {
           'customer': {'name': 'John Doe', 'email': 'john@example.com'},
           'items': ['item1', 'item2', 'item3'],
@@ -449,7 +451,8 @@ void main() {
     group('Performance and Limits', () {
       test('handles large number of variables', () {
         // Arrange
-        const template = 'v1={{v1}}, v2={{v2}}, v3={{v3}}, v4={{v4}}, v5={{v5}}';
+        const template =
+            'v1={{v1}}, v2={{v2}}, v3={{v3}}, v4={{v4}}, v5={{v5}}';
         final variables = {
           'v1': '1',
           'v2': '2',
