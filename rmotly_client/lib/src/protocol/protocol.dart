@@ -19,7 +19,7 @@ import 'openapi_operation.dart' as _i7;
 import 'openapi_parameter.dart' as _i8;
 import 'openapi_spec.dart' as _i9;
 import 'user.dart' as _i10;
-import 'package:remotly_client/src/protocol/openapi_operation.dart' as _i11;
+import 'package:rmotly_client/src/protocol/openapi_operation.dart' as _i11;
 import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i12;
 export 'greeting.dart';
 export 'action.dart';

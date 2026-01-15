@@ -1,7 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 
 import '../services/openapi_parser_service.dart';
-import 'package:remotly_server/src/generated/protocol.dart' as protocol;
+import 'package:rmotly_server/src/generated/protocol.dart' as protocol;
 
 /// Serverpod endpoint for OpenAPI specification parsing.
 ///
