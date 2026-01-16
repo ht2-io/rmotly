@@ -294,7 +294,10 @@ class PayloadParserService {
   /// ```
   NotificationPayload _parseGotify(Map<String, dynamic> body) {
     Map<String, dynamic>? extras;
-    if (body['extras'] is Map) {
+    if (body['extras'] is Map<String, dynamic>) {
+      extras = body['extras'] as Map<String, dynamic>;
+    } else if (body['extras'] is Map) {
+      // Fallback for loosely typed maps
       extras = Map<String, dynamic>.from(body['extras'] as Map);
     }
     
@@ -304,9 +307,9 @@ class PayloadParserService {
     if (extras != null) {
       // Gotify uses client::notification for display hints
       final clientNotif = extras['client::notification'];
-      if (clientNotif is Map) {
+      if (clientNotif is Map<String, dynamic>) {
         final clickData = clientNotif['click'];
-        if (clickData is Map && clickData.containsKey('url')) {
+        if (clickData is Map<String, dynamic> && clickData.containsKey('url')) {
           actionUrl = clickData['url'] as String?;
         }
         if (clientNotif.containsKey('bigImageUrl')) {
