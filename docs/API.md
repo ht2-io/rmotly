@@ -566,14 +566,16 @@ The simplest format uses common field names. This is the fallback when no specif
 
 **Field mapping:**
 
-| Webhook Field | Rmotly Field | Alternatives (checked in order) |
-|--------------|--------------|--------------------------------|
-| `title` | title | `subject`, `header` (default: "Notification") |
-| `body` / `message` | body | `body`, `message`, `text`, `content`, `description` (default: "") |
-| `priority` | priority | See [Priority Mapping](#priority-mapping) |
-| `image` | imageUrl | `imageUrl`, `image_url` |
-| `url` | actionUrl | `actionUrl`, `click_url`, `link` |
-| `data` | data | `payload`, `extras`, `extra` |
+The generic parser checks multiple field names to extract notification data:
+
+| Rmotly Field | Webhook Fields (checked in order) | Default |
+|--------------|-----------------------------------|---------|
+| title | `title`, `subject`, `header` | "Notification" |
+| body | `body`, `message`, `text`, `content`, `description` | "" |
+| priority | `priority` (string or number) | "normal" |
+| imageUrl | `image`, `imageUrl`, `image_url` | null |
+| actionUrl | `url`, `actionUrl`, `click_url`, `link` | null |
+| data | `data`, `payload`, `extras`, `extra` | null |
 
 **Example:**
 
