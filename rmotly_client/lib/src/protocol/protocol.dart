@@ -26,8 +26,7 @@ import 'package:rmotly_client/src/protocol/control.dart' as _i14;
 import 'package:rmotly_client/src/protocol/event.dart' as _i15;
 import 'package:rmotly_client/src/protocol/notification_topic.dart' as _i16;
 import 'package:rmotly_client/src/protocol/openapi_operation.dart' as _i17;
-import 'package:rmotly_client/src/services/subscription_manager_service.dart'
-    as _i18;
+import 'package:rmotly_client/src/protocol/push_subscription.dart' as _i18;
 import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i19;
 export 'greeting.dart';
 export 'action.dart';
@@ -168,9 +167,9 @@ class Protocol extends _i1.SerializationManager {
           .map((e) => deserialize<_i17.OpenApiOperation>(e))
           .toList() as T;
     }
-    if (t == List<_i18.PushSubscriptionInfo>) {
+    if (t == List<_i18.PushSubscription>) {
       return (data as List)
-          .map((e) => deserialize<_i18.PushSubscriptionInfo>(e))
+          .map((e) => deserialize<_i18.PushSubscription>(e))
           .toList() as T;
     }
     if (t == List<Map<String, dynamic>>) {

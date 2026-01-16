@@ -22,8 +22,7 @@ import 'package:rmotly_server/src/services/notification_stream_service.dart'
     as _i8;
 import 'package:rmotly_server/src/generated/openapi_spec.dart' as _i9;
 import 'package:rmotly_server/src/generated/openapi_operation.dart' as _i10;
-import 'package:rmotly_server/src/services/subscription_manager_service.dart'
-    as _i11;
+import 'package:rmotly_server/src/generated/push_subscription.dart' as _i11;
 import 'package:rmotly_server/src/generated/greeting.dart' as _i12;
 import 'package:rmotly_server/src/generated/protocol.dart';
 import 'package:rmotly_server/src/generated/endpoints.dart';
@@ -1220,12 +1219,14 @@ class _PushSubscriptionEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i11.PushSubscriptionInfo> registerEndpoint(
+  _i3.Future<_i11.PushSubscription> registerEndpoint(
     _i1.TestSessionBuilder sessionBuilder, {
     required String endpoint,
     String? p256dh,
     String? authSecret,
-    required String deliveryMethod,
+    required String subscriptionType,
+    required String deviceId,
+    String? userAgent,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1242,14 +1243,16 @@ class _PushSubscriptionEndpoint {
             'endpoint': endpoint,
             'p256dh': p256dh,
             'authSecret': authSecret,
-            'deliveryMethod': deliveryMethod,
+            'subscriptionType': subscriptionType,
+            'deviceId': deviceId,
+            'userAgent': userAgent,
           }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i11.PushSubscriptionInfo>);
+        ) as _i3.Future<_i11.PushSubscription>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1259,7 +1262,7 @@ class _PushSubscriptionEndpoint {
 
   _i3.Future<bool> unregisterEndpoint(
     _i1.TestSessionBuilder sessionBuilder,
-    String endpoint,
+    String deviceId,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1272,7 +1275,7 @@ class _PushSubscriptionEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'pushSubscription',
           methodName: 'unregisterEndpoint',
-          parameters: _i1.testObjectToJson({'endpoint': endpoint}),
+          parameters: _i1.testObjectToJson({'deviceId': deviceId}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
@@ -1286,7 +1289,7 @@ class _PushSubscriptionEndpoint {
     });
   }
 
-  _i3.Future<List<_i11.PushSubscriptionInfo>> listSubscriptions(
+  _i3.Future<List<_i11.PushSubscription>> listSubscriptions(
       _i1.TestSessionBuilder sessionBuilder) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1305,7 +1308,7 @@ class _PushSubscriptionEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<List<_i11.PushSubscriptionInfo>>);
+        ) as _i3.Future<List<_i11.PushSubscription>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1313,10 +1316,10 @@ class _PushSubscriptionEndpoint {
     });
   }
 
-  _i3.Future<_i11.PushSubscriptionInfo> updateSubscription(
+  _i3.Future<_i11.PushSubscription> updateSubscription(
     _i1.TestSessionBuilder sessionBuilder,
     int subscriptionId, {
-    bool? enabled,
+    bool? active,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1331,14 +1334,14 @@ class _PushSubscriptionEndpoint {
           methodName: 'updateSubscription',
           parameters: _i1.testObjectToJson({
             'subscriptionId': subscriptionId,
-            'enabled': enabled,
+            'active': active,
           }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i11.PushSubscriptionInfo>);
+        ) as _i3.Future<_i11.PushSubscription>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
