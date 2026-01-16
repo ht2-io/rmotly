@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:serverpod/serverpod.dart';
+import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 
 import '../services/notification_service.dart';
 import '../services/notification_stream_service.dart';
@@ -192,7 +193,8 @@ class SseEndpoint extends Endpoint {
   ///
   /// Returns the SSE endpoint URL and authentication token.
   Future<Map<String, dynamic>> getConnectionInfo(Session session) async {
-    final userId = await session.auth.authenticatedUserId;
+    final authInfo = await session.authenticated;
+    final userId = authInfo?.userId;
     if (userId == null) {
       throw StateError('User not authenticated');
     }
@@ -214,7 +216,8 @@ class SseEndpoint extends Endpoint {
   /// This is used when the client connects and wants to retrieve
   /// any notifications that were queued while disconnected.
   Future<List<Map<String, dynamic>>> getQueuedNotifications(Session session) async {
-    final userId = await session.auth.authenticatedUserId;
+    final authInfo = await session.authenticated;
+    final userId = authInfo?.userId;
     if (userId == null) {
       throw StateError('User not authenticated');
     }

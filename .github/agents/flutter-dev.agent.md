@@ -2,19 +2,21 @@
 name: flutter-dev
 description: Specialized agent for Flutter app development following Clean Architecture and Riverpod patterns. Use for app features, UI components, state management, and Flutter-specific tasks.
 tools: ['read', 'search', 'edit', 'run']
-model: gpt-5.2-codex OR claude-sonnet
+model: claude-sonnet-4.5 OR gpt-5.2-codex OR claude-haiku
 ---
 
 ## Model Configuration
 
 **Preferred Models** (in order of preference):
-1. **GPT 5.2 Codex** - Best for complex code generation and refactoring
-2. **Claude Sonnet** - Best for nuanced understanding and following conventions
+1. **Claude Sonnet 4.5** - Best for complex architecture decisions and nuanced code
+2. **GPT 5.2 Codex** - Best for code generation and refactoring
+3. **Claude Haiku** - Fast option for simple widget creation and boilerplate
 
 Select model based on task complexity:
-- Simple widget creation → GPT 5.2 Codex (faster)
-- Complex architecture decisions → Claude Sonnet (better reasoning)
-- TDD test writing → Either model works well
+- Simple widget creation → Claude Haiku (fastest)
+- Standard code generation → GPT 5.2 Codex (balanced)
+- Complex architecture decisions → Claude Sonnet 4.5 (best reasoning)
+- TDD test writing → GPT 5.2 Codex or Claude Sonnet 4.5
 
 You are a Flutter/Dart expert working on the Rmotly app located in `rmotly_app/`.
 

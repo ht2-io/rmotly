@@ -11,11 +11,689 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
-import 'package:rmotly_client/src/protocol/openapi_spec.dart' as _i3;
-import 'package:rmotly_client/src/protocol/openapi_operation.dart' as _i4;
-import 'package:rmotly_client/src/protocol/greeting.dart' as _i5;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i6;
-import 'protocol.dart' as _i7;
+import 'package:rmotly_client/src/protocol/action.dart' as _i3;
+import 'package:rmotly_client/src/protocol/control.dart' as _i4;
+import 'package:rmotly_client/src/protocol/event.dart' as _i5;
+import 'package:rmotly_client/src/protocol/notification_topic.dart' as _i6;
+import 'package:rmotly_client/src/services/notification_stream_service.dart'
+    as _i7;
+import 'package:rmotly_client/src/protocol/openapi_spec.dart' as _i8;
+import 'package:rmotly_client/src/protocol/openapi_operation.dart' as _i9;
+import 'package:rmotly_client/src/services/subscription_manager_service.dart'
+    as _i10;
+import 'package:rmotly_client/src/protocol/greeting.dart' as _i11;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i12;
+import 'protocol.dart' as _i13;
+
+/// Endpoint for managing HTTP actions (request templates).
+///
+/// Actions define HTTP requests that can be triggered by controls or events.
+/// They support template variables ({{variable}}) for dynamic content.
+/// {@category Endpoint}
+class EndpointAction extends _i1.EndpointRef {
+  EndpointAction(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'action';
+
+  /// Create a new action.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [name]: Display name for the action
+  /// - [httpMethod]: HTTP method (GET, POST, PUT, DELETE, PATCH)
+  /// - [urlTemplate]: URL template with {{variable}} placeholders
+  /// - [description]: Optional description
+  /// - [headersTemplate]: Optional headers template as JSON string
+  /// - [bodyTemplate]: Optional body template with {{variable}} placeholders
+  /// - [parameters]: Optional parameters definition as JSON string
+  ///
+  /// Returns: The created [Action].
+  _i2.Future<_i3.Action> createAction({
+    required String name,
+    required String httpMethod,
+    required String urlTemplate,
+    String? description,
+    String? headersTemplate,
+    String? bodyTemplate,
+    String? parameters,
+  }) =>
+      caller.callServerEndpoint<_i3.Action>(
+        'action',
+        'createAction',
+        {
+          'name': name,
+          'httpMethod': httpMethod,
+          'urlTemplate': urlTemplate,
+          'description': description,
+          'headersTemplate': headersTemplate,
+          'bodyTemplate': bodyTemplate,
+          'parameters': parameters,
+        },
+      );
+
+  /// List all actions for the authenticated user.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  ///
+  /// Returns: List of [Action] objects.
+  _i2.Future<List<_i3.Action>> listActions() =>
+      caller.callServerEndpoint<List<_i3.Action>>(
+        'action',
+        'listActions',
+        {},
+      );
+
+  /// Get a specific action by ID.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [actionId]: The ID of the action to retrieve
+  ///
+  /// Returns: The [Action] if found and owned by user.
+  _i2.Future<_i3.Action> getAction({required int actionId}) =>
+      caller.callServerEndpoint<_i3.Action>(
+        'action',
+        'getAction',
+        {'actionId': actionId},
+      );
+
+  /// Update an existing action.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [actionId]: The ID of the action to update
+  /// - [name]: New name (optional)
+  /// - [description]: New description (optional)
+  /// - [httpMethod]: New HTTP method (optional)
+  /// - [urlTemplate]: New URL template (optional)
+  /// - [headersTemplate]: New headers template (optional)
+  /// - [bodyTemplate]: New body template (optional)
+  /// - [parameters]: New parameters definition (optional)
+  ///
+  /// Returns: The updated [Action].
+  _i2.Future<_i3.Action> updateAction({
+    required int actionId,
+    String? name,
+    String? description,
+    String? httpMethod,
+    String? urlTemplate,
+    String? headersTemplate,
+    String? bodyTemplate,
+    String? parameters,
+  }) =>
+      caller.callServerEndpoint<_i3.Action>(
+        'action',
+        'updateAction',
+        {
+          'actionId': actionId,
+          'name': name,
+          'description': description,
+          'httpMethod': httpMethod,
+          'urlTemplate': urlTemplate,
+          'headersTemplate': headersTemplate,
+          'bodyTemplate': bodyTemplate,
+          'parameters': parameters,
+        },
+      );
+
+  /// Delete an action.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [actionId]: The ID of the action to delete
+  ///
+  /// Returns: True if the action was deleted.
+  _i2.Future<bool> deleteAction({required int actionId}) =>
+      caller.callServerEndpoint<bool>(
+        'action',
+        'deleteAction',
+        {'actionId': actionId},
+      );
+
+  /// Test an action by executing it with provided parameters.
+  ///
+  /// This performs the HTTP request defined by the action template
+  /// and returns the result for verification.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [actionId]: The ID of the action to test
+  /// - [parameters]: Optional parameters for template substitution
+  ///
+  /// Returns: Map containing test result (success, statusCode, body, etc.)
+  _i2.Future<Map<String, dynamic>> testAction({
+    required int actionId,
+    Map<String, dynamic>? parameters,
+  }) =>
+      caller.callServerEndpoint<Map<String, dynamic>>(
+        'action',
+        'testAction',
+        {
+          'actionId': actionId,
+          'parameters': parameters,
+        },
+      );
+
+  /// Create an action from an OpenAPI specification.
+  ///
+  /// Fetches the OpenAPI spec and creates an action from
+  /// the specified operation.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [specUrl]: URL of the OpenAPI specification
+  /// - [operationId]: ID of the operation to import
+  /// - [name]: Optional custom name (defaults to operation summary)
+  ///
+  /// Returns: The created [Action].
+  _i2.Future<_i3.Action> createFromOpenApi({
+    required String specUrl,
+    required String operationId,
+    String? name,
+  }) =>
+      caller.callServerEndpoint<_i3.Action>(
+        'action',
+        'createFromOpenApi',
+        {
+          'specUrl': specUrl,
+          'operationId': operationId,
+          'name': name,
+        },
+      );
+}
+
+/// Endpoint for managing controls (UI widgets on the dashboard).
+///
+/// Controls are user-configurable widgets that can trigger actions
+/// when interacted with. They support different types (button, toggle,
+/// slider, text_input) and can be arranged on the dashboard.
+/// {@category Endpoint}
+class EndpointControl extends _i1.EndpointRef {
+  EndpointControl(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'control';
+
+  /// Create a new control.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [name]: Display name for the control
+  /// - [controlType]: Type of control (button, toggle, slider, text_input)
+  /// - [actionId]: Optional ID of the action to trigger
+  /// - [config]: Configuration as JSON string (label, colors, min/max, etc.)
+  /// - [position]: Position in the dashboard grid (optional, auto-assigned)
+  ///
+  /// Returns: The created [Control].
+  _i2.Future<_i4.Control> createControl({
+    required String name,
+    required String controlType,
+    int? actionId,
+    String? config,
+    int? position,
+  }) =>
+      caller.callServerEndpoint<_i4.Control>(
+        'control',
+        'createControl',
+        {
+          'name': name,
+          'controlType': controlType,
+          'actionId': actionId,
+          'config': config,
+          'position': position,
+        },
+      );
+
+  /// List all controls for the authenticated user.
+  ///
+  /// Returns controls ordered by position for dashboard layout.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  ///
+  /// Returns: List of [Control] objects ordered by position.
+  _i2.Future<List<_i4.Control>> listControls() =>
+      caller.callServerEndpoint<List<_i4.Control>>(
+        'control',
+        'listControls',
+        {},
+      );
+
+  /// Get a specific control by ID.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [controlId]: The ID of the control to retrieve
+  ///
+  /// Returns: The [Control] if found and owned by user.
+  _i2.Future<_i4.Control> getControl({required int controlId}) =>
+      caller.callServerEndpoint<_i4.Control>(
+        'control',
+        'getControl',
+        {'controlId': controlId},
+      );
+
+  /// Update an existing control.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [controlId]: The ID of the control to update
+  /// - [name]: New name (optional)
+  /// - [controlType]: New control type (optional)
+  /// - [actionId]: New action ID (optional, use -1 to unlink)
+  /// - [config]: New configuration (optional)
+  ///
+  /// Returns: The updated [Control].
+  _i2.Future<_i4.Control> updateControl({
+    required int controlId,
+    String? name,
+    String? controlType,
+    int? actionId,
+    String? config,
+  }) =>
+      caller.callServerEndpoint<_i4.Control>(
+        'control',
+        'updateControl',
+        {
+          'controlId': controlId,
+          'name': name,
+          'controlType': controlType,
+          'actionId': actionId,
+          'config': config,
+        },
+      );
+
+  /// Delete a control.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [controlId]: The ID of the control to delete
+  ///
+  /// Returns: True if the control was deleted.
+  _i2.Future<bool> deleteControl({required int controlId}) =>
+      caller.callServerEndpoint<bool>(
+        'control',
+        'deleteControl',
+        {'controlId': controlId},
+      );
+
+  /// Reorder controls on the dashboard.
+  ///
+  /// Updates the position of multiple controls in a single transaction.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [controlIds]: List of control IDs in the new order
+  ///
+  /// Returns: List of updated [Control] objects.
+  _i2.Future<List<_i4.Control>> reorderControls(
+          {required List<int> controlIds}) =>
+      caller.callServerEndpoint<List<_i4.Control>>(
+        'control',
+        'reorderControls',
+        {'controlIds': controlIds},
+      );
+
+  /// Duplicate a control.
+  ///
+  /// Creates a copy of an existing control with a new name.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [controlId]: The ID of the control to duplicate
+  /// - [newName]: Name for the duplicated control (optional)
+  ///
+  /// Returns: The newly created [Control].
+  _i2.Future<_i4.Control> duplicateControl({
+    required int controlId,
+    String? newName,
+  }) =>
+      caller.callServerEndpoint<_i4.Control>(
+        'control',
+        'duplicateControl',
+        {
+          'controlId': controlId,
+          'newName': newName,
+        },
+      );
+}
+
+/// Endpoint for managing events (triggered by controls or webhooks).
+///
+/// Provides methods to send, list, and retrieve events.
+/// {@category Endpoint}
+class EndpointEvent extends _i1.EndpointRef {
+  EndpointEvent(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'event';
+
+  /// Send a new event.
+  ///
+  /// Creates an event from a control interaction or external source,
+  /// processes any associated action, and logs the result.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [sourceType]: Event source type (control, webhook, system)
+  /// - [sourceId]: Identifier of the source (control ID, topic ID, etc.)
+  /// - [eventType]: Type of event (button_press, toggle_change, etc.)
+  /// - [payload]: Optional event payload as JSON string
+  ///
+  /// Returns: The created [Event] with action result if applicable.
+  _i2.Future<_i5.Event> sendEvent({
+    required String sourceType,
+    required String sourceId,
+    required String eventType,
+    String? payload,
+  }) =>
+      caller.callServerEndpoint<_i5.Event>(
+        'event',
+        'sendEvent',
+        {
+          'sourceType': sourceType,
+          'sourceId': sourceId,
+          'eventType': eventType,
+          'payload': payload,
+        },
+      );
+
+  /// List events for the authenticated user.
+  ///
+  /// Supports pagination and filtering by source type, event type, and date.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [limit]: Maximum number of events to return (default: 50, max: 100)
+  /// - [offset]: Number of events to skip for pagination
+  /// - [sourceType]: Optional filter by source type
+  /// - [eventType]: Optional filter by event type
+  /// - [since]: Optional filter for events after this timestamp
+  ///
+  /// Returns: List of [Event] objects matching the criteria.
+  _i2.Future<List<_i5.Event>> listEvents({
+    required int limit,
+    required int offset,
+    String? sourceType,
+    String? eventType,
+    DateTime? since,
+  }) =>
+      caller.callServerEndpoint<List<_i5.Event>>(
+        'event',
+        'listEvents',
+        {
+          'limit': limit,
+          'offset': offset,
+          'sourceType': sourceType,
+          'eventType': eventType,
+          'since': since,
+        },
+      );
+
+  /// Get a specific event by ID.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [eventId]: The ID of the event to retrieve
+  ///
+  /// Returns: The [Event] if found and owned by the user.
+  ///
+  /// Throws: [ArgumentError] if event not found or not owned by user.
+  _i2.Future<_i5.Event> getEvent({required int eventId}) =>
+      caller.callServerEndpoint<_i5.Event>(
+        'event',
+        'getEvent',
+        {'eventId': eventId},
+      );
+
+  /// Delete an event by ID.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [eventId]: The ID of the event to delete
+  ///
+  /// Returns: True if the event was deleted.
+  _i2.Future<bool> deleteEvent({required int eventId}) =>
+      caller.callServerEndpoint<bool>(
+        'event',
+        'deleteEvent',
+        {'eventId': eventId},
+      );
+
+  /// Get event counts by source type for the authenticated user.
+  ///
+  /// Useful for dashboard statistics.
+  _i2.Future<Map<String, int>> getEventCounts({DateTime? since}) =>
+      caller.callServerEndpoint<Map<String, int>>(
+        'event',
+        'getEventCounts',
+        {'since': since},
+      );
+}
+
+/// Endpoint for managing notification topics and sending notifications.
+///
+/// Notification topics are used to receive external webhooks and route
+/// notifications to users. Each topic has a unique API key for authentication.
+/// {@category Endpoint}
+class EndpointNotification extends _i1.EndpointRef {
+  EndpointNotification(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'notification';
+
+  /// Create a new notification topic.
+  ///
+  /// Generates a unique API key for webhook authentication.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [name]: Display name for the topic
+  /// - [description]: Optional description
+  /// - [config]: Optional configuration as JSON string
+  ///
+  /// Returns: The created [NotificationTopic] with generated API key.
+  _i2.Future<_i6.NotificationTopic> createTopic({
+    required String name,
+    String? description,
+    String? config,
+  }) =>
+      caller.callServerEndpoint<_i6.NotificationTopic>(
+        'notification',
+        'createTopic',
+        {
+          'name': name,
+          'description': description,
+          'config': config,
+        },
+      );
+
+  /// List all notification topics for the authenticated user.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [includeDisabled]: Include disabled topics (default: false)
+  ///
+  /// Returns: List of [NotificationTopic] objects.
+  _i2.Future<List<_i6.NotificationTopic>> listTopics(
+          {required bool includeDisabled}) =>
+      caller.callServerEndpoint<List<_i6.NotificationTopic>>(
+        'notification',
+        'listTopics',
+        {'includeDisabled': includeDisabled},
+      );
+
+  /// Get a specific notification topic by ID.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [topicId]: The ID of the topic to retrieve
+  ///
+  /// Returns: The [NotificationTopic] if found and owned by user.
+  _i2.Future<_i6.NotificationTopic> getTopic({required int topicId}) =>
+      caller.callServerEndpoint<_i6.NotificationTopic>(
+        'notification',
+        'getTopic',
+        {'topicId': topicId},
+      );
+
+  /// Update an existing notification topic.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [topicId]: The ID of the topic to update
+  /// - [name]: New name (optional)
+  /// - [description]: New description (optional)
+  /// - [enabled]: New enabled state (optional)
+  /// - [config]: New configuration (optional)
+  ///
+  /// Returns: The updated [NotificationTopic].
+  _i2.Future<_i6.NotificationTopic> updateTopic({
+    required int topicId,
+    String? name,
+    String? description,
+    bool? enabled,
+    String? config,
+  }) =>
+      caller.callServerEndpoint<_i6.NotificationTopic>(
+        'notification',
+        'updateTopic',
+        {
+          'topicId': topicId,
+          'name': name,
+          'description': description,
+          'enabled': enabled,
+          'config': config,
+        },
+      );
+
+  /// Delete a notification topic.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [topicId]: The ID of the topic to delete
+  ///
+  /// Returns: True if the topic was deleted.
+  _i2.Future<bool> deleteTopic({required int topicId}) =>
+      caller.callServerEndpoint<bool>(
+        'notification',
+        'deleteTopic',
+        {'topicId': topicId},
+      );
+
+  /// Regenerate the API key for a topic.
+  ///
+  /// The old API key will immediately stop working.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [topicId]: The ID of the topic
+  ///
+  /// Returns: The [NotificationTopic] with new API key.
+  _i2.Future<_i6.NotificationTopic> regenerateApiKey({required int topicId}) =>
+      caller.callServerEndpoint<_i6.NotificationTopic>(
+        'notification',
+        'regenerateApiKey',
+        {'topicId': topicId},
+      );
+
+  /// Send a notification to a specific user.
+  ///
+  /// This is for internal use (e.g., system notifications).
+  /// External notifications should come through the webhook endpoint.
+  ///
+  /// Parameters:
+  /// - [session]: The current session
+  /// - [title]: Notification title
+  /// - [body]: Notification body
+  /// - [payload]: Optional additional data as JSON string
+  /// - [priority]: Notification priority (low, normal, high, urgent)
+  ///
+  /// Returns: True if the notification was queued for delivery.
+  _i2.Future<bool> sendNotification({
+    required String title,
+    required String body,
+    String? payload,
+    required String priority,
+  }) =>
+      caller.callServerEndpoint<bool>(
+        'notification',
+        'sendNotification',
+        {
+          'title': title,
+          'body': body,
+          'payload': payload,
+          'priority': priority,
+        },
+      );
+}
+
+/// Endpoint for real-time notification streaming via WebSocket.
+///
+/// This endpoint uses Serverpod's built-in streaming support to deliver
+/// notifications to connected clients in real-time (Tier 1 delivery).
+///
+/// Usage:
+/// ```dart
+/// // In Flutter client
+/// final stream = client.notificationStream.streamNotifications();
+/// await for (final notification in stream) {
+///   print('Received: ${notification.title}');
+/// }
+/// ```
+/// {@category Endpoint}
+class EndpointNotificationStream extends _i1.EndpointRef {
+  EndpointNotificationStream(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'notificationStream';
+
+  /// Stream notifications to the connected client.
+  ///
+  /// This method establishes a WebSocket connection and streams
+  /// notifications to the authenticated user in real-time.
+  ///
+  /// The stream remains open until the client disconnects or
+  /// the server closes the connection.
+  ///
+  /// Throws [AuthenticationException] if user is not authenticated.
+  _i2.Stream<_i7.StreamNotification> streamNotifications() =>
+      caller.callStreamingServerEndpoint<_i2.Stream<_i7.StreamNotification>,
+          _i7.StreamNotification>(
+        'notificationStream',
+        'streamNotifications',
+        {},
+        {},
+      );
+
+  /// Get the current connection status for the authenticated user.
+  ///
+  /// Returns the number of active WebSocket connections for this user.
+  _i2.Future<int> getConnectionCount() => caller.callServerEndpoint<int>(
+        'notificationStream',
+        'getConnectionCount',
+        {},
+      );
+
+  /// Send a test notification to the authenticated user.
+  ///
+  /// This is useful for testing the notification stream.
+  /// Returns the number of connections that received the notification.
+  _i2.Future<int> sendTestNotification({
+    required String title,
+    required String body,
+  }) =>
+      caller.callServerEndpoint<int>(
+        'notificationStream',
+        'sendTestNotification',
+        {
+          'title': title,
+          'body': body,
+        },
+      );
+}
 
 /// Serverpod endpoint for OpenAPI specification parsing.
 ///
@@ -40,8 +718,8 @@ class EndpointOpenApi extends _i1.EndpointRef {
   /// Returns: [protocol.OpenApiSpec] containing the parsed specification
   ///
   /// Throws: [OpenApiParseException] if parsing fails
-  _i2.Future<_i3.OpenApiSpec> parseSpec(String url) =>
-      caller.callServerEndpoint<_i3.OpenApiSpec>(
+  _i2.Future<_i8.OpenApiSpec> parseSpec(String url) =>
+      caller.callServerEndpoint<_i8.OpenApiSpec>(
         'openApi',
         'parseSpec',
         {'url': url},
@@ -59,11 +737,205 @@ class EndpointOpenApi extends _i1.EndpointRef {
   /// Returns: List of [protocol.OpenApiOperation] containing all operations
   ///
   /// Throws: [OpenApiParseException] if parsing fails
-  _i2.Future<List<_i4.OpenApiOperation>> listOperations(String specUrl) =>
-      caller.callServerEndpoint<List<_i4.OpenApiOperation>>(
+  _i2.Future<List<_i9.OpenApiOperation>> listOperations(String specUrl) =>
+      caller.callServerEndpoint<List<_i9.OpenApiOperation>>(
         'openApi',
         'listOperations',
         {'specUrl': specUrl},
+      );
+}
+
+/// Endpoint for managing UnifiedPush/WebPush subscriptions.
+///
+/// This endpoint allows clients to register push endpoints (from UnifiedPush
+/// distributors like ntfy, FCM, NextPush, etc.) and manage their subscriptions.
+///
+/// See docs/PUSH_NOTIFICATION_DESIGN.md for the complete architecture.
+///
+/// Usage:
+/// ```dart
+/// // Register a new push endpoint
+/// final subscription = await client.pushSubscription.registerEndpoint(
+///   endpoint: 'https://ntfy.sh/ABC123',
+///   p256dh: 'base64-encoded-public-key',
+///   authSecret: 'base64-encoded-auth-secret',
+///   deliveryMethod: 'webpush',
+/// );
+///
+/// // List all subscriptions
+/// final subscriptions = await client.pushSubscription.listSubscriptions();
+///
+/// // Disable a subscription
+/// await client.pushSubscription.updateSubscription(
+///   subscriptionId: 1,
+///   enabled: false,
+/// );
+/// ```
+/// {@category Endpoint}
+class EndpointPushSubscription extends _i1.EndpointRef {
+  EndpointPushSubscription(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'pushSubscription';
+
+  /// Register a push endpoint (from UnifiedPush).
+  ///
+  /// When a Flutter client registers with a UnifiedPush distributor,
+  /// it receives an endpoint URL. This method stores that endpoint
+  /// so the server can send push notifications to it.
+  ///
+  /// [endpoint] - The push endpoint URL from the UnifiedPush distributor
+  /// [p256dh] - Optional P-256 public key for WebPush encryption (base64url)
+  /// [authSecret] - Optional authentication secret for WebPush (base64url)
+  /// [deliveryMethod] - The delivery method: 'webpush', 'sse', or 'websocket'
+  ///
+  /// Returns the registered subscription information.
+  ///
+  /// Throws [AuthenticationException] if user is not authenticated.
+  /// Throws [ArgumentError] if deliveryMethod is invalid.
+  _i2.Future<_i10.PushSubscriptionInfo> registerEndpoint({
+    required String endpoint,
+    String? p256dh,
+    String? authSecret,
+    required String deliveryMethod,
+  }) =>
+      caller.callServerEndpoint<_i10.PushSubscriptionInfo>(
+        'pushSubscription',
+        'registerEndpoint',
+        {
+          'endpoint': endpoint,
+          'p256dh': p256dh,
+          'authSecret': authSecret,
+          'deliveryMethod': deliveryMethod,
+        },
+      );
+
+  /// Unregister a push endpoint.
+  ///
+  /// Removes the specified endpoint from the user's subscriptions.
+  /// This should be called when:
+  /// - User explicitly disables push notifications
+  /// - UnifiedPush distributor is uninstalled
+  /// - Endpoint becomes invalid
+  ///
+  /// [endpoint] - The endpoint URL to unregister
+  ///
+  /// Returns true if the endpoint was found and removed, false otherwise.
+  ///
+  /// Throws [AuthenticationException] if user is not authenticated.
+  _i2.Future<bool> unregisterEndpoint(String endpoint) =>
+      caller.callServerEndpoint<bool>(
+        'pushSubscription',
+        'unregisterEndpoint',
+        {'endpoint': endpoint},
+      );
+
+  /// List subscriptions for the current user.
+  ///
+  /// Returns all push subscriptions (both active and disabled)
+  /// for the authenticated user.
+  ///
+  /// Returns an empty list if the user has no subscriptions.
+  ///
+  /// Throws [AuthenticationException] if user is not authenticated.
+  _i2.Future<List<_i10.PushSubscriptionInfo>> listSubscriptions() =>
+      caller.callServerEndpoint<List<_i10.PushSubscriptionInfo>>(
+        'pushSubscription',
+        'listSubscriptions',
+        {},
+      );
+
+  /// Update a subscription (enable/disable).
+  ///
+  /// Allows toggling subscriptions on/off without removing them.
+  /// Useful for temporary notification silencing.
+  ///
+  /// [subscriptionId] - The ID of the subscription to update
+  /// [enabled] - Whether the subscription should be enabled
+  ///
+  /// Returns the updated subscription information.
+  ///
+  /// Throws [AuthenticationException] if user is not authenticated.
+  /// Throws [StateError] if the subscription doesn't exist or belongs to another user.
+  _i2.Future<_i10.PushSubscriptionInfo> updateSubscription(
+    int subscriptionId, {
+    bool? enabled,
+  }) =>
+      caller.callServerEndpoint<_i10.PushSubscriptionInfo>(
+        'pushSubscription',
+        'updateSubscription',
+        {
+          'subscriptionId': subscriptionId,
+          'enabled': enabled,
+        },
+      );
+}
+
+/// SSE endpoint wrapper for Serverpod endpoint pattern
+///
+/// This provides a Serverpod endpoint interface for SSE functionality.
+/// Note: Actual SSE streaming requires the custom SseHandler above.
+/// {@category Endpoint}
+class EndpointSse extends _i1.EndpointRef {
+  EndpointSse(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'sse';
+
+  /// Get SSE connection info for the authenticated user.
+  ///
+  /// Returns the SSE endpoint URL and authentication token.
+  _i2.Future<Map<String, dynamic>> getConnectionInfo() =>
+      caller.callServerEndpoint<Map<String, dynamic>>(
+        'sse',
+        'getConnectionInfo',
+        {},
+      );
+
+  /// Get queued notifications for SSE pickup.
+  ///
+  /// This is used when the client connects and wants to retrieve
+  /// any notifications that were queued while disconnected.
+  _i2.Future<List<Map<String, dynamic>>> getQueuedNotifications() =>
+      caller.callServerEndpoint<List<Map<String, dynamic>>>(
+        'sse',
+        'getQueuedNotifications',
+        {},
+      );
+}
+
+/// Serverpod endpoint for webhook management
+///
+/// This provides authenticated methods for managing webhooks.
+/// {@category Endpoint}
+class EndpointWebhook extends _i1.EndpointRef {
+  EndpointWebhook(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'webhook';
+
+  /// Get webhook URL for a topic
+  _i2.Future<String> getWebhookUrl(int topicId) =>
+      caller.callServerEndpoint<String>(
+        'webhook',
+        'getWebhookUrl',
+        {'topicId': topicId},
+      );
+
+  /// Test webhook endpoint
+  _i2.Future<Map<String, dynamic>> testWebhook(
+    int topicId, {
+    required String title,
+    required String body,
+  }) =>
+      caller.callServerEndpoint<Map<String, dynamic>>(
+        'webhook',
+        'testWebhook',
+        {
+          'topicId': topicId,
+          'title': title,
+          'body': body,
+        },
       );
 }
 
@@ -77,8 +949,8 @@ class EndpointGreeting extends _i1.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i2.Future<_i5.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i5.Greeting>(
+  _i2.Future<_i11.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i11.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -87,10 +959,10 @@ class EndpointGreeting extends _i1.EndpointRef {
 
 class Modules {
   Modules(Client client) {
-    auth = _i6.Caller(client);
+    auth = _i12.Caller(client);
   }
 
-  late final _i6.Caller auth;
+  late final _i12.Caller auth;
 }
 
 class Client extends _i1.ServerpodClientShared {
@@ -109,7 +981,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i7.Protocol(),
+          _i13.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,
@@ -119,12 +991,36 @@ class Client extends _i1.ServerpodClientShared {
           disconnectStreamsOnLostInternetConnection:
               disconnectStreamsOnLostInternetConnection,
         ) {
+    action = EndpointAction(this);
+    control = EndpointControl(this);
+    event = EndpointEvent(this);
+    notification = EndpointNotification(this);
+    notificationStream = EndpointNotificationStream(this);
     openApi = EndpointOpenApi(this);
+    pushSubscription = EndpointPushSubscription(this);
+    sse = EndpointSse(this);
+    webhook = EndpointWebhook(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
   }
 
+  late final EndpointAction action;
+
+  late final EndpointControl control;
+
+  late final EndpointEvent event;
+
+  late final EndpointNotification notification;
+
+  late final EndpointNotificationStream notificationStream;
+
   late final EndpointOpenApi openApi;
+
+  late final EndpointPushSubscription pushSubscription;
+
+  late final EndpointSse sse;
+
+  late final EndpointWebhook webhook;
 
   late final EndpointGreeting greeting;
 
@@ -132,7 +1028,15 @@ class Client extends _i1.ServerpodClientShared {
 
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
+        'action': action,
+        'control': control,
+        'event': event,
+        'notification': notification,
+        'notificationStream': notificationStream,
         'openApi': openApi,
+        'pushSubscription': pushSubscription,
+        'sse': sse,
+        'webhook': webhook,
         'greeting': greeting,
       };
 

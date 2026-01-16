@@ -11,7 +11,7 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 | Phase 3: App Core | In Progress | 31% |
 | Phase 4: Features | Not Started | 0% |
 | Phase 5: Integration | Not Started | 0% |
-| Phase 6: Polish | In Progress | 4% |
+| Phase 6: Polish | In Progress | 17% |
 
 ---
 
@@ -89,7 +89,7 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
   - web_push (WebPush RFC8030/8291/8292)
   - pointycastle (encryption)
 
-- [ ] **1.3.4** Configure docker-compose for ntfy
+- [x] **1.3.4** Configure docker-compose for ntfy
   - Add ntfy service to docker-compose.yml
   - Configure environment variables
   - Set up health checks
@@ -694,18 +694,18 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 
 ### 6.3 Security
 
-- [ ] **6.3.1** Implement secure storage for credentials
-  - Encrypt action credentials
-  - Secure API key storage
+- [x] **6.3.1** Implement secure storage for credentials
+  - Encrypt action credentials (EncryptionService with AES-256-GCM)
+  - Secure API key storage (SecureStorageService for Flutter)
 
-- [ ] **6.3.2** Implement rate limiting on API
-  - Per-user limits
-  - Per-topic limits
+- [x] **6.3.2** Implement rate limiting on API
+  - Per-user limits (RateLimitService implemented)
+  - Per-topic limits (Webhook endpoint has rate limiting)
 
-- [ ] **6.3.3** Security audit
-  - Review authentication flow
-  - Review data validation
-  - Review API security
+- [x] **6.3.3** Security audit
+  - Review authentication flow (documented in SECURITY_AUDIT.md)
+  - Review data validation (documented in SECURITY_AUDIT.md)
+  - Review API security (documented in SECURITY_AUDIT.md)
 
 ### 6.4 Documentation
 
@@ -770,10 +770,14 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
   - Create developer account
   - Submit for review
 
-- [ ] **6.6.7** Write deployment documentation
+- [x] **6.6.7** Write deployment documentation
   - Single command deployment guide
   - Environment variables reference
   - Self-hosting guide
+  - VPS deployment guide
+  - Cloud deployment (AWS/GCP)
+  - Production checklist
+  - Troubleshooting section
 
 ---
 

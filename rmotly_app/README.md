@@ -123,6 +123,7 @@ The app uses **Riverpod** for state management. All providers are defined with t
 - [API Documentation](../docs/API.md) - API endpoints and usage
 - [Testing Guide](../docs/TESTING.md) - Testing patterns and best practices
 - [TemplateParser](../docs/TEMPLATE_PARSER.md) - Template parsing utility documentation
+- [Deployment Guide](../docs/DEPLOYMENT.md) - Complete deployment guide for the backend API
 
 ## Contributing
 

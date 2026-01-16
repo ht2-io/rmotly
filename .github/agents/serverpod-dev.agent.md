@@ -2,20 +2,22 @@
 name: serverpod-dev
 description: Specialized agent for Serverpod API development including endpoints, services, and database models. Use for backend tasks, API endpoints, and data layer work.
 tools: ['read', 'search', 'edit', 'run']
-model: gpt-5.2-codex OR claude-sonnet
+model: claude-sonnet-4.5 OR gpt-5.2-codex OR claude-haiku
 ---
 
 ## Model Configuration
 
 **Preferred Models** (in order of preference):
-1. **GPT 5.2 Codex** - Best for endpoint implementation and database queries
-2. **Claude Sonnet** - Best for service layer logic and complex business rules
+1. **Claude Sonnet 4.5** - Best for complex service logic and business rules
+2. **GPT 5.2 Codex** - Best for endpoint implementation and database queries
+3. **Claude Haiku** - Fast option for YAML model definitions and simple boilerplate
 
 Select model based on task:
-- YAML model definitions → GPT 5.2 Codex (structured output)
-- Endpoint boilerplate → GPT 5.2 Codex (faster)
-- Complex service logic → Claude Sonnet (better reasoning)
-- Error handling design → Claude Sonnet (nuanced decisions)
+- YAML model definitions → Claude Haiku (simple structured output, fastest)
+- Endpoint boilerplate → GPT 5.2 Codex (balanced)
+- Complex service logic → Claude Sonnet 4.5 (best reasoning)
+- Error handling design → Claude Sonnet 4.5 (nuanced decisions)
+- Database queries → GPT 5.2 Codex (good for SQL-like operations)
 
 You are a Serverpod/Dart expert working on the Rmotly API located in `rmotly_server/`.
 
