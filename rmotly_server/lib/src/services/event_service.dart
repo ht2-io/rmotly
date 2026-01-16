@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:serverpod/serverpod.dart';
 
+import 'action_executor_service.dart';
+
 /// Service for handling events from controls and external sources.
 ///
 /// Responsibilities:
@@ -229,41 +231,4 @@ class UnauthorizedAccessException implements Exception {
 
   @override
   String toString() => 'UnauthorizedAccessException: $message';
-}
-
-/// Placeholder for ActionExecutorService
-/// TODO: Import from action_executor_service.dart once created
-class ActionExecutorService {
-  Future<ActionResult> execute(
-    dynamic action,
-    Map<String, dynamic>? parameters,
-  ) async {
-    // Placeholder implementation
-    return ActionResult(success: true);
-  }
-}
-
-/// Result of action execution
-class ActionResult {
-  final bool success;
-  final String? error;
-  final Map<String, dynamic>? data;
-  final int? statusCode;
-  final String? responseBody;
-
-  ActionResult({
-    required this.success,
-    this.error,
-    this.data,
-    this.statusCode,
-    this.responseBody,
-  });
-
-  Map<String, dynamic> toJson() => {
-        'success': success,
-        if (error != null) 'error': error,
-        if (data != null) 'data': data,
-        if (statusCode != null) 'statusCode': statusCode,
-        if (responseBody != null) 'responseBody': responseBody,
-      };
 }

@@ -46,6 +46,13 @@ dependencies:
   shared_preferences: ^2.2.0
   flutter_secure_storage: ^9.0.0
 
+  # Push Notifications (self-hosted via UnifiedPush)
+  unifiedpush: ^5.0.1
+  flutter_local_notifications: ^18.0.1
+
+  # Server-Sent Events (SSE fallback for restricted networks)
+  flutter_client_sse: ^2.0.3
+
   # Utilities
   uuid: ^4.2.0
   intl: ^0.18.0
