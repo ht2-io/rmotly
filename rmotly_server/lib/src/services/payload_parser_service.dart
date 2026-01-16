@@ -139,9 +139,11 @@ class PayloadParserService {
   }
 
   bool _isNtfyFormat(Map<String, dynamic> body) {
-    // ntfy has 'topic' and 'message' fields
-    return body.containsKey('topic') ||
-        (body.containsKey('message') && body.containsKey('priority') is int);
+    // ntfy has 'topic' field (most specific) or 'message' field
+    // If it has 'topic', it's definitely ntfy
+    if (body.containsKey('topic')) return true;
+    // For ambiguous cases, don't try to detect as ntfy without 'topic'
+    return false;
   }
 
   bool _isPushoverFormat(Map<String, dynamic> body) {
