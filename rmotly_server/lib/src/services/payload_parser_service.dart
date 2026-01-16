@@ -81,20 +81,25 @@ class PayloadParserService {
   /// Parse a notification payload, auto-detecting the format
   NotificationPayload parse(Map<String, dynamic> body) {
     // Try each format in order of specificity
+    // Check Firebase first (most specific with 'notification' wrapper)
     if (_isFirebaseFormat(body)) {
       return _parseFirebase(body);
     }
+    // Check ntfy (has 'topic' field or specific priority range with message)
     if (_isNtfyFormat(body)) {
       return _parseNtfy(body);
     }
-    if (_isPushoverFormat(body)) {
-      return _parsePushover(body);
+    // Check Home Assistant before Gotify (has 'data' with specific fields)
+    if (_isHomeAssistantFormat(body)) {
+      return _parseHomeAssistant(body);
     }
+    // Check Gotify before Pushover (has 'extras' or 'appid')
     if (_isGotifyFormat(body)) {
       return _parseGotify(body);
     }
-    if (_isHomeAssistantFormat(body)) {
-      return _parseHomeAssistant(body);
+    // Check Pushover (has limited priority range)
+    if (_isPushoverFormat(body)) {
+      return _parsePushover(body);
     }
 
     // Fall back to generic parsing
@@ -126,8 +131,11 @@ class PayloadParserService {
 
   bool _isFirebaseFormat(Map<String, dynamic> body) {
     // Firebase has a 'notification' object with 'title' and 'body'
-    return body.containsKey('notification') &&
-        body['notification'] is Map<String, dynamic>;
+    if (!body.containsKey('notification')) return false;
+    final notification = body['notification'];
+    if (notification is! Map<String, dynamic>) return false;
+    // Must have at least title or body to be considered Firebase format
+    return notification.containsKey('title') || notification.containsKey('body');
   }
 
   bool _isNtfyFormat(Map<String, dynamic> body) {
@@ -141,7 +149,15 @@ class PayloadParserService {
     if (!body.containsKey('message')) return false;
     final priority = body['priority'];
     if (priority == null) return body.containsKey('user') || body.containsKey('token');
-    return priority is int && priority >= -2 && priority <= 2;
+    // Check if priority is int or parseable as int in range -2 to 2
+    if (priority is int) {
+      return priority >= -2 && priority <= 2;
+    }
+    if (priority is String) {
+      final parsed = int.tryParse(priority);
+      return parsed != null && parsed >= -2 && parsed <= 2;
+    }
+    return false;
   }
 
   bool _isGotifyFormat(Map<String, dynamic> body) {
@@ -275,16 +291,25 @@ class PayloadParserService {
   /// }
   /// ```
   NotificationPayload _parseGotify(Map<String, dynamic> body) {
-    final extras = body['extras'] as Map<String, dynamic>?;
+    Map<String, dynamic>? extras;
+    if (body['extras'] is Map) {
+      extras = Map<String, dynamic>.from(body['extras'] as Map);
+    }
+    
     String? imageUrl;
     String? actionUrl;
 
     if (extras != null) {
       // Gotify uses client::notification for display hints
-      final clientNotif = extras['client::notification'] as Map<String, dynamic>?;
-      if (clientNotif != null) {
-        actionUrl = clientNotif['click']?['url'] as String?;
-        imageUrl = clientNotif['bigImageUrl'] as String?;
+      final clientNotif = extras['client::notification'];
+      if (clientNotif is Map) {
+        final clickData = clientNotif['click'];
+        if (clickData is Map && clickData.containsKey('url')) {
+          actionUrl = clickData['url'] as String?;
+        }
+        if (clientNotif.containsKey('bigImageUrl')) {
+          imageUrl = clientNotif['bigImageUrl'] as String?;
+        }
       }
     }
 
