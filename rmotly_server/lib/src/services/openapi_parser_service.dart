@@ -74,9 +74,8 @@ class OpenApiOperation {
     // Add query parameters as template
     final queryParams = parameters.where((p) => p.location == 'query');
     if (queryParams.isNotEmpty) {
-      final queryString = queryParams
-          .map((p) => '${p.name}={{${p.name}}}')
-          .join('&');
+      final queryString =
+          queryParams.map((p) => '${p.name}={{${p.name}}}').join('&');
       url = '$url?$queryString';
     }
 
@@ -460,7 +459,9 @@ class OpenApiParserService {
 
   /// Find an operation by ID
   OpenApiOperation? findOperation(OpenApiSpec spec, String operationId) {
-    return spec.operations.where((o) => o.operationId == operationId).firstOrNull;
+    return spec.operations
+        .where((o) => o.operationId == operationId)
+        .firstOrNull;
   }
 
   /// Generate an action template from an operation
@@ -475,7 +476,8 @@ class OpenApiParserService {
       'urlTemplate': operation.generateUrlTemplate(baseUrl),
       'headersTemplate': operation.generateHeadersTemplate(),
       'bodyTemplate': operation.generateBodyTemplate(),
-      'parameters': jsonEncode(operation.parameters.map((p) => p.toJson()).toList()),
+      'parameters':
+          jsonEncode(operation.parameters.map((p) => p.toJson()).toList()),
     };
   }
 
