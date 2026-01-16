@@ -480,7 +480,9 @@ networks:
 
 ```bash
 # Generate VAPID keys (one-time)
-npx web-push generate-vapid-keys
+# See docs/VAPID_KEYS.md for detailed instructions
+cd rmotly_server && dart run bin/generate_vapid_keys.dart
+# Or: npx web-push generate-vapid-keys
 
 # Create .env file with keys
 cat > .env << EOF
@@ -501,6 +503,8 @@ docker-compose logs -f
 # Stop all services
 docker-compose down
 ```
+
+> **📖 For detailed VAPID key management, see [VAPID_KEYS.md](./VAPID_KEYS.md)**
 
 ### Production Deployment with Traefik (Optional)
 
@@ -643,6 +647,9 @@ dependencies:
 
 - [UnifiedPush Specification](https://unifiedpush.org/)
 - [WebPush RFC8030](https://datatracker.ietf.org/doc/html/rfc8030)
+- [WebPush RFC8291 (Message Encryption)](https://datatracker.ietf.org/doc/html/rfc8291)
+- [WebPush RFC8292 (VAPID)](https://datatracker.ietf.org/doc/html/rfc8292)
+- [VAPID Keys Documentation](./VAPID_KEYS.md) - **Comprehensive guide to generating and managing VAPID keys**
 - [Serverpod Streaming Methods](https://docs.serverpod.dev/concepts/streams)
 - [ntfy Documentation](https://docs.ntfy.sh/)
 - [SSE's Comeback in 2025](https://dev.to/haraf/server-sent-events-sse-vs-websockets-vs-long-polling-whats-best-in-2025-5ep8)

@@ -5,6 +5,10 @@
 ///
 /// Output can be copied directly to config/development.yaml or
 /// set as environment variables for production.
+///
+/// For detailed documentation on VAPID key management, key rotation,
+/// security best practices, and troubleshooting, see:
+/// docs/VAPID_KEYS.md
 library;
 
 import 'dart:convert';
