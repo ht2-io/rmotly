@@ -7,6 +7,8 @@ import 'core/adapters/action_adapter.dart';
 import 'core/adapters/control_adapter.dart';
 import 'core/adapters/notification_topic_adapter.dart';
 import 'core/providers/api_client_provider.dart';
+import 'core/theme/theme.dart';
+import 'features/dashboard/dashboard.dart';
 import 'shared/services/auth_service.dart';
 import 'shared/services/push_service.dart';
 
@@ -60,15 +62,15 @@ class RmotlyApp extends ConsumerWidget {
       },
     );
 
-    // Watch auth state
+    // Watch auth state and theme
     final authState = ref.watch(authServiceProvider);
+    final themeMode = ref.watch(flutterThemeModeProvider);
 
     return MaterialApp.router(
       title: 'Rmotly',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: themeMode,
       routerConfig: _createRouter(authState),
     );
   }
@@ -100,7 +102,7 @@ GoRouter _createRouter(AuthState authState) {
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => const HomeScreen(),
+        builder: (context, state) => const DashboardView(),
       ),
       GoRoute(
         path: '/login',
@@ -109,6 +111,21 @@ GoRouter _createRouter(AuthState authState) {
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/control/new',
+        builder: (context, state) => const ControlEditorView(),
+      ),
+      GoRoute(
+        path: '/control/:id',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          return ControlEditorView(controlId: id);
+        },
+      ),
+      GoRoute(
+        path: '/settings',
+        builder: (context, state) => const SettingsPlaceholder(),
       ),
     ],
   );
@@ -429,6 +446,67 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Placeholder settings screen
+class SettingsPlaceholder extends ConsumerWidget {
+  const SettingsPlaceholder({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authService = ref.read(authServiceProvider.notifier);
+    final themeNotifier = ref.read(themeModeProvider.notifier);
+    final currentTheme = ref.watch(themeModeProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Settings'),
+      ),
+      body: ListView(
+        children: [
+          // Theme section
+          ListTile(
+            leading: const Icon(Icons.palette),
+            title: const Text('Theme'),
+            subtitle: Text(currentTheme.name.toUpperCase()),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Choose Theme'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: AppThemeMode.values.map((mode) {
+                      return RadioListTile<AppThemeMode>(
+                        title: Text(mode.name.toUpperCase()),
+                        value: mode,
+                        groupValue: currentTheme,
+                        onChanged: (value) {
+                          if (value != null) {
+                            themeNotifier.setThemeMode(value);
+                            Navigator.pop(context);
+                          }
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+              );
+            },
+          ),
+          const Divider(),
+          // Account section
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Sign Out'),
+            onTap: () async {
+              await authService.signOut();
+            },
+          ),
+        ],
       ),
     );
   }
