@@ -19,8 +19,7 @@ import 'package:rmotly_client/src/services/notification_stream_service.dart'
     as _i7;
 import 'package:rmotly_client/src/protocol/openapi_spec.dart' as _i8;
 import 'package:rmotly_client/src/protocol/openapi_operation.dart' as _i9;
-import 'package:rmotly_client/src/services/subscription_manager_service.dart'
-    as _i10;
+import 'package:rmotly_client/src/protocol/push_subscription.dart' as _i10;
 import 'package:rmotly_client/src/protocol/greeting.dart' as _i11;
 import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i12;
 import 'protocol.dart' as _i13;
@@ -799,47 +798,53 @@ class EndpointPushSubscription extends _i1.EndpointRef {
   /// [endpoint] - The push endpoint URL from the UnifiedPush distributor
   /// [p256dh] - Optional P-256 public key for WebPush encryption (base64url)
   /// [authSecret] - Optional authentication secret for WebPush (base64url)
-  /// [deliveryMethod] - The delivery method: 'webpush', 'sse', or 'websocket'
+  /// [subscriptionType] - The subscription type: 'unifiedpush' or 'webpush'
+  /// [deviceId] - Unique identifier for the device
+  /// [userAgent] - Optional user agent string
   ///
-  /// Returns the registered subscription information.
+  /// Returns the registered subscription.
   ///
   /// Throws [AuthenticationException] if user is not authenticated.
-  /// Throws [ArgumentError] if deliveryMethod is invalid.
-  _i2.Future<_i10.PushSubscriptionInfo> registerEndpoint({
+  /// Throws [ArgumentError] if subscriptionType is invalid.
+  _i2.Future<_i10.PushSubscription> registerEndpoint({
     required String endpoint,
     String? p256dh,
     String? authSecret,
-    required String deliveryMethod,
+    required String subscriptionType,
+    required String deviceId,
+    String? userAgent,
   }) =>
-      caller.callServerEndpoint<_i10.PushSubscriptionInfo>(
+      caller.callServerEndpoint<_i10.PushSubscription>(
         'pushSubscription',
         'registerEndpoint',
         {
           'endpoint': endpoint,
           'p256dh': p256dh,
           'authSecret': authSecret,
-          'deliveryMethod': deliveryMethod,
+          'subscriptionType': subscriptionType,
+          'deviceId': deviceId,
+          'userAgent': userAgent,
         },
       );
 
   /// Unregister a push endpoint.
   ///
-  /// Removes the specified endpoint from the user's subscriptions.
+  /// Removes the specified device's endpoint from the user's subscriptions.
   /// This should be called when:
   /// - User explicitly disables push notifications
   /// - UnifiedPush distributor is uninstalled
   /// - Endpoint becomes invalid
   ///
-  /// [endpoint] - The endpoint URL to unregister
+  /// [deviceId] - The device ID to unregister
   ///
   /// Returns true if the endpoint was found and removed, false otherwise.
   ///
   /// Throws [AuthenticationException] if user is not authenticated.
-  _i2.Future<bool> unregisterEndpoint(String endpoint) =>
+  _i2.Future<bool> unregisterEndpoint(String deviceId) =>
       caller.callServerEndpoint<bool>(
         'pushSubscription',
         'unregisterEndpoint',
-        {'endpoint': endpoint},
+        {'deviceId': deviceId},
       );
 
   /// List subscriptions for the current user.
@@ -850,8 +855,8 @@ class EndpointPushSubscription extends _i1.EndpointRef {
   /// Returns an empty list if the user has no subscriptions.
   ///
   /// Throws [AuthenticationException] if user is not authenticated.
-  _i2.Future<List<_i10.PushSubscriptionInfo>> listSubscriptions() =>
-      caller.callServerEndpoint<List<_i10.PushSubscriptionInfo>>(
+  _i2.Future<List<_i10.PushSubscription>> listSubscriptions() =>
+      caller.callServerEndpoint<List<_i10.PushSubscription>>(
         'pushSubscription',
         'listSubscriptions',
         {},
@@ -863,22 +868,22 @@ class EndpointPushSubscription extends _i1.EndpointRef {
   /// Useful for temporary notification silencing.
   ///
   /// [subscriptionId] - The ID of the subscription to update
-  /// [enabled] - Whether the subscription should be enabled
+  /// [active] - Whether the subscription should be active
   ///
-  /// Returns the updated subscription information.
+  /// Returns the updated subscription.
   ///
   /// Throws [AuthenticationException] if user is not authenticated.
   /// Throws [StateError] if the subscription doesn't exist or belongs to another user.
-  _i2.Future<_i10.PushSubscriptionInfo> updateSubscription(
+  _i2.Future<_i10.PushSubscription> updateSubscription(
     int subscriptionId, {
-    bool? enabled,
+    bool? active,
   }) =>
-      caller.callServerEndpoint<_i10.PushSubscriptionInfo>(
+      caller.callServerEndpoint<_i10.PushSubscription>(
         'pushSubscription',
         'updateSubscription',
         {
           'subscriptionId': subscriptionId,
-          'enabled': enabled,
+          'active': active,
         },
       );
 }
