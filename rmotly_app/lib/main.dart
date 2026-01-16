@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/providers/api_client_provider.dart';
+import 'core/theme/theme_exports.dart';
 import 'shared/services/auth_service.dart';
 
 void main() async {
