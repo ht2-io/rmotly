@@ -73,12 +73,16 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 
 > **Note:** Replacing Firebase with self-hosted UnifiedPush + ntfy for privacy and independence. See `docs/PUSH_NOTIFICATION_DESIGN.md` for full architecture.
 
-- [ ] **1.3.1** Generate VAPID keys for WebPush
+- [x] **1.3.1** Generate VAPID keys for WebPush
   ```bash
-  npx web-push generate-vapid-keys
+  cd rmotly_server
+  dart run bin/generate_vapid_keys.dart
   ```
   - Store keys in environment variables
   - Add to server configuration
+  - Script available in `rmotly_server/bin/generate_vapid_keys.dart`
+  - Development keys already configured in `config/development.yaml`
+  - Production template available in `config/production.yaml.template`
 
 - [ ] **1.3.2** Add push notification dependencies to Flutter
   - unifiedpush (UnifiedPush connector)

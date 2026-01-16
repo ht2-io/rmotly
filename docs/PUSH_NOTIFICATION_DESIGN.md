@@ -480,9 +480,11 @@ networks:
 
 ```bash
 # Generate VAPID keys (one-time)
-npx web-push generate-vapid-keys
+cd rmotly_server
+dart run bin/generate_vapid_keys.dart
 
 # Create .env file with keys
+cd ..
 cat > .env << EOF
 POSTGRES_USER=rmotly
 POSTGRES_PASSWORD=your-secure-password
