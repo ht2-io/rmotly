@@ -20,7 +20,9 @@ import 'openapi_parameter.dart' as _i8;
 import 'openapi_spec.dart' as _i9;
 import 'user.dart' as _i10;
 import 'package:rmotly_client/src/protocol/openapi_operation.dart' as _i11;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i12;
+import 'package:rmotly_client/src/services/subscription_manager_service.dart'
+    as _i12;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i13;
 export 'greeting.dart';
 export 'action.dart';
 export 'control.dart';
@@ -117,8 +119,22 @@ class Protocol extends _i1.SerializationManager {
           .map((e) => deserialize<_i11.OpenApiOperation>(e))
           .toList() as T;
     }
+    if (t == List<_i12.PushSubscriptionInfo>) {
+      return (data as List)
+          .map((e) => deserialize<_i12.PushSubscriptionInfo>(e))
+          .toList() as T;
+    }
+    if (t == Map<String, dynamic>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
+    }
+    if (t == List<Map<String, dynamic>>) {
+      return (data as List)
+          .map((e) => deserialize<Map<String, dynamic>>(e))
+          .toList() as T;
+    }
     try {
-      return _i12.Protocol().deserialize<T>(data, t);
+      return _i13.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -154,7 +170,7 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i10.User) {
       return 'User';
     }
-    className = _i12.Protocol().getClassNameForObject(data);
+    className = _i13.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth.$className';
     }
@@ -196,7 +212,7 @@ class Protocol extends _i1.SerializationManager {
     }
     if (dataClassName.startsWith('serverpod_auth.')) {
       data['className'] = dataClassName.substring(15);
-      return _i12.Protocol().deserializeByClassName(data);
+      return _i13.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }

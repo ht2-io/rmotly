@@ -29,7 +29,8 @@ class NotificationStreamEndpoint extends Endpoint {
   /// Throws [AuthenticationException] if user is not authenticated.
   Stream<StreamNotification> streamNotifications(Session session) async* {
     // Get authenticated user
-    final userId = await session.auth.authenticatedUserId;
+    final authInfo = await session.authenticated;
+    final userId = authInfo?.userId;
     if (userId == null) {
       session.log(
         'Unauthenticated stream request rejected',
@@ -69,7 +70,8 @@ class NotificationStreamEndpoint extends Endpoint {
   ///
   /// Returns the number of active WebSocket connections for this user.
   Future<int> getConnectionCount(Session session) async {
-    final userId = await session.auth.authenticatedUserId;
+    final authInfo = await session.authenticated;
+    final userId = authInfo?.userId;
     if (userId == null) {
       throw AuthenticationException('User not authenticated');
     }
@@ -86,7 +88,8 @@ class NotificationStreamEndpoint extends Endpoint {
     String title = 'Test Notification',
     String body = 'This is a test notification from Rmotly.',
   }) async {
-    final userId = await session.auth.authenticatedUserId;
+    final authInfo = await session.authenticated;
+    final userId = authInfo?.userId;
     if (userId == null) {
       throw AuthenticationException('User not authenticated');
     }
