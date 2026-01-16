@@ -65,8 +65,8 @@ sessionLogs:
 # Generate keys with: dart run bin/generate_vapid_keys.dart
 # Set these environment variables in production:
 #   VAPID_SUBJECT - Contact email (mailto:admin@yourdomain.com)
-#   VAPID_PUBLIC_KEY - Base64url encoded public key (65 bytes uncompressed P-256 point)
-#   VAPID_PRIVATE_KEY - Base64url encoded private key (32 bytes scalar)
+#   VAPID_PUBLIC_KEY - Base64url encoded public key
+#   VAPID_PRIVATE_KEY - Base64url encoded private key
 # See docs/PUSH_NOTIFICATION_DESIGN.md for architecture details.
 vapid:
   subject: ${VAPID_SUBJECT}

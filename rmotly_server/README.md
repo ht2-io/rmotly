@@ -29,7 +29,7 @@ This will output keys that you can:
   export VAPID_PRIVATE_KEY="<generated-private-key>"
   ```
 
-**Note**: Development keys are already configured in `config/development.yaml`. Only regenerate if needed.
+**Note**: Development keys are already configured in `config/development.yaml`. Only regenerate if you need different keys for testing or if existing keys need to be rotated for security reasons.
 
 For more details, see [docs/PUSH_NOTIFICATION_DESIGN.md](../docs/PUSH_NOTIFICATION_DESIGN.md).
 
