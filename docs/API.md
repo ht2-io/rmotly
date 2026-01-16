@@ -566,11 +566,10 @@ The simplest format uses common field names. This is the fallback when no specif
 
 **Field mapping:**
 
-| Webhook Field | Rmotly Field | Alternatives |
-|--------------|--------------|--------------|
-| `title` | title | `subject`, `name`, `header`, `notification.title` |
-| `message` | body | `text`, `content`, `description`, `notification.body` |
-| `body` | body | `message`, `text`, `content`, `description` |
+| Webhook Field | Rmotly Field | Alternatives (checked in order) |
+|--------------|--------------|--------------------------------|
+| `title` | title | `subject`, `header` (default: "Notification") |
+| `body` / `message` | body | `body`, `message`, `text`, `content`, `description` (default: "") |
 | `priority` | priority | See [Priority Mapping](#priority-mapping) |
 | `image` | imageUrl | `imageUrl`, `image_url` |
 | `url` | actionUrl | `actionUrl`, `click_url`, `link` |
@@ -987,8 +986,8 @@ Configure Rmotly webhook in Uptime Kuma:
 
 ```json
 {
-  "title": "[heartbeat.name] is [heartbeat.status]",
-  "message": "[heartbeat.msg]",
+  "title": "{{msg}}",
+  "message": "Monitor: {{monitor.name}} - Status: {{monitor.status}}",
   "priority": "urgent"
 }
 ```
