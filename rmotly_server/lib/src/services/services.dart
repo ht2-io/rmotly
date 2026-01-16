@@ -4,10 +4,12 @@
 library;
 
 export 'action_executor_service.dart';
+export 'encryption_service.dart';
 export 'event_service.dart';
 export 'notification_service.dart';
 export 'notification_stream_service.dart';
 export 'openapi_parser_service.dart';
 export 'payload_parser_service.dart';
 export 'push_service.dart';
+export 'rate_limit_service.dart';
 export 'subscription_manager_service.dart';

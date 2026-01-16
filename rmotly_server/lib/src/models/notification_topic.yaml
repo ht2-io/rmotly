@@ -9,7 +9,7 @@ fields:
   name: String
   ### Optional description of what notifications this topic receives
   description: String?
-  ### API key for authenticating webhook requests
+  ### API key for authenticating webhook requests (stored encrypted)
   apiKey: String
   ### Whether the topic is enabled
   enabled: bool

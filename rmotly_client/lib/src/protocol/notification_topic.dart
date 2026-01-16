@@ -66,7 +66,7 @@ abstract class NotificationTopic implements _i1.SerializableModel {
   /// Optional description of what notifications this topic receives
   String? description;
 
-  /// API key for authenticating webhook requests
+  /// API key for authenticating webhook requests (stored encrypted)
   String apiKey;
 
   /// Whether the topic is enabled
