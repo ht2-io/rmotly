@@ -736,9 +736,9 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 ### 6.4 Documentation
 
 - [ ] **6.4.1** Write API documentation
-  - Endpoint documentation
-  - Authentication guide
-  - Webhook integration guide
+  - Endpoint documentation (existing in docs/API.md)
+  - Authentication guide (existing in docs/API.md)
+  - [x] Webhook integration guide (comprehensive guide added to docs/API.md)
 
 - [ ] **6.4.2** Write user documentation
   - Getting started guide
