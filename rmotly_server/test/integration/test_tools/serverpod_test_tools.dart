@@ -194,6 +194,7 @@ class _ActionEndpoint {
 
   _i3.Future<_i4.Action> createAction(
     _i1.TestSessionBuilder sessionBuilder, {
+    required int userId,
     required String name,
     required String httpMethod,
     required String urlTemplate,
@@ -214,6 +215,7 @@ class _ActionEndpoint {
           endpointPath: 'action',
           methodName: 'createAction',
           parameters: _i1.testObjectToJson({
+            'userId': userId,
             'name': name,
             'httpMethod': httpMethod,
             'urlTemplate': urlTemplate,
@@ -236,7 +238,9 @@ class _ActionEndpoint {
   }
 
   _i3.Future<List<_i4.Action>> listActions(
-      _i1.TestSessionBuilder sessionBuilder) async {
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int userId,
+  }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
@@ -248,7 +252,7 @@ class _ActionEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'action',
           methodName: 'listActions',
-          parameters: _i1.testObjectToJson({}),
+          parameters: _i1.testObjectToJson({'userId': userId}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
@@ -262,7 +266,7 @@ class _ActionEndpoint {
     });
   }
 
-  _i3.Future<_i4.Action> getAction(
+  _i3.Future<_i4.Action?> getAction(
     _i1.TestSessionBuilder sessionBuilder, {
     required int actionId,
   }) async {
@@ -283,7 +287,7 @@ class _ActionEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i4.Action>);
+        ) as _i3.Future<_i4.Action?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -301,6 +305,10 @@ class _ActionEndpoint {
     String? headersTemplate,
     String? bodyTemplate,
     String? parameters,
+    required bool clearDescription,
+    required bool clearHeadersTemplate,
+    required bool clearBodyTemplate,
+    required bool clearParameters,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -322,6 +330,10 @@ class _ActionEndpoint {
             'headersTemplate': headersTemplate,
             'bodyTemplate': bodyTemplate,
             'parameters': parameters,
+            'clearDescription': clearDescription,
+            'clearHeadersTemplate': clearHeadersTemplate,
+            'clearBodyTemplate': clearBodyTemplate,
+            'clearParameters': clearParameters,
           }),
           serializationManager: _serializationManager,
         );
@@ -368,7 +380,7 @@ class _ActionEndpoint {
   _i3.Future<Map<String, dynamic>> testAction(
     _i1.TestSessionBuilder sessionBuilder, {
     required int actionId,
-    Map<String, dynamic>? parameters,
+    required Map<String, dynamic> testParameters,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -383,7 +395,7 @@ class _ActionEndpoint {
           methodName: 'testAction',
           parameters: _i1.testObjectToJson({
             'actionId': actionId,
-            'parameters': parameters,
+            'testParameters': testParameters,
           }),
           serializationManager: _serializationManager,
         );
@@ -391,41 +403,6 @@ class _ActionEndpoint {
           _localUniqueSession,
           _localCallContext.arguments,
         ) as _i3.Future<Map<String, dynamic>>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _i3.Future<_i4.Action> createFromOpenApi(
-    _i1.TestSessionBuilder sessionBuilder, {
-    required String specUrl,
-    required String operationId,
-    String? name,
-  }) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-        endpoint: 'action',
-        method: 'createFromOpenApi',
-      );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'action',
-          methodName: 'createFromOpenApi',
-          parameters: _i1.testObjectToJson({
-            'specUrl': specUrl,
-            'operationId': operationId,
-            'name': name,
-          }),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue = await (_localCallContext.method.call(
-          _localUniqueSession,
-          _localCallContext.arguments,
-        ) as _i3.Future<_i4.Action>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -446,11 +423,12 @@ class _ControlEndpoint {
 
   _i3.Future<_i5.Control> createControl(
     _i1.TestSessionBuilder sessionBuilder, {
+    required int userId,
     required String name,
     required String controlType,
+    required String config,
+    required int position,
     int? actionId,
-    String? config,
-    int? position,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -464,11 +442,12 @@ class _ControlEndpoint {
           endpointPath: 'control',
           methodName: 'createControl',
           parameters: _i1.testObjectToJson({
+            'userId': userId,
             'name': name,
             'controlType': controlType,
-            'actionId': actionId,
             'config': config,
             'position': position,
+            'actionId': actionId,
           }),
           serializationManager: _serializationManager,
         );
@@ -484,7 +463,9 @@ class _ControlEndpoint {
   }
 
   _i3.Future<List<_i5.Control>> listControls(
-      _i1.TestSessionBuilder sessionBuilder) async {
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int userId,
+  }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
@@ -496,7 +477,7 @@ class _ControlEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'control',
           methodName: 'listControls',
-          parameters: _i1.testObjectToJson({}),
+          parameters: _i1.testObjectToJson({'userId': userId}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
@@ -510,7 +491,7 @@ class _ControlEndpoint {
     });
   }
 
-  _i3.Future<_i5.Control> getControl(
+  _i3.Future<_i5.Control?> getControl(
     _i1.TestSessionBuilder sessionBuilder, {
     required int controlId,
   }) async {
@@ -531,7 +512,7 @@ class _ControlEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i5.Control>);
+        ) as _i3.Future<_i5.Control?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -544,8 +525,10 @@ class _ControlEndpoint {
     required int controlId,
     String? name,
     String? controlType,
-    int? actionId,
     String? config,
+    int? position,
+    int? actionId,
+    required bool clearActionId,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -562,8 +545,10 @@ class _ControlEndpoint {
             'controlId': controlId,
             'name': name,
             'controlType': controlType,
-            'actionId': actionId,
             'config': config,
+            'position': position,
+            'actionId': actionId,
+            'clearActionId': clearActionId,
           }),
           serializationManager: _serializationManager,
         );
@@ -609,7 +594,8 @@ class _ControlEndpoint {
 
   _i3.Future<List<_i5.Control>> reorderControls(
     _i1.TestSessionBuilder sessionBuilder, {
-    required List<int> controlIds,
+    required int userId,
+    required Map<int, int> controlPositions,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -622,46 +608,16 @@ class _ControlEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'control',
           methodName: 'reorderControls',
-          parameters: _i1.testObjectToJson({'controlIds': controlIds}),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue = await (_localCallContext.method.call(
-          _localUniqueSession,
-          _localCallContext.arguments,
-        ) as _i3.Future<List<_i5.Control>>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _i3.Future<_i5.Control> duplicateControl(
-    _i1.TestSessionBuilder sessionBuilder, {
-    required int controlId,
-    String? newName,
-  }) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-        endpoint: 'control',
-        method: 'duplicateControl',
-      );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'control',
-          methodName: 'duplicateControl',
           parameters: _i1.testObjectToJson({
-            'controlId': controlId,
-            'newName': newName,
+            'userId': userId,
+            'controlPositions': controlPositions,
           }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i5.Control>);
+        ) as _i3.Future<List<_i5.Control>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
