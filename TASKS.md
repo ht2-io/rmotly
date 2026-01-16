@@ -7,7 +7,7 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 | Phase | Status | Progress |
 |-------|--------|----------|
 | Phase 1: Project Setup | In Progress | 67% |
-| Phase 2: API Core | In Progress | 19% |
+| Phase 2: API Core | In Progress | 26% |
 | Phase 3: App Core | In Progress | 31% |
 | Phase 4: Features | Not Started | 0% |
 | Phase 5: Integration | Not Started | 0% |
@@ -328,7 +328,7 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
   - Payload normalization
   - Rate limiting
 
-- [ ] **2.4.2** Implement payload format detection
+- [x] **2.4.2** Implement payload format detection
   - Firebase format
   - Pushover format
   - Ntfy format
