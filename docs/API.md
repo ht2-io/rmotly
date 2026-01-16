@@ -18,6 +18,8 @@ Development: http://localhost:8080
 
 ## Authentication
 
+Rmotly uses **Serverpod Authentication** for user account management. See [AUTHENTICATION.md](./AUTHENTICATION.md) for detailed documentation.
+
 ### App Authentication (Serverpod)
 
 The Flutter app uses Serverpod's built-in authentication with JWT tokens.
@@ -27,8 +29,27 @@ The Flutter app uses Serverpod's built-in authentication with JWT tokens.
 final client = Client('https://api.rmotly.app/')
   ..connectivityMonitor = FlutterConnectivityMonitor();
 
-// Authentication
-await client.auth.signIn(email, password);
+// Sign up
+await client.modules.auth.email.createAccountRequest(
+  userName: 'john',
+  email: 'john@example.com', 
+  password: 'secure_password',
+);
+
+// Verify email with code
+await client.modules.auth.email.createAccount(
+  email: 'john@example.com',
+  verificationCode: '123456',
+);
+
+// Sign in
+final authResponse = await client.modules.auth.email.authenticate(
+  email: 'john@example.com',
+  password: 'secure_password',
+);
+
+// Sign out
+await client.modules.auth.signOut();
 ```
 
 ### External API Authentication
