@@ -89,7 +89,7 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
   - web_push (WebPush RFC8030/8291/8292)
   - pointycastle (encryption)
 
-- [ ] **1.3.4** Configure docker-compose for ntfy
+- [x] **1.3.4** Configure docker-compose for ntfy
   - Add ntfy service to docker-compose.yml
   - Configure environment variables
   - Set up health checks
