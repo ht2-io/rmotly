@@ -34,7 +34,7 @@
         
         <!-- Receiver for boot completed to restart push service -->
         <receiver 
-            android:name="com.dexterous.flutterlocal notifications.ScheduledNotificationBootReceiver"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
@@ -43,7 +43,7 @@
         
         <!-- Receiver for scheduled notifications -->
         <receiver 
-            android:name="com.dexterous.flutterlocal notifications.ScheduledNotificationReceiver"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
             android:exported="false" />
         
         <!-- Don't delete the meta-data below.
