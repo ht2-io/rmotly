@@ -7,8 +7,8 @@ import 'core/adapters/action_adapter.dart';
 import 'core/adapters/control_adapter.dart';
 import 'core/adapters/notification_topic_adapter.dart';
 import 'core/providers/api_client_provider.dart';
-import 'core/theme/theme_exports.dart';
 import 'shared/services/auth_service.dart';
+import 'shared/services/push_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,9 +33,32 @@ class RmotlyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Initialize the session manager and API client
-    final sessionManager = ref.watch(sessionManagerProvider);
+    // Initialize the API client
     ref.watch(apiClientProvider);
+
+    // Initialize push service
+    final pushService = ref.watch(pushServiceProvider.notifier);
+    
+    // Initialize push service when app starts
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await pushService.initialize();
+        debugPrint('Push service initialized successfully');
+      } catch (e) {
+        debugPrint('Failed to initialize push service: $e');
+      }
+    });
+
+    // Listen to notifications
+    ref.listen<AsyncValue<PushNotification>>(
+      notificationStreamProvider,
+      (_, notification) {
+        notification.whenData((notif) {
+          debugPrint('Received notification: ${notif.title}');
+          // TODO: Handle notification actions (e.g., show snackbar, navigate)
+        });
+      },
+    );
 
     // Watch auth state
     final authState = ref.watch(authServiceProvider);
