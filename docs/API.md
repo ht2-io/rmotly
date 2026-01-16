@@ -988,9 +988,11 @@ Configure Rmotly webhook in Uptime Kuma:
 {
   "title": "[heartbeat.name] is [heartbeat.status]",
   "message": "[heartbeat.msg]",
-  "priority": "[heartbeat.status == 'down' ? 'urgent' : 'normal']"
+  "priority": "urgent"
 }
 ```
+
+Note: Uptime Kuma sends different payloads based on status. For dynamic priority, configure separate notification rules for up/down events.
 
 #### Generic curl Examples
 
