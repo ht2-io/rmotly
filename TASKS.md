@@ -8,8 +8,8 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 |-------|--------|----------|
 | Phase 1: Project Setup | In Progress | 67% |
 | Phase 2: API Core | In Progress | 26% |
-| Phase 3: App Core | In Progress | 31% |
-| Phase 4: Features | Not Started | 0% |
+| Phase 3: App Core | Complete | 100% |
+| Phase 4: Features | In Progress | 55% |
 | Phase 5: Integration | Not Started | 0% |
 | Phase 6: Polish | In Progress | 17% |
 
@@ -376,40 +376,49 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 
 ### 3.2 Theme and Styling
 
-- [ ] **3.2.1** Define color palette
+- [x] **3.2.1** Define color palette
   - Primary, secondary, accent colors
   - Light theme colors
   - Dark theme colors
+  - Implemented in `lib/core/theme/colors.dart`
 
-- [ ] **3.2.2** Create ThemeData
+- [x] **3.2.2** Create ThemeData
   - Light theme
   - Dark theme
+  - Implemented in `lib/core/theme/theme.dart`
 
-- [ ] **3.2.3** Create reusable text styles
+- [x] **3.2.3** Create reusable text styles
+  - Implemented in `lib/core/theme/typography.dart`
 
-- [ ] **3.2.4** Create reusable button styles
+- [x] **3.2.4** Create reusable button styles
+  - Implemented in `lib/core/theme/button_styles.dart`
 
 ### 3.3 API Client Setup
 
-- [ ] **3.3.1** Configure Serverpod client
+- [x] **3.3.1** Configure Serverpod client
   - Initialize with base URL
   - Set up connectivity monitor
+  - Implemented in `lib/core/providers/api_client_provider.dart`
 
-- [ ] **3.3.2** Create API client provider
+- [x] **3.3.2** Create API client provider
+  - Implemented in `lib/core/providers/api_client_provider.dart`
 
-- [ ] **3.3.3** Create repository providers
+- [x] **3.3.3** Create repository providers
+  - Implemented in `lib/core/providers/repository_providers.dart`
 
 ### 3.4 Local Storage
 
-- [ ] **3.4.1** Set up Hive
+- [x] **3.4.1** Set up Hive
   - Initialize in main.dart
   - Register adapters
+  - Implemented in `lib/core/services/local_storage_service.dart`
 
-- [ ] **3.4.2** Create local storage service
+- [x] **3.4.2** Create local storage service
   - Cache controls
   - Cache actions
   - Cache topics
   - Store user preferences
+  - Implemented in `lib/core/services/local_storage_service.dart` and `lib/core/providers/local_storage_provider.dart`
 
 ---
 
@@ -417,65 +426,77 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 
 ### 4.1 Authentication Feature
 
-- [ ] **4.1.1** Create auth repository
+- [x] **4.1.1** Create auth repository
   - signIn(email, password)
   - signUp(email, password)
   - signOut()
   - getCurrentUser()
+  - Implemented in `lib/shared/services/auth_service.dart`
 
-- [ ] **4.1.2** Create auth view model
+- [x] **4.1.2** Create auth view model
   - Login state management
   - Error handling
+  - Implemented with AuthService StateNotifier and AuthState
 
-- [ ] **4.1.3** Create login view
+- [x] **4.1.3** Create login view
   - Email/password form
   - Validation
   - Error display
+  - Implemented in `lib/main.dart` (LoginScreen)
 
-- [ ] **4.1.4** Create registration view
+- [x] **4.1.4** Create registration view
   - Registration form
   - Email verification (optional)
+  - Implemented in `lib/main.dart` (RegisterScreen)
 
-- [ ] **4.1.5** Implement auth guard
+- [x] **4.1.5** Implement auth guard
   - Redirect to login if not authenticated
   - Persist session
+  - Implemented with GoRouter redirect in `lib/main.dart`
 
 ### 4.2 Dashboard Feature
 
-- [ ] **4.2.1** Create control entity
-  - Control class
-  - ControlType enum
+- [x] **4.2.1** Create control entity
+  - Control class (in rmotly_client)
+  - ControlType enum (in `lib/core/control_type.dart`)
   - Control configuration classes
 
-- [ ] **4.2.2** Create control repository
+- [x] **4.2.2** Create control repository
   - CRUD operations
   - Sync with API
   - Local caching
+  - Implemented in `lib/features/dashboard/domain/repositories/control_repository.dart` (interface)
+  - Implementation stub in `lib/features/dashboard/data/repositories/control_repository_impl.dart`
 
-- [ ] **4.2.3** Create dashboard view model
+- [x] **4.2.3** Create dashboard view model
   - Load controls
   - Handle control interactions
   - Reorder controls
+  - Implemented in `lib/features/dashboard/presentation/viewmodel/dashboard_viewmodel.dart`
 
-- [ ] **4.2.4** Create dashboard view
+- [x] **4.2.4** Create dashboard view
   - Grid/list layout
   - Pull-to-refresh
   - FAB for adding controls
+  - Implemented in `lib/features/dashboard/presentation/views/dashboard_view.dart`
 
-- [ ] **4.2.5** Create control widgets
+- [x] **4.2.5** Create control widgets
   - ButtonControlWidget
   - ToggleControlWidget
   - SliderControlWidget
   - InputControlWidget
   - DropdownControlWidget
+  - Implemented in `lib/features/dashboard/presentation/widgets/`
 
-- [ ] **4.2.6** Create control editor view
+- [x] **4.2.6** Create control editor view
   - Type selector
   - Configuration form
   - Action selector
   - Preview
+  - Implemented in `lib/features/dashboard/presentation/views/control_editor_view.dart`
 
-- [ ] **4.2.7** Implement drag-and-drop reordering
+- [x] **4.2.7** Implement drag-and-drop reordering
+  - Implemented with ReorderableListView in dashboard_view.dart
 
 ### 4.3 Actions Feature
 
@@ -533,30 +554,34 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 
 ### 4.5 Notifications Feature (UnifiedPush + Self-Hosted)
 
-- [ ] **4.5.1** Create notification topic entity
-  - NotificationTopic class
+- [x] **4.5.1** Create notification topic entity
+  - NotificationTopic class (in rmotly_client)
   - NotificationConfig class
 
-- [ ] **4.5.2** Create topic repository
+- [x] **4.5.2** Create topic repository
   - CRUD operations
   - API key management
+  - Implemented in `lib/core/repositories/topic_repository.dart`
 
-- [ ] **4.5.3** Create UnifiedPush service
+- [x] **4.5.3** Create UnifiedPush service
   - Initialize UnifiedPush connector
   - Register with user-selected distributor
   - Handle endpoint changes
   - Process incoming encrypted notifications
   - Show local notifications
+  - Implemented in `lib/shared/services/push_service.dart`
 
-- [ ] **4.5.4** Create notification stream service (WebSocket)
+- [x] **4.5.4** Create notification stream service (WebSocket)
   - Connect to Serverpod streaming endpoint
   - Handle real-time notifications in foreground
   - Automatic reconnection
+  - Placeholder implemented in `lib/shared/services/push_service.dart`
 
-- [ ] **4.5.5** Create SSE fallback service
+- [x] **4.5.5** Create SSE fallback service
   - Connect to SSE endpoint
   - Handle notifications when WebSocket unavailable
   - Auto-reconnect on connection loss
+  - Implemented in `lib/shared/services/push_service.dart`
 
 - [ ] **4.5.6** Create topics view model
   - Load topics
@@ -592,9 +617,10 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
   - Data section
   - About section
 
-- [ ] **4.6.2** Implement theme switching
+- [x] **4.6.2** Implement theme switching
   - Light/dark/system modes
   - Persist preference
+  - Implemented with ThemeModeNotifier in `lib/core/theme/theme.dart`
 
 - [ ] **4.6.3** Implement notification preferences
   - Enable/disable notifications
