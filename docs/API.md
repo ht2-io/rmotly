@@ -568,8 +568,9 @@ The simplest format uses common field names. This is the fallback when no specif
 
 | Webhook Field | Rmotly Field | Alternatives |
 |--------------|--------------|--------------|
-| `title` | title | `subject`, `header` |
-| `message` | body | `body`, `text`, `content`, `description` |
+| `title` | title | `subject`, `name`, `header`, `notification.title` |
+| `message` | body | `text`, `content`, `description`, `notification.body` |
+| `body` | body | `message`, `text`, `content`, `description` |
 | `priority` | priority | See [Priority Mapping](#priority-mapping) |
 | `image` | imageUrl | `imageUrl`, `image_url` |
 | `url` | actionUrl | `actionUrl`, `click_url`, `link` |
