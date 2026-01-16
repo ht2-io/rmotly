@@ -54,7 +54,7 @@ When you are finished, you can shut down Serverpod with `Ctrl-C`, then stop the 
 To verify ntfy is working correctly:
 
 ```bash
-# Check health status
+# Check health status (should return {"healthy":true})
 curl http://localhost:8093/v1/health
 
 # Send a test notification
@@ -62,6 +62,11 @@ curl -d "Test notification from Rmotly" http://localhost:8093/rmotly-test
 
 # Subscribe to notifications (in another terminal)
 curl -s http://localhost:8093/rmotly-test/json
+```
+
+**Expected health check response:**
+```json
+{"healthy":true}
 ```
 
 ## Deployment
