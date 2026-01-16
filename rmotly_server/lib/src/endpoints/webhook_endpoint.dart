@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 
 import '../services/notification_service.dart';
+import '../services/payload_parser_service.dart';
 import '../services/rate_limit_service.dart';
 
 /// Webhook handler for external notification ingestion.
@@ -30,10 +30,12 @@ class WebhookHandler {
   final Serverpod _pod;
   final NotificationService _notificationService;
   final RateLimitService _rateLimiter;
+  final PayloadParserService _payloadParser;
 
   WebhookHandler(this._pod)
       : _notificationService = NotificationService(),
-        _rateLimiter = RateLimitService(RateLimitConfig.webhook);
+        _rateLimiter = RateLimitService(RateLimitConfig.webhook),
+        _payloadParser = PayloadParserService();
 
   /// Handle incoming webhook request
   Future<void> handleRequest(HttpRequest request, String topicId) async {
@@ -82,17 +84,17 @@ class WebhookHandler {
         return;
       }
 
-      // Parse the notification payload
-      final notification = _parsePayload(payload);
+      // Parse the notification payload using PayloadParserService
+      final parsedPayload = _payloadParser.parse(payload);
 
       // Create notification data
       final notificationData = NotificationData(
         userId: topic['userId'] as int,
         topicId: topic['id'] as int,
-        title: notification['title'] as String? ?? 'Notification',
-        body: notification['body'] as String? ?? '',
-        data: notification['data'] as Map<String, dynamic>?,
-        priority: notification['priority'] as String? ?? 'normal',
+        title: parsedPayload.title,
+        body: parsedPayload.body,
+        data: parsedPayload.data,
+        priority: parsedPayload.priority,
       );
 
       // Deliver the notification
@@ -104,8 +106,8 @@ class WebhookHandler {
       // Log the request
       final duration = DateTime.now().difference(startTime);
       _pod.logVerbose(
-        'Webhook processed: topic=$topicId, status=${result.status}, '
-        'duration=${duration.inMilliseconds}ms',
+        'Webhook processed: topic=$topicId, format=${parsedPayload.sourceFormat.name}, '
+        'status=${result.status}, duration=${duration.inMilliseconds}ms',
       );
 
       // Send success response
@@ -154,90 +156,6 @@ class WebhookHandler {
     // }
 
     return null;
-  }
-
-  /// Parse notification payload, detecting format automatically
-  Map<String, dynamic> _parsePayload(Map<String, dynamic> payload) {
-    // Try Firebase format
-    if (payload.containsKey('notification')) {
-      final notification = payload['notification'] as Map<String, dynamic>;
-      return {
-        'title': notification['title'],
-        'body': notification['body'],
-        'data': payload['data'],
-        'priority': payload['priority'],
-      };
-    }
-
-    // Try Pushover format
-    if (payload.containsKey('message') && !payload.containsKey('body')) {
-      return {
-        'title': payload['title'],
-        'body': payload['message'],
-        'data': payload['extras'],
-        'priority': _pushoverPriorityToString(payload['priority']),
-      };
-    }
-
-    // Try ntfy format
-    if (payload.containsKey('topic') && payload.containsKey('message')) {
-      return {
-        'title': payload['title'],
-        'body': payload['message'],
-        'data': payload['extras'],
-        'priority': _ntfyPriorityToString(payload['priority']),
-      };
-    }
-
-    // Try Gotify format
-    if (payload.containsKey('message') && payload.containsKey('extras')) {
-      return {
-        'title': payload['title'],
-        'body': payload['message'],
-        'data': payload['extras'],
-        'priority': _gotifyPriorityToString(payload['priority']),
-      };
-    }
-
-    // Generic format
-    return {
-      'title': payload['title'] ?? 'Notification',
-      'body': payload['body'] ?? payload['message'] ?? payload['text'] ?? '',
-      'data': payload['data'] ?? payload['extras'],
-      'priority': payload['priority']?.toString() ?? 'normal',
-    };
-  }
-
-  /// Convert Pushover priority (-2 to 2) to string
-  String _pushoverPriorityToString(dynamic priority) {
-    if (priority == null) return 'normal';
-    final p = priority is int ? priority : int.tryParse(priority.toString()) ?? 0;
-    if (p <= -2) return 'low';
-    if (p <= -1) return 'low';
-    if (p == 0) return 'normal';
-    if (p == 1) return 'high';
-    return 'urgent';
-  }
-
-  /// Convert ntfy priority (1-5) to string
-  String _ntfyPriorityToString(dynamic priority) {
-    if (priority == null) return 'normal';
-    final p = priority is int ? priority : int.tryParse(priority.toString()) ?? 3;
-    if (p <= 1) return 'low';
-    if (p <= 2) return 'low';
-    if (p == 3) return 'normal';
-    if (p == 4) return 'high';
-    return 'urgent';
-  }
-
-  /// Convert Gotify priority (1-10) to string
-  String _gotifyPriorityToString(dynamic priority) {
-    if (priority == null) return 'normal';
-    final p = priority is int ? priority : int.tryParse(priority.toString()) ?? 5;
-    if (p <= 3) return 'low';
-    if (p <= 6) return 'normal';
-    if (p <= 8) return 'high';
-    return 'urgent';
   }
 
   /// Send error response
