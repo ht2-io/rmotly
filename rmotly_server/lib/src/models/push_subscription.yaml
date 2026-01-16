@@ -1,0 +1,42 @@
+# PushSubscription model for Rmotly
+# Stores push notification endpoint subscriptions (UnifiedPush/WebPush)
+class: PushSubscription
+table: push_subscriptions
+fields:
+  ### Foreign key to the user who owns this subscription
+  userId: int, relation(parent=users)
+  ### Push endpoint URL (UnifiedPush distributor or WebPush endpoint)
+  endpoint: String
+  ### WebPush p256dh key for encryption (base64url encoded)
+  p256dh: String?
+  ### WebPush auth secret for encryption (base64url encoded)
+  auth: String?
+  ### Subscription type (unifiedpush, webpush)
+  subscriptionType: String
+  ### Device identifier for managing multiple devices
+  deviceId: String
+  ### User agent or device description
+  userAgent: String?
+  ### Whether the subscription is currently active
+  active: bool
+  ### Timestamp when the subscription was created
+  createdAt: DateTime
+  ### Timestamp when the subscription was last updated
+  updatedAt: DateTime
+  ### Timestamp of the last successful push delivery
+  lastUsedAt: DateTime?
+  ### Number of consecutive delivery failures
+  failureCount: int
+
+indexes:
+  subscription_user_idx:
+    fields: userId
+    type: btree
+  subscription_endpoint_idx:
+    fields: endpoint
+    type: btree
+    unique: true
+  subscription_device_idx:
+    fields: userId, deviceId
+    type: btree
+    unique: true

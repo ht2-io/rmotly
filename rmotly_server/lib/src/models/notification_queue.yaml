@@ -1,0 +1,49 @@
+# NotificationQueue model for Rmotly
+# Queues notifications for retry and delivery tracking
+class: NotificationQueue
+table: notification_queue
+fields:
+  ### Foreign key to the user who will receive the notification
+  userId: int, relation(parent=users)
+  ### Foreign key to the push subscription (optional, null for broadcast)
+  subscriptionId: int?, relation(parent=push_subscriptions)
+  ### Notification title
+  title: String
+  ### Notification body/message
+  body: String
+  ### Notification payload as JSON string (additional data)
+  payload: String?
+  ### Priority level (low, normal, high, urgent)
+  priority: String
+  ### Current delivery status (pending, sending, delivered, failed, expired)
+  status: String
+  ### Delivery tier attempted (websocket, webpush, sse)
+  deliveryTier: String?
+  ### Number of delivery attempts
+  attemptCount: int
+  ### Maximum number of delivery attempts before marking as failed
+  maxAttempts: int
+  ### Last error message if delivery failed
+  lastError: String?
+  ### Timestamp when the notification was queued
+  createdAt: DateTime
+  ### Timestamp when delivery should be attempted next
+  scheduledAt: DateTime
+  ### Timestamp when the notification expires (no more retries)
+  expiresAt: DateTime
+  ### Timestamp when the notification was delivered (null if not yet delivered)
+  deliveredAt: DateTime?
+
+indexes:
+  queue_user_idx:
+    fields: userId
+    type: btree
+  queue_status_idx:
+    fields: status, scheduledAt
+    type: btree
+  queue_subscription_idx:
+    fields: subscriptionId
+    type: btree
+  queue_expires_idx:
+    fields: expiresAt
+    type: btree

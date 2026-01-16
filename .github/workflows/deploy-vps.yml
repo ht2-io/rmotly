@@ -1,0 +1,259 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [deployment-vps-production, deployment-vps-staging]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Deployment target'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/rmotly-server
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rmotly_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:8
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.6.2'
+
+      - name: Cache pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      - name: Install dependencies
+        working-directory: rmotly_server
+        run: dart pub get
+
+      - name: Analyze code
+        working-directory: rmotly_server
+        run: dart analyze
+
+      - name: Run tests
+        working-directory: rmotly_server
+        run: dart test
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rmotly_test
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+
+  build:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set target environment
+        id: target
+        env:
+          INPUT_TARGET: ${{ github.event.inputs.target }}
+          BRANCH_REF: ${{ github.ref }}
+        run: |
+          if [ -n "$INPUT_TARGET" ]; then
+            echo "env=$INPUT_TARGET" >> $GITHUB_OUTPUT
+          else
+            echo "env=${BRANCH_REF##*-}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=${{ steps.target.outputs.env }}-
+            type=raw,value=${{ steps.target.outputs.env }}-latest
+            type=raw,value=latest,enable=${{ steps.target.outputs.env == 'production' }}
+
+      - name: Create passwords file
+        working-directory: rmotly_server
+        env:
+          SERVERPOD_PASSWORDS: ${{ secrets.SERVERPOD_PASSWORDS }}
+        run: echo "$SERVERPOD_PASSWORDS" > config/passwords.yaml
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./rmotly_server
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: ${{ github.event.inputs.target || 'staging' }}
+      url: ${{ github.event.inputs.target == 'production' && 'https://api.rmotly.com' || 'https://staging-api.rmotly.com' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set target environment
+        id: target
+        env:
+          INPUT_TARGET: ${{ github.event.inputs.target }}
+          BRANCH_REF: ${{ github.ref }}
+        run: |
+          if [ -n "$INPUT_TARGET" ]; then
+            echo "env=$INPUT_TARGET" >> $GITHUB_OUTPUT
+          else
+            echo "env=${BRANCH_REF##*-}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set deployment variables
+        id: vars
+        env:
+          TARGET_ENV: ${{ steps.target.outputs.env }}
+          VPS_HOST_PROD: ${{ secrets.VPS_HOST_PRODUCTION }}
+          VPS_HOST_STAGE: ${{ secrets.VPS_HOST_STAGING }}
+        run: |
+          if [ "$TARGET_ENV" == "production" ]; then
+            echo "host=$VPS_HOST_PROD" >> $GITHUB_OUTPUT
+            echo "domain=api.rmotly.com" >> $GITHUB_OUTPUT
+            echo "compose_file=docker-compose.production.yaml" >> $GITHUB_OUTPUT
+          else
+            echo "host=$VPS_HOST_STAGE" >> $GITHUB_OUTPUT
+            echo "domain=staging-api.rmotly.com" >> $GITHUB_OUTPUT
+            echo "compose_file=docker-compose.staging.yaml" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          COMPOSE_FILE: ${{ steps.vars.outputs.compose_file }}
+          TARGET_ENV: ${{ steps.target.outputs.env }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_ACTOR: ${{ github.actor }}
+        with:
+          host: ${{ steps.vars.outputs.host }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: COMPOSE_FILE,TARGET_ENV,GH_TOKEN,GH_ACTOR
+          script: |
+            set -e
+
+            # Navigate to deployment directory
+            cd /opt/rmotly
+
+            # Login to GitHub Container Registry
+            echo "$GH_TOKEN" | docker login ghcr.io -u "$GH_ACTOR" --password-stdin
+
+            # Pull latest images
+            docker compose -f "$COMPOSE_FILE" pull
+
+            # Apply database migrations (if any)
+            docker compose -f "$COMPOSE_FILE" run --rm serverpod \
+              ./server --apply-migrations --mode="$TARGET_ENV" || true
+
+            # Deploy with zero-downtime
+            docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
+
+            # Wait for health check
+            echo "Waiting for service to be healthy..."
+            sleep 10
+
+            # Cleanup old images
+            docker image prune -af --filter "until=24h"
+
+            echo "Deployment complete!"
+
+      - name: Verify deployment
+        env:
+          DEPLOY_DOMAIN: ${{ steps.vars.outputs.domain }}
+        run: |
+          echo "Verifying deployment at https://$DEPLOY_DOMAIN"
+          for i in {1..30}; do
+            if curl -sf "https://$DEPLOY_DOMAIN/health" > /dev/null 2>&1; then
+              echo "Health check passed!"
+              exit 0
+            fi
+            echo "Attempt $i/30: Waiting for service..."
+            sleep 10
+          done
+          echo "Health check failed after 30 attempts"
+          exit 1
+
+      - name: Rollback on failure
+        if: failure()
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          COMPOSE_FILE: ${{ steps.vars.outputs.compose_file }}
+        with:
+          host: ${{ steps.vars.outputs.host }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: COMPOSE_FILE
+          script: |
+            cd /opt/rmotly
+            echo "Deployment failed, rolling back..."
+            docker compose -f "$COMPOSE_FILE" down
+            docker compose -f "$COMPOSE_FILE" up -d --remove-orphans

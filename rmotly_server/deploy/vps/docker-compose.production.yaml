@@ -1,0 +1,243 @@
+# Production Docker Compose for VPS Deployment
+# Includes: Traefik (reverse proxy + SSL), Serverpod, PostgreSQL, Redis, ntfy
+#
+# Usage:
+#   docker compose -f docker-compose.production.yaml up -d
+#
+# Prerequisites:
+#   - Set environment variables in .env file
+#   - Configure DNS to point to VPS IP
+#   - Traefik will auto-provision SSL via Let's Encrypt
+
+services:
+  # =============================================================================
+  # Traefik - Reverse Proxy & SSL Termination
+  # =============================================================================
+  traefik:
+    image: traefik:v3.2
+    container_name: rmotly-traefik
+    restart: unless-stopped
+    command:
+      # API & Dashboard
+      - "--api.dashboard=true"
+      - "--api.insecure=false"
+      # Providers
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=rmotly-network"
+      # Entrypoints
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls=true"
+      # Let's Encrypt
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      # Logging
+      - "--log.level=INFO"
+      - "--accesslog=true"
+      - "--accesslog.filepath=/var/log/traefik/access.log"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_letsencrypt:/letsencrypt
+      - traefik_logs:/var/log/traefik
+    networks:
+      - rmotly-network
+    labels:
+      # Dashboard (optional, access via traefik.${DOMAIN})
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN}`)"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=dashboard-auth"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH}"
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # =============================================================================
+  # Serverpod - Dart Backend Server
+  # =============================================================================
+  serverpod:
+    image: ghcr.io/${GITHUB_REPOSITORY}/rmotly-server:production-latest
+    container_name: rmotly-serverpod
+    restart: unless-stopped
+    environment:
+      - runmode=production
+      - serverid=default
+      - logging=normal
+      - role=monolith
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rmotly-network
+    labels:
+      - "traefik.enable=true"
+      # API Router (main endpoint)
+      - "traefik.http.routers.api.rule=Host(`api.${DOMAIN}`)"
+      - "traefik.http.routers.api.entrypoints=websecure"
+      - "traefik.http.routers.api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.api.service=api"
+      - "traefik.http.services.api.loadbalancer.server.port=8080"
+      # Insights Router (Serverpod admin panel)
+      - "traefik.http.routers.insights.rule=Host(`insights.${DOMAIN}`)"
+      - "traefik.http.routers.insights.entrypoints=websecure"
+      - "traefik.http.routers.insights.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.insights.service=insights"
+      - "traefik.http.services.insights.loadbalancer.server.port=8081"
+      # Web Router (static files)
+      - "traefik.http.routers.web.rule=Host(`web.${DOMAIN}`)"
+      - "traefik.http.routers.web.entrypoints=websecure"
+      - "traefik.http.routers.web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.web.service=web"
+      - "traefik.http.services.web.loadbalancer.server.port=8082"
+      # Health check endpoint
+      - "traefik.http.routers.api.middlewares=api-headers"
+      - "traefik.http.middlewares.api-headers.headers.customresponseheaders.X-Server=rmotly"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # =============================================================================
+  # PostgreSQL - Primary Database
+  # =============================================================================
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: rmotly-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups/postgres:/backups
+    networks:
+      - rmotly-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Not exposed externally - only accessible within Docker network
+
+  # =============================================================================
+  # Redis - Cache & Session Store
+  # =============================================================================
+  redis:
+    image: redis:8-alpine
+    container_name: rmotly-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD}
+      --appendonly yes
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - rmotly-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Not exposed externally - only accessible within Docker network
+
+  # =============================================================================
+  # ntfy - Self-Hosted Push Notifications (UnifiedPush)
+  # =============================================================================
+  ntfy:
+    image: binwiederhier/ntfy:latest
+    container_name: rmotly-ntfy
+    restart: unless-stopped
+    command: serve
+    environment:
+      - TZ=UTC
+      - NTFY_BASE_URL=https://ntfy.${DOMAIN}
+      - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
+      - NTFY_CACHE_DURATION=24h
+      - NTFY_ATTACHMENT_CACHE_DIR=/var/cache/ntfy/attachments
+      - NTFY_ENABLE_LOGIN=false
+      - NTFY_BEHIND_PROXY=true
+    volumes:
+      - ntfy_cache:/var/cache/ntfy
+      - ntfy_etc:/etc/ntfy
+    networks:
+      - rmotly-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ntfy.rule=Host(`ntfy.${DOMAIN}`)"
+      - "traefik.http.routers.ntfy.entrypoints=websecure"
+      - "traefik.http.routers.ntfy.tls.certresolver=letsencrypt"
+      - "traefik.http.services.ntfy.loadbalancer.server.port=80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # =============================================================================
+  # Backup Service - Automated PostgreSQL Backups
+  # =============================================================================
+  backup:
+    image: prodrigestivill/postgres-backup-local:17
+    container_name: rmotly-backup
+    restart: unless-stopped
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - SCHEDULE=@daily
+      - BACKUP_KEEP_DAYS=7
+      - BACKUP_KEEP_WEEKS=4
+      - BACKUP_KEEP_MONTHS=6
+      - HEALTHCHECK_PORT=8080
+    volumes:
+      - ./backups/postgres:/backups
+    networks:
+      - rmotly-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  rmotly-network:
+    driver: bridge
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  ntfy_cache:
+    driver: local
+  ntfy_etc:
+    driver: local
+  traefik_letsencrypt:
+    driver: local
+  traefik_logs:
+    driver: local

@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:serverpod/serverpod.dart';
 
+import '../generated/protocol.dart';
+
 /// Result of an action execution
 class ActionResult {
   /// Whether the action executed successfully
@@ -331,6 +333,25 @@ class ActionExecutorService {
       if (headers != null) 'headers': headers,
       if (body != null) 'body': body,
     };
+  }
+
+  /// Execute an action from an Action model
+  ///
+  /// Convenience method that converts an Action model to ActionConfig
+  /// and executes it.
+  Future<ActionResult> executeAction(
+    Action action,
+    Map<String, dynamic>? parameters, {
+    Session? session,
+    Duration timeout = defaultTimeout,
+  }) async {
+    final config = ActionConfig(
+      httpMethod: action.httpMethod,
+      urlTemplate: action.urlTemplate,
+      headersTemplate: action.headersTemplate,
+      bodyTemplate: action.bodyTemplate,
+    );
+    return execute(config, parameters, session: session, timeout: timeout);
   }
 
   /// Close the HTTP client
