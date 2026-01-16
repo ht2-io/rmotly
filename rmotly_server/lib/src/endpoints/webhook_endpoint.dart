@@ -5,37 +5,7 @@ import 'dart:io';
 import 'package:serverpod/serverpod.dart';
 
 import '../services/notification_service.dart';
-
-/// Rate limiting configuration
-class _RateLimitConfig {
-  final int maxRequests;
-  final Duration window;
-  final Map<String, List<DateTime>> _requests = {};
-
-  _RateLimitConfig({
-    this.maxRequests = 100,
-    this.window = const Duration(minutes: 1),
-  });
-
-  bool isRateLimited(String key) {
-    final now = DateTime.now();
-    final windowStart = now.subtract(window);
-
-    // Clean old requests
-    _requests[key]?.removeWhere((t) => t.isBefore(windowStart));
-
-    // Check limit
-    final count = _requests[key]?.length ?? 0;
-    if (count >= maxRequests) {
-      return true;
-    }
-
-    // Record request
-    _requests.putIfAbsent(key, () => []);
-    _requests[key]!.add(now);
-    return false;
-  }
-}
+import '../services/rate_limit_service.dart';
 
 /// Webhook handler for external notification ingestion.
 ///
@@ -58,11 +28,11 @@ class _RateLimitConfig {
 class WebhookHandler {
   final Serverpod _pod;
   final NotificationService _notificationService;
-  final _RateLimitConfig _rateLimiter;
+  final RateLimitService _rateLimiter;
 
   WebhookHandler(this._pod)
       : _notificationService = NotificationService(),
-        _rateLimiter = _RateLimitConfig();
+        _rateLimiter = RateLimitService(RateLimitConfig.webhook);
 
   /// Handle incoming webhook request
   Future<void> handleRequest(HttpRequest request, String topicId) async {

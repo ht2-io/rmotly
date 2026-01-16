@@ -24,6 +24,7 @@ abstract class Action implements _i1.SerializableModel {
     this.openApiSpecUrl,
     this.openApiOperationId,
     this.parameters,
+    this.encryptedCredentials,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -40,6 +41,7 @@ abstract class Action implements _i1.SerializableModel {
     String? openApiSpecUrl,
     String? openApiOperationId,
     String? parameters,
+    String? encryptedCredentials,
     required DateTime createdAt,
     required DateTime updatedAt,
   }) = _ActionImpl;
@@ -57,6 +59,8 @@ abstract class Action implements _i1.SerializableModel {
       openApiSpecUrl: jsonSerialization['openApiSpecUrl'] as String?,
       openApiOperationId: jsonSerialization['openApiOperationId'] as String?,
       parameters: jsonSerialization['parameters'] as String?,
+      encryptedCredentials:
+          jsonSerialization['encryptedCredentials'] as String?,
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       updatedAt:
@@ -99,6 +103,10 @@ abstract class Action implements _i1.SerializableModel {
   /// Optional parameters definition as JSON string
   String? parameters;
 
+  /// Encrypted credentials for authentication (API keys, tokens, etc.)
+  /// Format: encrypted JSON map of credential key-value pairs
+  String? encryptedCredentials;
+
   /// Timestamp when the action was created
   DateTime createdAt;
 
@@ -120,6 +128,7 @@ abstract class Action implements _i1.SerializableModel {
     String? openApiSpecUrl,
     String? openApiOperationId,
     String? parameters,
+    String? encryptedCredentials,
     DateTime? createdAt,
     DateTime? updatedAt,
   });
@@ -137,6 +146,8 @@ abstract class Action implements _i1.SerializableModel {
       if (openApiSpecUrl != null) 'openApiSpecUrl': openApiSpecUrl,
       if (openApiOperationId != null) 'openApiOperationId': openApiOperationId,
       if (parameters != null) 'parameters': parameters,
+      if (encryptedCredentials != null)
+        'encryptedCredentials': encryptedCredentials,
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
     };
@@ -163,6 +174,7 @@ class _ActionImpl extends Action {
     String? openApiSpecUrl,
     String? openApiOperationId,
     String? parameters,
+    String? encryptedCredentials,
     required DateTime createdAt,
     required DateTime updatedAt,
   }) : super._(
@@ -177,6 +189,7 @@ class _ActionImpl extends Action {
           openApiSpecUrl: openApiSpecUrl,
           openApiOperationId: openApiOperationId,
           parameters: parameters,
+          encryptedCredentials: encryptedCredentials,
           createdAt: createdAt,
           updatedAt: updatedAt,
         );
@@ -197,6 +210,7 @@ class _ActionImpl extends Action {
     Object? openApiSpecUrl = _Undefined,
     Object? openApiOperationId = _Undefined,
     Object? parameters = _Undefined,
+    Object? encryptedCredentials = _Undefined,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -216,6 +230,9 @@ class _ActionImpl extends Action {
           ? openApiOperationId
           : this.openApiOperationId,
       parameters: parameters is String? ? parameters : this.parameters,
+      encryptedCredentials: encryptedCredentials is String?
+          ? encryptedCredentials
+          : this.encryptedCredentials,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
