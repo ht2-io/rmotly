@@ -1,25 +1,45 @@
 # rmotly_server
 
-This is the starting point for your Serverpod server.
+This is the Rmotly Serverpod API server.
 
 ## Quick Start
 
+### 1. Start Database Services
+
 To run your server, you first need to start Postgres, Redis, and ntfy. It's easiest to do with Docker.
 
-    docker compose up --build --detach
+```bash
+docker compose up --build --detach
+```
 
 This starts:
 - PostgreSQL on port 8090
 - Redis on port 8091
 - ntfy push server on port 8093
 
-Then you can start the Serverpod server.
+### 2. Generate VAPID Keys (First Time Setup)
 
-    dart bin/main.dart
+VAPID keys are required for WebPush notifications:
 
-When you are finished, you can shut down Serverpod with `Ctrl-C`, then stop the services.
+```bash
+dart run bin/generate_vapid_keys.dart
+```
 
-    docker compose stop
+Copy the generated keys to `config/development.yaml` or set as environment variables. See [docs/VAPID_KEYS.md](../docs/VAPID_KEYS.md) for detailed instructions.
+
+### 3. Start the Server
+
+```bash
+dart bin/main.dart
+```
+
+### 4. Shutdown
+
+Stop the Serverpod server with `Ctrl-C`, then stop the services:
+
+```bash
+docker compose stop
+```
 
 ## Services
 
@@ -69,15 +89,15 @@ curl -s http://localhost:8093/rmotly-test/json
 {"healthy":true}
 ```
 
-## Deployment
+## Configuration
 
-For production deployment, see the [Complete Deployment Guide](../docs/DEPLOYMENT.md).
+- **Development**: `config/development.yaml`
+- **Production**: `config/production.yaml.template`
+- **VAPID Keys**: See [docs/VAPID_KEYS.md](../docs/VAPID_KEYS.md)
 
-The guide covers:
-- Quick start (single command deployment)
-- Environment variables reference
-- Self-hosting with Docker Compose
-- VPS deployment
-- Cloud deployment (AWS/GCP)
-- Production checklist
-- Troubleshooting
+## Documentation
+
+- [API Documentation](../docs/API.md)
+- [Push Notifications](../docs/PUSH_NOTIFICATION_DESIGN.md)
+- [VAPID Keys Management](../docs/VAPID_KEYS.md)
+- [Complete Deployment Guide](../docs/DEPLOYMENT.md)
