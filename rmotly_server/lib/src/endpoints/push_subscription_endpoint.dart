@@ -1,4 +1,5 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 
 import '../services/subscription_manager_service.dart';
 import 'notification_stream_endpoint.dart' show AuthenticationException;
