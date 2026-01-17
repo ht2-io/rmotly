@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:serverpod/serverpod.dart';
 
+import '../generated/protocol.dart';
 import 'notification_stream_service.dart';
 import 'push_service.dart';
 

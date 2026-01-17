@@ -5,7 +5,7 @@ import 'package:serverpod/serverpod.dart';
 import '../../endpoints/sse_endpoint.dart';
 
 /// Route handler for SSE endpoint
-/// 
+///
 /// Handles GET /api/sse/notifications
 class SseRoute extends Route {
   final Serverpod pod;
@@ -15,7 +15,9 @@ class SseRoute extends Route {
     _handler = SseHandler(pod);
   }
 
-  Future<void> handleRequest(HttpRequest request) async {
+  @override
+  Future<bool> handleCall(Session session, HttpRequest request) async {
     await _handler.handleRequest(request);
+    return true;
   }
 }
