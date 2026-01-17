@@ -12,6 +12,9 @@ final errorHandlerServiceProvider = Provider<ErrorHandlerService>((ref) {
 });
 
 /// Provider for the OfflineQueueService.
+///
+/// The service uses a singleton pattern and is initialized in main.dart.
+/// Subsequent calls return the same initialized instance.
 final offlineQueueServiceProvider = Provider<OfflineQueueService>((ref) {
   return OfflineQueueService();
 });

@@ -94,6 +94,17 @@ class OfflineQueueService {
   Box<String>? _queueBox;
   final _uuid = const Uuid();
 
+  // Singleton pattern
+  static OfflineQueueService? _instance;
+
+  /// Get the singleton instance
+  factory OfflineQueueService() {
+    _instance ??= OfflineQueueService._internal();
+    return _instance!;
+  }
+
+  OfflineQueueService._internal();
+
   /// Initialize the offline queue service
   Future<void> init() async {
     _queueBox = await Hive.openBox<String>(_queueBoxName);

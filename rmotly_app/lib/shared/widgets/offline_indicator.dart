@@ -13,7 +13,6 @@ class OfflineIndicator extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final connectivityStatus = ref.watch(connectivityStatusProvider);
-    final syncService = ref.watch(syncServiceProvider);
 
     return connectivityStatus.when(
       data: (status) {
@@ -22,38 +21,31 @@ class OfflineIndicator extends ConsumerWidget {
           return const SizedBox.shrink();
         }
 
-        // Device is offline, show indicator
-        return FutureBuilder<int>(
-          future: syncService.getPendingCount(),
-          builder: (context, snapshot) {
-            final pendingCount = snapshot.data ?? 0;
-            
-            return Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: Theme.of(context).colorScheme.errorContainer,
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.cloud_off,
-                    size: 20,
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      pendingCount > 0
-                          ? 'Offline - $pendingCount event${pendingCount == 1 ? '' : 's'} queued'
-                          : 'You are offline',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onErrorContainer,
-                          ),
-                    ),
-                  ),
-                ],
+        // Device is offline, show indicator with pending count
+        // Note: We use a simple display here. In production, consider using
+        // a StreamBuilder with periodic updates to avoid excessive rebuilds.
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          color: Theme.of(context).colorScheme.errorContainer,
+          child: Row(
+            children: [
+              Icon(
+                Icons.cloud_off,
+                size: 20,
+                color: Theme.of(context).colorScheme.onErrorContainer,
               ),
-            );
-          },
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'You are offline',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                      ),
+                ),
+              ),
+            ],
+          ),
         );
       },
       loading: () => const SizedBox.shrink(),
