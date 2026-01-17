@@ -101,7 +101,8 @@ class DashboardView extends ConsumerWidget {
     context.push('/control/new');
   }
 
-  void _showEditControlDialog(BuildContext context, WidgetRef ref, Control control) {
+  void _showEditControlDialog(
+      BuildContext context, WidgetRef ref, Control control) {
     context.push('/control/${control.id}');
   }
 
@@ -113,7 +114,8 @@ class DashboardView extends ConsumerWidget {
     final confirmed = await ConfirmationDialog.show(
       context: context,
       title: 'Delete Control',
-      message: 'Are you sure you want to delete "${control.name}"? This action cannot be undone.',
+      message:
+          'Are you sure you want to delete "${control.name}"? This action cannot be undone.',
       confirmLabel: 'Delete',
       isDestructive: true,
       icon: Icons.delete,
@@ -203,7 +205,8 @@ class _ControlGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildControlCard(BuildContext context, Control control, bool isExecuting) {
+  Widget _buildControlCard(
+      BuildContext context, Control control, bool isExecuting) {
     final controlType = getControlTypeFromString(control.controlType);
 
     Widget controlWidget;

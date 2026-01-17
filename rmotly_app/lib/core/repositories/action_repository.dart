@@ -112,7 +112,8 @@ class ActionRepository {
   ///
   /// Returns the test result as a string.
   /// Throws an exception if the operation fails.
-  Future<String> testAction(int actionId, Map<String, dynamic>? parameters) async {
+  Future<String> testAction(
+      int actionId, Map<String, dynamic>? parameters) async {
     // TODO: Implement once ActionEndpoint is available
     // return await _client.action.testAction(actionId, parameters);
     throw UnimplementedError('ActionEndpoint not yet implemented in Serverpod');

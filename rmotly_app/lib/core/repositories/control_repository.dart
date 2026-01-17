@@ -29,10 +29,10 @@ class ControlRepository {
     try {
       // TODO: Implement once ControlEndpoint is available
       // final controls = await _client.control.listControls();
-      // 
+      //
       // // Cache the controls
       // await _localStorage.cacheControls(controls);
-      // 
+      //
       // return controls;
       throw UnimplementedError('ControlEndpoint not yet implemented in Serverpod');
     } catch (error) {
@@ -63,7 +63,8 @@ class ControlRepository {
   Future<Control> getControl(int controlId) async {
     // TODO: Implement once ControlEndpoint is available
     // return await _client.control.getControl(controlId);
-    throw UnimplementedError('ControlEndpoint not yet implemented in Serverpod');
+    throw UnimplementedError(
+        'ControlEndpoint not yet implemented in Serverpod');
   }
 
   /// Creates a new control.
@@ -76,7 +77,8 @@ class ControlRepository {
   Future<Control> createControl(Control control) async {
     // TODO: Implement once ControlEndpoint is available
     // return await _client.control.createControl(control);
-    throw UnimplementedError('ControlEndpoint not yet implemented in Serverpod');
+    throw UnimplementedError(
+        'ControlEndpoint not yet implemented in Serverpod');
   }
 
   /// Updates an existing control.
@@ -89,7 +91,8 @@ class ControlRepository {
   Future<Control> updateControl(Control control) async {
     // TODO: Implement once ControlEndpoint is available
     // return await _client.control.updateControl(control);
-    throw UnimplementedError('ControlEndpoint not yet implemented in Serverpod');
+    throw UnimplementedError(
+        'ControlEndpoint not yet implemented in Serverpod');
   }
 
   /// Deletes a control by ID.
@@ -101,7 +104,8 @@ class ControlRepository {
   Future<void> deleteControl(int controlId) async {
     // TODO: Implement once ControlEndpoint is available
     // await _client.control.deleteControl(controlId);
-    throw UnimplementedError('ControlEndpoint not yet implemented in Serverpod');
+    throw UnimplementedError(
+        'ControlEndpoint not yet implemented in Serverpod');
   }
 
   /// Reorders controls.
@@ -113,6 +117,7 @@ class ControlRepository {
   Future<void> reorderControls(List<int> order) async {
     // TODO: Implement once ControlEndpoint is available
     // await _client.control.reorderControls(order);
-    throw UnimplementedError('ControlEndpoint not yet implemented in Serverpod');
+    throw UnimplementedError(
+        'ControlEndpoint not yet implemented in Serverpod');
   }
 }

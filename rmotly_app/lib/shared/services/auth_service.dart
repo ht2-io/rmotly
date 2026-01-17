@@ -105,7 +105,8 @@ class AuthService extends StateNotifier<AuthState> {
   }
 
   /// Create a new account with email and password
-  Future<bool> createAccount(String email, String password, {String? userName}) async {
+  Future<bool> createAccount(String email, String password,
+      {String? userName}) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -192,7 +193,8 @@ class AuthService extends StateNotifier<AuthState> {
   }
 
   /// Reset password with verification code
-  Future<bool> resetPassword(String email, String verificationCode, String newPassword) async {
+  Future<bool> resetPassword(
+      String email, String verificationCode, String newPassword) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -243,7 +245,8 @@ class AuthService extends StateNotifier<AuthState> {
 }
 
 /// Provider for the auth service
-final authServiceProvider = StateNotifierProvider<AuthService, AuthState>((ref) {
+final authServiceProvider =
+    StateNotifierProvider<AuthService, AuthState>((ref) {
   final sessionManager = ref.watch(sessionManagerProvider);
   return AuthService(sessionManager);
 });

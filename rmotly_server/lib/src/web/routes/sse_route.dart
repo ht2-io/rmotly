@@ -15,7 +15,6 @@ class SseRoute extends Route {
     _handler = SseHandler(pod);
   }
 
-  @override
   Future<void> handleRequest(HttpRequest request) async {
     await _handler.handleRequest(request);
   }

@@ -62,14 +62,17 @@ class _DropdownControlWidgetState extends State<DropdownControlWidget> {
   void _parseConfig() {
     final config = parseControlConfig(widget.control.config);
     final optionsList = config['options'] as List<dynamic>? ?? [];
-    _options = optionsList.map((o) {
-      if (o is Map<String, dynamic>) {
-        return DropdownOption.fromJson(o);
-      } else if (o is String) {
-        return DropdownOption(id: o, label: o);
-      }
-      return DropdownOption(id: '', label: '');
-    }).where((o) => o.id.isNotEmpty).toList();
+    _options = optionsList
+        .map((o) {
+          if (o is Map<String, dynamic>) {
+            return DropdownOption.fromJson(o);
+          } else if (o is String) {
+            return DropdownOption(id: o, label: o);
+          }
+          return DropdownOption(id: '', label: '');
+        })
+        .where((o) => o.id.isNotEmpty)
+        .toList();
 
     _selectedId = config['selected'] as String?;
   }

@@ -65,7 +65,9 @@ class _SliderControlWidgetState extends State<SliderControlWidget> {
       children: [
         if (showValue) ...[
           Text(
-            unit.isEmpty ? _value.toStringAsFixed(0) : '${_value.toStringAsFixed(0)}$unit',
+            unit.isEmpty
+                ? _value.toStringAsFixed(0)
+                : '${_value.toStringAsFixed(0)}$unit',
             style: theme.textTheme.headlineMedium?.copyWith(
               color: colorScheme.primary,
               fontWeight: FontWeight.w600,
@@ -100,13 +102,17 @@ class _SliderControlWidgetState extends State<SliderControlWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              unit.isEmpty ? _min.toStringAsFixed(0) : '${_min.toStringAsFixed(0)}$unit',
+              unit.isEmpty
+                  ? _min.toStringAsFixed(0)
+                  : '${_min.toStringAsFixed(0)}$unit',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
             Text(
-              unit.isEmpty ? _max.toStringAsFixed(0) : '${_max.toStringAsFixed(0)}$unit',
+              unit.isEmpty
+                  ? _max.toStringAsFixed(0)
+                  : '${_max.toStringAsFixed(0)}$unit',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),

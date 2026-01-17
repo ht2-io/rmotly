@@ -195,8 +195,7 @@ void main() {
         // Arrange
         when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
             .thenAnswer((_) async => [testControl1, testControl2]);
-        when(() => mockRepository.deleteControl(1))
-            .thenAnswer((_) async => {});
+        when(() => mockRepository.deleteControl(1)).thenAnswer((_) async => {});
 
         await viewModel.loadControls();
 

@@ -29,10 +29,10 @@ class TopicRepository {
     try {
       // TODO: Implement once NotificationEndpoint is available
       // final topics = await _client.notification.listTopics();
-      // 
+      //
       // // Cache the topics
       // await _localStorage.cacheTopics(topics);
-      // 
+      //
       // return topics;
       throw UnimplementedError('NotificationEndpoint not yet implemented in Serverpod');
     } catch (error) {
@@ -63,7 +63,8 @@ class TopicRepository {
   Future<NotificationTopic> getTopic(int topicId) async {
     // TODO: Implement once NotificationEndpoint is available
     // return await _client.notification.getTopic(topicId);
-    throw UnimplementedError('NotificationEndpoint not yet implemented in Serverpod');
+    throw UnimplementedError(
+        'NotificationEndpoint not yet implemented in Serverpod');
   }
 
   /// Creates a new notification topic.
@@ -76,7 +77,8 @@ class TopicRepository {
   Future<NotificationTopic> createTopic(NotificationTopic topic) async {
     // TODO: Implement once NotificationEndpoint is available
     // return await _client.notification.createTopic(topic);
-    throw UnimplementedError('NotificationEndpoint not yet implemented in Serverpod');
+    throw UnimplementedError(
+        'NotificationEndpoint not yet implemented in Serverpod');
   }
 
   /// Updates an existing notification topic.
@@ -89,7 +91,8 @@ class TopicRepository {
   Future<NotificationTopic> updateTopic(NotificationTopic topic) async {
     // TODO: Implement once NotificationEndpoint is available
     // return await _client.notification.updateTopic(topic);
-    throw UnimplementedError('NotificationEndpoint not yet implemented in Serverpod');
+    throw UnimplementedError(
+        'NotificationEndpoint not yet implemented in Serverpod');
   }
 
   /// Deletes a notification topic by ID.
@@ -101,7 +104,8 @@ class TopicRepository {
   Future<void> deleteTopic(int topicId) async {
     // TODO: Implement once NotificationEndpoint is available
     // await _client.notification.deleteTopic(topicId);
-    throw UnimplementedError('NotificationEndpoint not yet implemented in Serverpod');
+    throw UnimplementedError(
+        'NotificationEndpoint not yet implemented in Serverpod');
   }
 
   /// Regenerates the API key for a notification topic.
@@ -114,6 +118,7 @@ class TopicRepository {
   Future<NotificationTopic> regenerateApiKey(int topicId) async {
     // TODO: Implement once NotificationEndpoint is available
     // return await _client.notification.regenerateApiKey(topicId);
-    throw UnimplementedError('NotificationEndpoint not yet implemented in Serverpod');
+    throw UnimplementedError(
+        'NotificationEndpoint not yet implemented in Serverpod');
   }
 }

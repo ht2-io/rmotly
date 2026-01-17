@@ -15,7 +15,6 @@ class WebhookRoute extends Route {
     _handler = WebhookHandler(pod);
   }
 
-  @override
   Future<void> handleRequest(HttpRequest request) async {
     // Extract topic ID from path
     final uri = request.uri;

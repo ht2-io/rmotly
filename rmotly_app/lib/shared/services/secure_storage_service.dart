@@ -20,7 +20,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// final apiKey = await storage.read('apiKey');
 /// ```
 class SecureStorageService {
-  static final SecureStorageService _instance = SecureStorageService._internal();
+  static final SecureStorageService _instance =
+      SecureStorageService._internal();
 
   factory SecureStorageService() => _instance;
 
@@ -134,7 +135,8 @@ class SecureStorageService {
     try {
       return await _storage.readAll();
     } catch (e) {
-      throw SecureStorageException('Failed to read all from secure storage: $e');
+      throw SecureStorageException(
+          'Failed to read all from secure storage: $e');
     }
   }
 
