@@ -61,7 +61,7 @@ jobs:
 
       - name: Generate Serverpod code
         working-directory: rmotly_server
-        run: dart pub global run serverpod_cli:serverpod generate
+        run: serverpod generate
 
       - name: Analyze code
         working-directory: rmotly_server
