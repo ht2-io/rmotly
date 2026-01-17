@@ -18,8 +18,6 @@ class ButtonControlWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final config = parseControlConfig(control.config);
 
     final label = config['label'] as String? ?? 'Press';
