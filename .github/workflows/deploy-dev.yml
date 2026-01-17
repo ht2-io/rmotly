@@ -73,6 +73,28 @@ jobs:
             database: 'postgres'
           EOF
 
+      - name: Apply database migrations
+        working-directory: rmotly_server
+        run: |
+          # Apply migrations in order
+          for migration_dir in $(ls -d migrations/*/ | sort); do
+            migration_file="$migration_dir/migration.sql"
+            if [ -f "$migration_file" ]; then
+              echo "Applying migration: $migration_dir"
+              PGPASSWORD=postgres psql -h localhost -U postgres -d rmotly_test -f "$migration_file"
+            fi
+          done
+
+      - name: Seed test data
+        run: |
+          # Insert test user for integration tests
+          PGPASSWORD=postgres psql -h localhost -U postgres -d rmotly_test << 'EOF'
+          INSERT INTO users (id, email, "displayName", "createdAt", "updatedAt")
+          VALUES (1, 'test@example.com', 'Test User', NOW(), NOW())
+          ON CONFLICT (id) DO NOTHING;
+          SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
+          EOF
+
       - name: Analyze code
         working-directory: rmotly_server
         run: dart analyze
@@ -80,7 +102,18 @@ jobs:
       - name: Run unit tests
         working-directory: rmotly_server
         run: dart test test/unit/
-        # TODO: Add integration tests once database migrations are configured in CI
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rmotly_test
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+
+      - name: Run integration tests
+        working-directory: rmotly_server
+        run: dart test test/integration/
         env:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
