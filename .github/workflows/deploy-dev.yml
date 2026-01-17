@@ -1,0 +1,110 @@
+name: Deploy to Dev Server
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  DEV_HOST: dev1.ht2.io
+  DEV_USER: cicd
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rmotly_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:8
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.6.2'
+
+      - name: Cache pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      - name: Install dependencies
+        working-directory: rmotly_server
+        run: dart pub get
+
+      - name: Analyze code
+        working-directory: rmotly_server
+        run: dart analyze
+
+      - name: Run tests
+        working-directory: rmotly_server
+        run: dart test
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rmotly_test
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+
+  deploy:
+    name: Deploy to Dev Server
+    runs-on: ubuntu-latest
+    needs: test
+    environment:
+      name: development
+      url: https://dev1.ht2.io
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.DEV_HOST }}
+          username: ${{ env.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          script: |
+            set -e
+            echo "Starting deployment to dev server..."
+            /opt/rmotly/deploy.sh
+            echo "Deployment complete!"
+
+      - name: Verify deployment
+        run: |
+          echo "Waiting for services to start..."
+          sleep 30
+          echo "Checking service status via SSH..."
+
+      - name: Check service status
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.DEV_HOST }}
+          username: ${{ env.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          script: |
+            cd /opt/rmotly/rmotly_server
+            docker compose ps
+            echo "Dev deployment verified!"
