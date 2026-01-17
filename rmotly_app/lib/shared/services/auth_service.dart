@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rmotly_client/rmotly_client.dart';
-import 'package:serverpod_auth_client/serverpod_auth_client.dart';
 import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 
 import '../../core/providers/api_client_provider.dart';
@@ -113,10 +112,10 @@ class AuthService extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final serverResponse = await _client.modules.auth.email
+      final success = await _client.modules.auth.email
           .createAccountRequest(userName ?? email, email, password);
 
-      if (serverResponse.success) {
+      if (success) {
         // Account created but needs email verification
         state = state.copyWith(
           isLoading: false,
@@ -126,7 +125,7 @@ class AuthService extends StateNotifier<AuthState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          error: serverResponse.failReason?.name ?? 'Account creation failed',
+          error: 'Account creation failed',
         );
         return false;
       }
@@ -147,7 +146,7 @@ class AuthService extends StateNotifier<AuthState> {
       final serverResponse = await _client.modules.auth.email
           .createAccount(email, verificationCode);
 
-      if (serverResponse.success) {
+      if (serverResponse != null && serverResponse.success) {
         // Automatically sign in after verification
         await _sessionManager.registerSignedInUser(
           serverResponse.userInfo!,
@@ -163,7 +162,7 @@ class AuthService extends StateNotifier<AuthState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          error: serverResponse.failReason?.name ?? 'Verification failed',
+          error: serverResponse?.failReason?.name ?? 'Verification failed',
         );
         return false;
       }
@@ -201,8 +200,9 @@ class AuthService extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
+      // Note: Serverpod auth API expects (verificationCode, newPassword)
       final success = await _client.modules.auth.email
-          .resetPassword(email, verificationCode, newPassword);
+          .resetPassword(verificationCode, newPassword);
 
       state = state.copyWith(isLoading: false);
       return success;
