@@ -710,13 +710,17 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 
 ### 6.2 Performance
 
-- [ ] **6.2.1** Optimize API calls
-  - Batch requests where possible
-  - Implement caching
+- [x] **6.2.1** Optimize API calls
+  - Cache-first strategy with background refresh
+  - Request deduplication
+  - Reduce redundant calls with smart caching
+  - See `rmotly_app/docs/PERFORMANCE_OPTIMIZATIONS.md`
 
-- [ ] **6.2.2** Optimize UI rendering
-  - Use const constructors
-  - Implement list virtualization
+- [x] **6.2.2** Optimize UI rendering
+  - Use const constructors and widget decomposition
+  - Selective Riverpod providers to minimize rebuilds
+  - List virtualization (ReorderableListView)
+  - See `rmotly_app/docs/PERFORMANCE_OPTIMIZATIONS.md`
 
 ### 6.3 Security
 

@@ -24,7 +24,8 @@ class DashboardViewModel extends StateNotifier<DashboardState> {
     state = state.copyWith(isLoading: true, clearError: true);
 
     try {
-      final controls = await _repository.getControls();
+      // Use cached data if available
+      final controls = await _repository.getControls(forceRefresh: false);
       state = state.copyWith(
         controls: controls,
         isLoading: false,
@@ -45,7 +46,8 @@ class DashboardViewModel extends StateNotifier<DashboardState> {
     state = state.copyWith(isRefreshing: true, clearError: true);
 
     try {
-      final controls = await _repository.getControls();
+      // Force refresh from API
+      final controls = await _repository.getControls(forceRefresh: true);
       state = state.copyWith(
         controls: controls,
         isRefreshing: false,

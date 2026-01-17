@@ -45,64 +45,13 @@ class ControlCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header row with icon and menu
-                  Row(
-                    children: [
-                      Icon(
-                        _getIconForControlType(controlType),
-                        size: 20,
-                        color: colorScheme.primary,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          control.name,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (onEdit != null || onDelete != null)
-                        PopupMenuButton<String>(
-                          icon: Icon(
-                            Icons.more_vert,
-                            size: 20,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          onSelected: (value) {
-                            if (value == 'edit') {
-                              onEdit?.call();
-                            } else if (value == 'delete') {
-                              onDelete?.call();
-                            }
-                          },
-                          itemBuilder: (context) => [
-                            if (onEdit != null)
-                              const PopupMenuItem(
-                                value: 'edit',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.edit, size: 20),
-                                    SizedBox(width: 8),
-                                    Text('Edit'),
-                                  ],
-                                ),
-                              ),
-                            if (onDelete != null)
-                              PopupMenuItem(
-                                value: 'delete',
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.delete, size: 20, color: colorScheme.error),
-                                    const SizedBox(width: 8),
-                                    Text('Delete', style: TextStyle(color: colorScheme.error)),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-                    ],
+                  _ControlCardHeader(
+                    controlType: controlType,
+                    controlName: control.name,
+                    colorScheme: colorScheme,
+                    textTheme: theme.textTheme,
+                    onEdit: onEdit,
+                    onDelete: onDelete,
                   ),
                   const SizedBox(height: 16),
                   // Control widget
@@ -114,27 +63,59 @@ class ControlCard extends StatelessWidget {
             ),
             // Loading overlay
             if (isExecuting)
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              _LoadingOverlay(colorScheme: colorScheme),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Optimized header widget with const constructor
+class _ControlCardHeader extends StatelessWidget {
+  final ControlType? controlType;
+  final String controlName;
+  final ColorScheme colorScheme;
+  final TextTheme textTheme;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+
+  const _ControlCardHeader({
+    required this.controlType,
+    required this.controlName,
+    required this.colorScheme,
+    required this.textTheme,
+    this.onEdit,
+    this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          _getIconForControlType(controlType),
+          size: 20,
+          color: colorScheme.primary,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            controlName,
+            style: textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        if (onEdit != null || onDelete != null)
+          _ControlCardMenu(
+            colorScheme: colorScheme,
+            onEdit: onEdit,
+            onDelete: onDelete,
+          ),
+      ],
     );
   }
 
@@ -153,5 +134,89 @@ class ControlCard extends StatelessWidget {
       default:
         return Icons.widgets;
     }
+  }
+}
+
+/// Optimized menu widget
+class _ControlCardMenu extends StatelessWidget {
+  final ColorScheme colorScheme;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+
+  const _ControlCardMenu({
+    required this.colorScheme,
+    this.onEdit,
+    this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      icon: Icon(
+        Icons.more_vert,
+        size: 20,
+        color: colorScheme.onSurfaceVariant,
+      ),
+      onSelected: (value) {
+        if (value == 'edit') {
+          onEdit?.call();
+        } else if (value == 'delete') {
+          onDelete?.call();
+        }
+      },
+      itemBuilder: (context) => [
+        if (onEdit != null)
+          const PopupMenuItem(
+            value: 'edit',
+            child: Row(
+              children: [
+                Icon(Icons.edit, size: 20),
+                SizedBox(width: 8),
+                Text('Edit'),
+              ],
+            ),
+          ),
+        if (onDelete != null)
+          PopupMenuItem(
+            value: 'delete',
+            child: Row(
+              children: [
+                Icon(Icons.delete, size: 20, color: colorScheme.error),
+                const SizedBox(width: 8),
+                Text('Delete', style: TextStyle(color: colorScheme.error)),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Optimized loading overlay widget with const constructor
+class _LoadingOverlay extends StatelessWidget {
+  final ColorScheme colorScheme;
+
+  const _LoadingOverlay({required this.colorScheme});
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: Container(
+        decoration: BoxDecoration(
+          color: colorScheme.surface.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Center(
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: colorScheme.primary,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
