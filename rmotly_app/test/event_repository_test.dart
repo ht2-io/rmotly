@@ -1,18 +1,42 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rmotly_app/core/repositories/event_repository.dart';
+import 'package:rmotly_app/core/services/error_handler_service.dart';
+import 'package:rmotly_app/core/services/connectivity_service.dart';
+import 'package:rmotly_app/core/services/offline_queue_service.dart';
 import 'package:rmotly_client/rmotly_client.dart';
 
 // Mock classes
 class MockClient extends Mock implements Client {}
 
+class MockErrorHandlerService extends Mock implements ErrorHandlerService {}
+
+class MockConnectivityService extends Mock implements ConnectivityService {}
+
+class MockOfflineQueueService extends Mock implements OfflineQueueService {}
+
 void main() {
   late MockClient mockClient;
+  late MockErrorHandlerService mockErrorHandler;
+  late MockConnectivityService mockConnectivityService;
+  late MockOfflineQueueService mockOfflineQueue;
   late EventRepository repository;
 
   setUp(() {
     mockClient = MockClient();
-    repository = EventRepository(mockClient);
+    mockErrorHandler = MockErrorHandlerService();
+    mockConnectivityService = MockConnectivityService();
+    mockOfflineQueue = MockOfflineQueueService();
+
+    // Default behavior
+    when(() => mockConnectivityService.isOnline).thenReturn(true);
+
+    repository = EventRepository(
+      mockClient,
+      mockErrorHandler,
+      mockConnectivityService,
+      mockOfflineQueue,
+    );
   });
 
   group('EventRepository', () {

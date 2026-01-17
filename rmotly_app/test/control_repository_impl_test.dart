@@ -2,18 +2,32 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rmotly_app/features/dashboard/data/repositories/control_repository_impl.dart';
 import 'package:rmotly_app/features/dashboard/domain/repositories/control_repository.dart';
+import 'package:rmotly_app/core/services/local_storage_service.dart';
 import 'package:rmotly_client/rmotly_client.dart';
+import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 
 // Mock classes
 class MockClient extends Mock implements Client {}
 
+class MockLocalStorageService extends Mock implements LocalStorageService {}
+
+class MockSessionManager extends Mock implements SessionManager {}
+
 void main() {
   late MockClient mockClient;
+  late MockLocalStorageService mockStorage;
+  late MockSessionManager mockSessionManager;
   late ControlRepository repository;
 
   setUp(() {
     mockClient = MockClient();
-    repository = ControlRepositoryImpl(mockClient);
+    mockStorage = MockLocalStorageService();
+    mockSessionManager = MockSessionManager();
+
+    // Default behavior
+    when(() => mockSessionManager.signedInUser).thenReturn(null);
+
+    repository = ControlRepositoryImpl(mockClient, mockStorage, mockSessionManager);
   });
 
   group('ControlRepositoryImpl', () {
@@ -59,7 +73,7 @@ void main() {
         for (final control in controls) {
           expect(control.createdAt, isNotNull);
           expect(control.updatedAt, isNotNull);
-          expect(control.updatedAt.isAfter(control.createdAt) || 
+          expect(control.updatedAt.isAfter(control.createdAt) ||
                  control.updatedAt.isAtSameMomentAs(control.createdAt), isTrue);
         }
       });

@@ -3,6 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:rmotly_app/core/services/local_storage_service.dart';
 import 'package:rmotly_app/features/dashboard/data/repositories/control_repository_impl.dart';
 import 'package:rmotly_client/rmotly_client.dart';
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as auth;
 import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 
 // Mock classes
@@ -12,7 +13,7 @@ class MockSessionManager extends Mock implements SessionManager {}
 class MockEndpointControl extends Mock {
   Future<List<Control>> listControls({required int userId});
 }
-class MockUserInfo extends Mock implements UserInfo {}
+class MockUserInfo extends Mock implements auth.UserInfo {}
 
 void main() {
   late MockClient mockClient;
