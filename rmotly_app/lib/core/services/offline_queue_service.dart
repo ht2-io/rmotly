@@ -98,6 +98,9 @@ class OfflineQueueService {
   static OfflineQueueService? _instance;
 
   /// Get the singleton instance
+  ///
+  /// Note: This implementation assumes Flutter's single-threaded model.
+  /// In Flutter, all Dart code runs in a single isolate by default.
   factory OfflineQueueService() {
     _instance ??= OfflineQueueService._internal();
     return _instance!;

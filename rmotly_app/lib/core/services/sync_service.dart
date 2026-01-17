@@ -47,6 +47,9 @@ class SyncService {
   /// Process all queued events
   ///
   /// Returns the number of successfully processed events.
+  ///
+  /// Note: This guard assumes Flutter's single-threaded model where
+  /// all async operations run sequentially on the event loop.
   Future<int> processQueue() async {
     // Prevent concurrent syncing
     if (_isSyncing) {

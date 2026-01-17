@@ -33,7 +33,7 @@ void main() {
     });
 
     test('returns user-friendly message for SocketException', () {
-      final exception = const SocketException('Connection refused');
+      final exception = SocketException('Connection refused');
       final message = errorHandler.getErrorMessage(exception);
       expect(message, 'No internet connection. Please check your network.');
     });
@@ -57,7 +57,7 @@ void main() {
     });
 
     test('returns true for SocketException', () {
-      final exception = const SocketException('Connection refused');
+      final exception = SocketException('Connection refused');
       expect(errorHandler.isRetryable(exception), isTrue);
     });
 
@@ -80,7 +80,7 @@ void main() {
     });
 
     test('maps SocketException to NetworkException', () {
-      final exception = const SocketException('Connection refused');
+      final exception = SocketException('Connection refused');
       final mapped = errorHandler.mapToAppException(exception);
       expect(mapped, isA<NetworkException>());
       expect(mapped.message, 'No internet connection');
