@@ -457,7 +457,13 @@ class PushService extends StateNotifier<PushServiceState> {
       try {
         data['data'] = jsonDecode(notification.data!);
       } catch (e) {
-        debugPrint('Failed to parse notification data: $e');
+        final dataPreview = notification.data!.length > 100
+            ? '${notification.data!.substring(0, 100)}...'
+            : notification.data!;
+        debugPrint(
+          'Failed to parse notification data for ${notification.id}: $e. '
+          'Data: $dataPreview',
+        );
       }
     }
 

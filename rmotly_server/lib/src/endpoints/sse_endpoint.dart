@@ -133,9 +133,15 @@ class SseHandler {
   /// Validate authentication token and return user ID
   Future<int?> _validateToken(String token) async {
     try {
-      // The token is the user ID for SSE connections
-      // This is a simplified approach for SSE streaming
-      // In production, you'd want to use proper session validation
+      // TODO: SECURITY - This is a simplified implementation
+      // In production, implement proper session token validation:
+      // 1. Use signed JWT tokens or session keys
+      // 2. Validate token signature/session validity
+      // 3. Check token expiration
+      // 4. Verify user permissions
+      // 
+      // Current implementation uses user ID directly which is NOT SECURE
+      // and should only be used for development/testing
       final userId = int.tryParse(token);
       if (userId == null) {
         return null;
