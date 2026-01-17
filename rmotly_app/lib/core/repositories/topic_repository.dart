@@ -34,7 +34,8 @@ class TopicRepository {
       // await _localStorage.cacheTopics(topics);
       //
       // return topics;
-      throw UnimplementedError('NotificationEndpoint not yet implemented in Serverpod');
+      throw UnimplementedError(
+          'NotificationEndpoint not yet implemented in Serverpod');
     } catch (error) {
       // If offline or error, try to return cached data
       if (!_connectivityService.isOnline || _errorHandler.isRetryable(error)) {

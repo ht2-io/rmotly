@@ -71,7 +71,7 @@ class EventRepository {
         eventType: eventType,
         payload: payload,
       );
-      
+
       throw const OfflineException(
         'Device is offline. Event queued for later.',
         code: 'OFFLINE',
@@ -85,7 +85,8 @@ class EventRepository {
       //   eventType: eventType,
       //   payload: payload,
       // );
-      throw UnimplementedError('EventEndpoint not yet implemented in Serverpod');
+      throw UnimplementedError(
+          'EventEndpoint not yet implemented in Serverpod');
     } catch (error) {
       // Map error to AppException
       throw _errorHandler.mapToAppException(error);

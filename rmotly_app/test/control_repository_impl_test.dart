@@ -27,7 +27,8 @@ void main() {
     // Default behavior
     when(() => mockSessionManager.signedInUser).thenReturn(null);
 
-    repository = ControlRepositoryImpl(mockClient, mockStorage, mockSessionManager);
+    repository =
+        ControlRepositoryImpl(mockClient, mockStorage, mockSessionManager);
   });
 
   group('ControlRepositoryImpl', () {
@@ -73,8 +74,10 @@ void main() {
         for (final control in controls) {
           expect(control.createdAt, isNotNull);
           expect(control.updatedAt, isNotNull);
-          expect(control.updatedAt.isAfter(control.createdAt) ||
-                 control.updatedAt.isAtSameMomentAs(control.createdAt), isTrue);
+          expect(
+              control.updatedAt.isAfter(control.createdAt) ||
+                  control.updatedAt.isAtSameMomentAs(control.createdAt),
+              isTrue);
         }
       });
 
@@ -92,7 +95,8 @@ void main() {
     });
 
     group('createControl', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Arrange
         final control = Control(
           id: null,
@@ -114,7 +118,8 @@ void main() {
     });
 
     group('updateControl', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Arrange
         final control = Control(
           id: 1,
@@ -136,7 +141,8 @@ void main() {
     });
 
     group('deleteControl', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.deleteControl(1),
@@ -146,7 +152,8 @@ void main() {
     });
 
     group('reorderControls', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Arrange
         final controls = [
           Control(
@@ -180,7 +187,8 @@ void main() {
     });
 
     group('sendControlEvent', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.sendControlEvent(

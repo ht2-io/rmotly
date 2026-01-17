@@ -18,7 +18,8 @@ abstract class ActionRepository {
   Future<bool> deleteAction(int actionId);
 
   /// Tests an action execution with parameters.
-  Future<ActionTestResult> testAction(int actionId, Map<String, dynamic> parameters);
+  Future<ActionTestResult> testAction(
+      int actionId, Map<String, dynamic> parameters);
 }
 
 /// Result of testing an action

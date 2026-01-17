@@ -101,9 +101,11 @@ class ActionCard extends StatelessWidget {
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete, size: 20, color: colorScheme.error),
+                            Icon(Icons.delete,
+                                size: 20, color: colorScheme.error),
                             const SizedBox(width: 8),
-                            Text('Delete', style: TextStyle(color: colorScheme.error)),
+                            Text('Delete',
+                                style: TextStyle(color: colorScheme.error)),
                           ],
                         ),
                       ),
@@ -122,7 +124,8 @@ class ActionCard extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              if (action.description != null && action.description!.isNotEmpty) ...[
+              if (action.description != null &&
+                  action.description!.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Text(
                   action.description!,

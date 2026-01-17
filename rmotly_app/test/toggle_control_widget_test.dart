@@ -36,7 +36,8 @@ void main() {
       );
     }
 
-    testWidgets('should display toggle with initial state from config', (tester) async {
+    testWidgets('should display toggle with initial state from config',
+        (tester) async {
       // Act
       await tester.pumpWidget(
         createTestWidget(
@@ -65,7 +66,8 @@ void main() {
       expect(find.text('Active'), findsNothing);
     });
 
-    testWidgets('should use default labels when config is missing', (tester) async {
+    testWidgets('should use default labels when config is missing',
+        (tester) async {
       // Arrange
       final controlWithoutLabels = Control(
         id: 1,
@@ -150,7 +152,8 @@ void main() {
       expect(switchWidget.onChanged, isNull);
     });
 
-    testWidgets('should update state when control config changes', (tester) async {
+    testWidgets('should update state when control config changes',
+        (tester) async {
       // Arrange
       await tester.pumpWidget(
         createTestWidget(
@@ -215,7 +218,8 @@ void main() {
       expect(values, [true, false, true]);
     });
 
-    testWidgets('should show correct text style for active state', (tester) async {
+    testWidgets('should show correct text style for active state',
+        (tester) async {
       // Arrange
       final activeControl = Control(
         id: 1,

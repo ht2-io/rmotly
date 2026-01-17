@@ -9,7 +9,7 @@ class ControlRepositoryImpl implements ControlRepository {
   final Client _client;
   final LocalStorageService _storage;
   final SessionManager _sessionManager;
-  
+
   // Track pending requests to prevent duplicate API calls
   Future<List<Control>>? _pendingGetControls;
   DateTime? _lastFetch;
@@ -20,13 +20,15 @@ class ControlRepositoryImpl implements ControlRepository {
   @override
   Future<List<Control>> getControls({bool forceRefresh = false}) async {
     // Return cached data if available and not forcing refresh
-    if (!forceRefresh && _lastFetch != null && 
+    if (!forceRefresh &&
+        _lastFetch != null &&
         DateTime.now().difference(_lastFetch!) < _cacheDuration) {
       try {
         final cached = await _storage.getCachedControls();
         if (cached.isNotEmpty) {
           // Start background refresh if cache is getting old
-          if (DateTime.now().difference(_lastFetch!) > const Duration(minutes: 2)) {
+          if (DateTime.now().difference(_lastFetch!) >
+              const Duration(minutes: 2)) {
             _refreshInBackground();
           }
           return cached;
@@ -43,7 +45,7 @@ class ControlRepositoryImpl implements ControlRepository {
 
     // Create new request
     _pendingGetControls = _fetchAndCache();
-    
+
     try {
       return await _pendingGetControls!;
     } finally {
@@ -92,10 +94,10 @@ class ControlRepositoryImpl implements ControlRepository {
       position: control.position,
       actionId: control.actionId,
     );
-    
+
     // Invalidate cache on create
     _lastFetch = null;
-    
+
     return createdControl;
   }
 
@@ -114,17 +116,17 @@ class ControlRepositoryImpl implements ControlRepository {
       actionId: control.actionId,
       clearActionId: control.actionId == null,
     );
-    
+
     // Invalidate cache on update
     _lastFetch = null;
-    
+
     return updatedControl;
   }
 
   @override
   Future<void> deleteControl(int controlId) async {
     await _client.control.deleteControl(controlId: controlId);
-    
+
     // Invalidate cache on delete
     _lastFetch = null;
   }
@@ -151,7 +153,7 @@ class ControlRepositoryImpl implements ControlRepository {
     } catch (_) {
       // Continue even if caching fails
     }
-    
+
     // Call API to persist reorder
     await _client.control.reorderControls(
       userId: userId,

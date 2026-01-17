@@ -172,7 +172,8 @@ class OpenApiViewModel extends StateNotifier<OpenApiState> {
         type: p.typeString,
         required: p.required,
         description: p.description,
-        defaultValue: p.defaultValue?.toString() ?? state.parameterValues[p.name],
+        defaultValue:
+            p.defaultValue?.toString() ?? state.parameterValues[p.name],
       );
     }).toList();
 

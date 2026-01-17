@@ -125,7 +125,8 @@ void main() {
         expect(authService.state.isAuthenticated, true);
         expect(authService.state.userInfo, isNotNull);
         expect(authService.state.error, isNull);
-        verify(() => mockEmailAuth.authenticate('test@example.com', 'password123'))
+        verify(() =>
+                mockEmailAuth.authenticate('test@example.com', 'password123'))
             .called(1);
         verify(() => mockSessionManager.registerSignedInUser(
               any(),

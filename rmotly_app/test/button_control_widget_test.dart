@@ -62,7 +62,8 @@ void main() {
       expect(find.byIcon(Icons.power_settings_new), findsOneWidget);
     });
 
-    testWidgets('should use default label when config is missing', (tester) async {
+    testWidgets('should use default label when config is missing',
+        (tester) async {
       // Arrange
       final controlWithoutLabel = Control(
         id: 1,
@@ -87,7 +88,8 @@ void main() {
       expect(find.text('Press'), findsOneWidget);
     });
 
-    testWidgets('should use default icon when config is missing', (tester) async {
+    testWidgets('should use default icon when config is missing',
+        (tester) async {
       // Arrange
       final controlWithoutIcon = Control(
         id: 1,
@@ -151,7 +153,8 @@ void main() {
       expect(wasPressed, false);
     });
 
-    testWidgets('should display correct icon for different icon names', (tester) async {
+    testWidgets('should display correct icon for different icon names',
+        (tester) async {
       // Test data: icon name -> expected IconData
       final iconMappings = {
         'play': Icons.play_arrow,

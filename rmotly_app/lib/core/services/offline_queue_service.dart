@@ -189,7 +189,7 @@ class OfflineQueueService {
       try {
         final json = jsonDecode(jsonStr) as Map<String, dynamic>;
         final event = QueuedEvent.fromJson(json);
-        
+
         final updatedEvent = event.copyWith(
           attemptCount: event.attemptCount + 1,
           lastError: error,

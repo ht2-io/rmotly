@@ -188,7 +188,8 @@ class _OperationCard extends StatelessWidget {
               ),
 
               // Summary/Description
-              if (operation.summary != null || operation.description != null) ...[
+              if (operation.summary != null ||
+                  operation.description != null) ...[
                 const SizedBox(height: 8),
                 Text(
                   operation.summary ?? operation.description ?? '',

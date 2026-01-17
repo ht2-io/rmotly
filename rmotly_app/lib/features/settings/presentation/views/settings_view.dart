@@ -96,12 +96,16 @@ class SettingsView extends ConsumerWidget {
           ListTile(
             leading: CircleAvatar(
               child: Text(
-                (authState.userInfo!.email ?? authState.userInfo!.userName ?? 'U')
+                (authState.userInfo!.email ??
+                        authState.userInfo!.userName ??
+                        'U')
                     .substring(0, 1)
                     .toUpperCase(),
               ),
             ),
-            title: Text(authState.userInfo!.email ?? authState.userInfo!.userName ?? 'User'),
+            title: Text(authState.userInfo!.email ??
+                authState.userInfo!.userName ??
+                'User'),
             subtitle: const Text('Signed in'),
           ),
         ListTile(

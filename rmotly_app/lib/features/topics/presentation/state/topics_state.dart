@@ -40,9 +40,8 @@ class TopicsState {
       isLoading: isLoading ?? this.isLoading,
       isRefreshing: isRefreshing ?? this.isRefreshing,
       error: clearError ? null : (error ?? this.error),
-      togglingTopicId: clearTogglingTopic
-          ? null
-          : (togglingTopicId ?? this.togglingTopicId),
+      togglingTopicId:
+          clearTogglingTopic ? null : (togglingTopicId ?? this.togglingTopicId),
       regeneratingTopicId: clearRegeneratingTopic
           ? null
           : (regeneratingTopicId ?? this.regeneratingTopicId),

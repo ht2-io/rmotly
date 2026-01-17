@@ -33,10 +33,14 @@ class _ActionEditorViewState extends ConsumerState<ActionEditorView> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.action?.name ?? '');
-    _urlController = TextEditingController(text: widget.action?.urlTemplate ?? '');
-    _descriptionController = TextEditingController(text: widget.action?.description ?? '');
-    _bodyController = TextEditingController(text: widget.action?.bodyTemplate ?? '');
-    _headersController = TextEditingController(text: widget.action?.headersTemplate ?? '');
+    _urlController =
+        TextEditingController(text: widget.action?.urlTemplate ?? '');
+    _descriptionController =
+        TextEditingController(text: widget.action?.description ?? '');
+    _bodyController =
+        TextEditingController(text: widget.action?.bodyTemplate ?? '');
+    _headersController =
+        TextEditingController(text: widget.action?.headersTemplate ?? '');
     _selectedMethod = HttpMethod.fromString(widget.action?.httpMethod ?? 'GET');
   }
 
@@ -243,13 +247,18 @@ class _ActionEditorViewState extends ConsumerState<ActionEditorView> {
       final now = DateTime.now();
       final action = rmotly.Action(
         id: widget.action?.id,
-        userId: widget.action?.userId ?? 0, // Server will set the correct userId
+        userId:
+            widget.action?.userId ?? 0, // Server will set the correct userId
         name: _nameController.text,
         httpMethod: _selectedMethod.value,
         urlTemplate: _urlController.text,
-        description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
-        bodyTemplate: _bodyController.text.isEmpty ? null : _bodyController.text,
-        headersTemplate: _headersController.text.isEmpty ? null : _headersController.text,
+        description: _descriptionController.text.isEmpty
+            ? null
+            : _descriptionController.text,
+        bodyTemplate:
+            _bodyController.text.isEmpty ? null : _bodyController.text,
+        headersTemplate:
+            _headersController.text.isEmpty ? null : _headersController.text,
         createdAt: widget.action?.createdAt ?? now,
         updatedAt: now,
       );

@@ -54,7 +54,9 @@ class _ActionsListViewState extends ConsumerState<ActionsListView> {
             icon: const Icon(Icons.refresh),
             onPressed: state.isLoading
                 ? null
-                : () => ref.read(actionsViewModelProvider.notifier).refreshActions(),
+                : () => ref
+                    .read(actionsViewModelProvider.notifier)
+                    .refreshActions(),
             tooltip: 'Refresh',
           ),
         ],
@@ -84,7 +86,8 @@ class _ActionsListViewState extends ConsumerState<ActionsListView> {
     }
 
     return RefreshIndicator(
-      onRefresh: () => ref.read(actionsViewModelProvider.notifier).refreshActions(),
+      onRefresh: () =>
+          ref.read(actionsViewModelProvider.notifier).refreshActions(),
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: state.actions.length,
@@ -133,7 +136,8 @@ class _ActionsListViewState extends ConsumerState<ActionsListView> {
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
-              onPressed: () => ref.read(actionsViewModelProvider.notifier).loadActions(),
+              onPressed: () =>
+                  ref.read(actionsViewModelProvider.notifier).loadActions(),
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
             ),
@@ -200,7 +204,8 @@ class _ActionsListViewState extends ConsumerState<ActionsListView> {
     ref.read(actionsViewModelProvider.notifier).testAction(actionId, {});
   }
 
-  Future<void> _confirmDelete(BuildContext context, rmotly.Action action) async {
+  Future<void> _confirmDelete(
+      BuildContext context, rmotly.Action action) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(

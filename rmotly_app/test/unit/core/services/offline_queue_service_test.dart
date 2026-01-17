@@ -29,7 +29,7 @@ void main() {
       );
 
       expect(eventId, isNotEmpty);
-      
+
       final count = await queueService.getQueuedCount();
       expect(count, 1);
     });

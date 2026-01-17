@@ -155,7 +155,15 @@ class OpenApiParserService {
     List<OpenApiOperation> operations,
     Map<String, dynamic> spec,
   ) {
-    final methods = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'];
+    final methods = [
+      'get',
+      'post',
+      'put',
+      'patch',
+      'delete',
+      'head',
+      'options'
+    ];
     final pathParameters = _parseParameters(
       pathItem['parameters'] as List<dynamic>?,
       spec,
@@ -199,7 +207,15 @@ class OpenApiParserService {
     List<OpenApiOperation> operations,
     Map<String, dynamic> spec,
   ) {
-    final methods = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'];
+    final methods = [
+      'get',
+      'post',
+      'put',
+      'patch',
+      'delete',
+      'head',
+      'options'
+    ];
     final pathParameters = _parseParametersSwagger2(
       pathItem['parameters'] as List<dynamic>?,
       spec,
@@ -248,7 +264,9 @@ class OpenApiParserService {
                   ?.map((t) => t.toString())
                   .toList() ??
               [],
-          parameters: allParams.where((p) => p.location != ParameterLocation.cookie).toList(),
+          parameters: allParams
+              .where((p) => p.location != ParameterLocation.cookie)
+              .toList(),
           requestBody: requestBody,
           responses: _parseResponsesSwagger2(operation['responses'], spec),
           deprecated: operation['deprecated'] as bool? ?? false,

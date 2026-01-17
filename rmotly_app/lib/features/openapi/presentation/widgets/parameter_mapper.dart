@@ -147,7 +147,8 @@ class _ParameterMapperState extends ConsumerState<ParameterMapper> {
                   _buildSection(
                     context,
                     title: 'Query Parameters',
-                    description: 'These will be added as query string parameters',
+                    description:
+                        'These will be added as query string parameters',
                     child: _buildParametersList(
                       context,
                       operation.queryParameters,
@@ -175,7 +176,8 @@ class _ParameterMapperState extends ConsumerState<ParameterMapper> {
                     title: 'Request Body',
                     description:
                         'This operation expects a request body. You can configure it when using the action.',
-                    child: _buildRequestBodyInfo(context, operation.requestBody!),
+                    child:
+                        _buildRequestBodyInfo(context, operation.requestBody!),
                   ),
 
                 const SizedBox(height: 80), // Space for FAB

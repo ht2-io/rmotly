@@ -21,7 +21,8 @@ class OpenApiSpec {
   });
 
   /// Get effective base URL
-  String? get effectiveBaseUrl => baseUrl ?? (servers.isNotEmpty ? servers.first.url : null);
+  String? get effectiveBaseUrl =>
+      baseUrl ?? (servers.isNotEmpty ? servers.first.url : null);
 }
 
 /// Represents an OpenAPI server definition

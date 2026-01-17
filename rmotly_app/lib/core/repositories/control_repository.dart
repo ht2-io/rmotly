@@ -34,7 +34,8 @@ class ControlRepository {
       // await _localStorage.cacheControls(controls);
       //
       // return controls;
-      throw UnimplementedError('ControlEndpoint not yet implemented in Serverpod');
+      throw UnimplementedError(
+          'ControlEndpoint not yet implemented in Serverpod');
     } catch (error) {
       // If offline or error, try to return cached data
       if (!_connectivityService.isOnline || _errorHandler.isRetryable(error)) {

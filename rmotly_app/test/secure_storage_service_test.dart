@@ -105,7 +105,8 @@ void main() {
     group('containsKey', () {
       test('should return false for non-existent key', () async {
         // Act
-        final contains = await storageService.containsKey('non_existent_key_789');
+        final contains =
+            await storageService.containsKey('non_existent_key_789');
 
         // Assert
         expect(contains, false);

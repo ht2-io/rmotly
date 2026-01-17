@@ -71,11 +71,13 @@ class SettingsState {
     bool clearSuccessMessage = false,
   }) {
     return SettingsState(
-      notificationPreferences: notificationPreferences ?? this.notificationPreferences,
+      notificationPreferences:
+          notificationPreferences ?? this.notificationPreferences,
       isExporting: isExporting ?? this.isExporting,
       isImporting: isImporting ?? this.isImporting,
       error: clearError ? null : (error ?? this.error),
-      successMessage: clearSuccessMessage ? null : (successMessage ?? this.successMessage),
+      successMessage:
+          clearSuccessMessage ? null : (successMessage ?? this.successMessage),
     );
   }
 }

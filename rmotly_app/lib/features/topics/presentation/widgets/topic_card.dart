@@ -130,9 +130,11 @@ class _TopicCardState extends State<TopicCard> {
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete, size: 20, color: colorScheme.error),
+                            Icon(Icons.delete,
+                                size: 20, color: colorScheme.error),
                             const SizedBox(width: 8),
-                            Text('Delete', style: TextStyle(color: colorScheme.error)),
+                            Text('Delete',
+                                style: TextStyle(color: colorScheme.error)),
                           ],
                         ),
                       ),
@@ -267,7 +269,8 @@ class _TopicCardState extends State<TopicCard> {
           ),
           IconButton(
             icon: const Icon(Icons.copy, size: 18),
-            onPressed: () => _copyToClipboard(context, widget.topic.apiKey, 'API Key'),
+            onPressed: () =>
+                _copyToClipboard(context, widget.topic.apiKey, 'API Key'),
             tooltip: 'Copy API Key',
           ),
         ],

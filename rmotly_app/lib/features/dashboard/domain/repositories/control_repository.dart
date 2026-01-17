@@ -9,7 +9,7 @@ abstract class ControlRepository {
   ///
   /// Returns a list of controls ordered by their position.
   /// Throws exceptions on network or API errors.
-  /// 
+  ///
   /// [forceRefresh] - If true, bypasses cache and fetches from API
   Future<List<Control>> getControls({bool forceRefresh = false});
 

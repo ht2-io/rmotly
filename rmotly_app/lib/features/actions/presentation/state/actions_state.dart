@@ -42,12 +42,10 @@ class ActionsState {
       isLoading: isLoading ?? this.isLoading,
       isRefreshing: isRefreshing ?? this.isRefreshing,
       error: clearError ? null : (error ?? this.error),
-      testingActionId: clearTestingAction
-          ? null
-          : (testingActionId ?? this.testingActionId),
-      lastTestResult: clearLastTestResult
-          ? null
-          : (lastTestResult ?? this.lastTestResult),
+      testingActionId:
+          clearTestingAction ? null : (testingActionId ?? this.testingActionId),
+      lastTestResult:
+          clearLastTestResult ? null : (lastTestResult ?? this.lastTestResult),
     );
   }
 

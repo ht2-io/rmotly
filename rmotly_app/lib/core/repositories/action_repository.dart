@@ -29,12 +29,13 @@ class ActionRepository {
     try {
       // TODO: Implement once ActionEndpoint is available
       // final actions = await _client.action.listActions();
-      // 
+      //
       // // Cache the actions
       // await _localStorage.cacheActions(actions);
-      // 
+      //
       // return actions;
-      throw UnimplementedError('ActionEndpoint not yet implemented in Serverpod');
+      throw UnimplementedError(
+          'ActionEndpoint not yet implemented in Serverpod');
     } catch (error) {
       // If offline or error, try to return cached data
       if (!_connectivityService.isOnline || _errorHandler.isRetryable(error)) {

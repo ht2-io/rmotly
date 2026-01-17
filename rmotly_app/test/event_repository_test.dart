@@ -41,7 +41,8 @@ void main() {
 
   group('EventRepository', () {
     group('listEvents', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.listEvents(),
@@ -59,7 +60,8 @@ void main() {
     });
 
     group('getEvent', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.getEvent(1),
@@ -69,7 +71,8 @@ void main() {
     });
 
     group('sendEvent', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.sendEvent(

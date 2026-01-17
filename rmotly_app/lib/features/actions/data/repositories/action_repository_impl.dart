@@ -124,7 +124,8 @@ class ActionRepositoryImpl implements ActionRepository {
   }
 
   @override
-  Future<ActionTestResult> testAction(int actionId, Map<String, dynamic> parameters) async {
+  Future<ActionTestResult> testAction(
+      int actionId, Map<String, dynamic> parameters) async {
     try {
       final result = await _client.action.testAction(
         actionId: actionId,
@@ -138,7 +139,8 @@ class ActionRepositoryImpl implements ActionRepository {
       return ActionTestResult(
         success: true,
         statusCode: 200,
-        responseBody: '{"mock": true, "message": "This is a simulated response"}',
+        responseBody:
+            '{"mock": true, "message": "This is a simulated response"}',
         responseHeaders: {'content-type': 'application/json'},
         executionTimeMs: 500,
       );

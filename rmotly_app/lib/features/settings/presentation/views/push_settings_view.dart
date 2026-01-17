@@ -306,9 +306,8 @@ class PushSettingsView extends ConsumerWidget {
                     Text(
                       title,
                       style: theme.textTheme.titleSmall?.copyWith(
-                        color: isSelected
-                            ? colorScheme.onPrimaryContainer
-                            : null,
+                        color:
+                            isSelected ? colorScheme.onPrimaryContainer : null,
                       ),
                     ),
                     Text(
@@ -355,7 +354,8 @@ class PushSettingsView extends ConsumerWidget {
     );
   }
 
-  Future<void> _sendTestNotification(BuildContext context, WidgetRef ref) async {
+  Future<void> _sendTestNotification(
+      BuildContext context, WidgetRef ref) async {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Test notification sent! Check your notification tray.'),

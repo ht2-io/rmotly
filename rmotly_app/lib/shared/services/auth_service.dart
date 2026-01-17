@@ -95,8 +95,8 @@ class AuthService extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final serverResponse = await _client.modules.auth.email
-          .authenticate(email, password);
+      final serverResponse =
+          await _client.modules.auth.email.authenticate(email, password);
 
       if (serverResponse.success) {
         await _sessionManager.registerSignedInUser(
@@ -208,8 +208,8 @@ class AuthService extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final success = await _client.modules.auth.email
-          .initiatePasswordReset(email);
+      final success =
+          await _client.modules.auth.email.initiatePasswordReset(email);
 
       state = state.copyWith(isLoading: false);
       return success;

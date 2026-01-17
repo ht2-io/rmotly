@@ -57,11 +57,11 @@ class ConnectivityService {
 /// Provider for the connectivity service
 final connectivityServiceProvider = Provider<ConnectivityService>((ref) {
   final service = ConnectivityService();
-  
+
   ref.onDispose(() {
     service.dispose();
   });
-  
+
   return service;
 });
 

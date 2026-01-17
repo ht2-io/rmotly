@@ -10,7 +10,8 @@ final settingsViewModelProvider =
 });
 
 /// Provider for notification preferences
-final notificationPreferencesProvider = Provider<NotificationPreferences>((ref) {
+final notificationPreferencesProvider =
+    Provider<NotificationPreferences>((ref) {
   return ref.watch(settingsViewModelProvider).notificationPreferences;
 });
 

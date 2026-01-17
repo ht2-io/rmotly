@@ -13,7 +13,8 @@ void main() {
         userId: 1,
         name: 'Test Slider',
         controlType: 'slider',
-        config: '{"min": 0, "max": 100, "value": 50, "divisions": 10, "unit": "°F", "showValue": true}',
+        config:
+            '{"min": 0, "max": 100, "value": 50, "divisions": 10, "unit": "°F", "showValue": true}',
         position: 0,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -36,7 +37,8 @@ void main() {
       );
     }
 
-    testWidgets('should display slider with initial value from config', (tester) async {
+    testWidgets('should display slider with initial value from config',
+        (tester) async {
       // Act
       await tester.pumpWidget(
         createTestWidget(
@@ -79,7 +81,8 @@ void main() {
       expect(find.text('100°F'), findsOneWidget);
     });
 
-    testWidgets('should use default values when config is missing', (tester) async {
+    testWidgets('should use default values when config is missing',
+        (tester) async {
       // Arrange
       final controlWithMinimalConfig = Control(
         id: 1,
@@ -107,7 +110,8 @@ void main() {
       expect(sliderWidget.value, 0.0);
     });
 
-    testWidgets('should call onChanged when slider is released', (tester) async {
+    testWidgets('should call onChanged when slider is released',
+        (tester) async {
       // Arrange
       double? capturedValue;
 
@@ -262,7 +266,8 @@ void main() {
       expect(sliderWidget.value, 100.0);
     });
 
-    testWidgets('should display without unit when unit is empty', (tester) async {
+    testWidgets('should display without unit when unit is empty',
+        (tester) async {
       // Arrange
       final controlWithoutUnit = Control(
         id: 1,
@@ -353,7 +358,8 @@ void main() {
       expect(sliderWidget.max, 100.0);
     });
 
-    testWidgets('should handle numeric config values as both int and double', (tester) async {
+    testWidgets('should handle numeric config values as both int and double',
+        (tester) async {
       // Arrange - Mix of int and double
       final controlWithMixedNumbers = Control(
         id: 1,

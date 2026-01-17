@@ -31,7 +31,8 @@ class _TopicEditorViewState extends ConsumerState<TopicEditorView> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.topic?.name ?? '');
-    _descriptionController = TextEditingController(text: widget.topic?.description ?? '');
+    _descriptionController =
+        TextEditingController(text: widget.topic?.description ?? '');
 
     // Parse config JSON
     Map<String, dynamic> config = {};

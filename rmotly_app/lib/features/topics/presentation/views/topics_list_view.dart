@@ -24,7 +24,8 @@ class TopicsListView extends ConsumerWidget {
             icon: const Icon(Icons.refresh),
             onPressed: state.isLoading
                 ? null
-                : () => ref.read(topicsViewModelProvider.notifier).refreshTopics(),
+                : () =>
+                    ref.read(topicsViewModelProvider.notifier).refreshTopics(),
             tooltip: 'Refresh',
           ),
         ],
@@ -118,7 +119,8 @@ class TopicsListView extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
-              onPressed: () => ref.read(topicsViewModelProvider.notifier).loadTopics(),
+              onPressed: () =>
+                  ref.read(topicsViewModelProvider.notifier).loadTopics(),
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
             ),

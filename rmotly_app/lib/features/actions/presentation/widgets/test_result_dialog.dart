@@ -87,7 +87,8 @@ class TestResultDialog extends StatelessWidget {
             ],
 
             // Response headers
-            if (result.responseHeaders != null && result.responseHeaders!.isNotEmpty) ...[
+            if (result.responseHeaders != null &&
+                result.responseHeaders!.isNotEmpty) ...[
               Text(
                 'Response Headers',
                 style: theme.textTheme.titleSmall,
@@ -115,7 +116,8 @@ class TestResultDialog extends StatelessWidget {
             ],
 
             // Response body
-            if (result.responseBody != null && result.responseBody!.isNotEmpty) ...[
+            if (result.responseBody != null &&
+                result.responseBody!.isNotEmpty) ...[
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -126,7 +128,8 @@ class TestResultDialog extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.copy, size: 18),
                     onPressed: () {
-                      Clipboard.setData(ClipboardData(text: result.responseBody!));
+                      Clipboard.setData(
+                          ClipboardData(text: result.responseBody!));
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Copied to clipboard')),
                       );

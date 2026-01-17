@@ -8,11 +8,15 @@ import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart
 
 // Mock classes
 class MockClient extends Mock implements Client {}
+
 class MockLocalStorageService extends Mock implements LocalStorageService {}
+
 class MockSessionManager extends Mock implements SessionManager {}
+
 class MockEndpointControl extends Mock {
   Future<List<Control>> listControls({required int userId});
 }
+
 class MockUserInfo extends Mock implements auth.UserInfo {}
 
 void main() {
@@ -53,17 +57,17 @@ void main() {
     mockSessionManager = MockSessionManager();
     mockControlEndpoint = MockEndpointControl();
     mockUserInfo = MockUserInfo();
-    
+
     // Set up user authentication
     when(() => mockUserInfo.id).thenReturn(100);
     when(() => mockSessionManager.signedInUser).thenReturn(mockUserInfo);
-    
-    repository = ControlRepositoryImpl(mockClient, mockStorage, mockSessionManager);
+
+    repository =
+        ControlRepositoryImpl(mockClient, mockStorage, mockSessionManager);
 
     // Set up default storage behavior
-    when(() => mockStorage.cacheControls(any()))
-        .thenAnswer((_) async => {});
-    
+    when(() => mockStorage.cacheControls(any())).thenAnswer((_) async => {});
+
     // Set up default client behavior - return test controls
     when(() => mockClient.control).thenReturn(mockControlEndpoint as dynamic);
     when(() => mockControlEndpoint.listControls(userId: any(named: 'userId')))
@@ -72,7 +76,8 @@ void main() {
 
   group('ControlRepositoryImpl Caching', () {
     group('getControls with caching', () {
-      test('should return cached data when available and not expired', () async {
+      test('should return cached data when available and not expired',
+          () async {
         // Arrange - Set up cache with data
         when(() => mockStorage.getCachedControls())
             .thenAnswer((_) async => testControls);
@@ -86,7 +91,8 @@ void main() {
         // Assert
         expect(result, testControls);
         // getCachedControls should be called when trying to use cache
-        verify(() => mockStorage.getCachedControls()).called(greaterThanOrEqualTo(1));
+        verify(() => mockStorage.getCachedControls())
+            .called(greaterThanOrEqualTo(1));
       });
 
       test('should fetch from API when forceRefresh is true', () async {
@@ -194,7 +200,8 @@ void main() {
         await repository.getControls(forceRefresh: false);
 
         // Cache was invalidated, so it should fetch fresh data
-        verify(() => mockStorage.cacheControls(any())).called(greaterThanOrEqualTo(1));
+        verify(() => mockStorage.cacheControls(any()))
+            .called(greaterThanOrEqualTo(1));
       });
 
       test('should invalidate cache on updateControl', () async {
@@ -217,7 +224,8 @@ void main() {
         when(() => mockStorage.getCachedControls())
             .thenAnswer((_) async => <Control>[]);
         await repository.getControls(forceRefresh: false);
-        verify(() => mockStorage.cacheControls(any())).called(greaterThanOrEqualTo(1));
+        verify(() => mockStorage.cacheControls(any()))
+            .called(greaterThanOrEqualTo(1));
       });
 
       test('should invalidate cache on deleteControl', () async {
@@ -237,7 +245,8 @@ void main() {
         when(() => mockStorage.getCachedControls())
             .thenAnswer((_) async => <Control>[]);
         await repository.getControls(forceRefresh: false);
-        verify(() => mockStorage.cacheControls(any())).called(greaterThanOrEqualTo(1));
+        verify(() => mockStorage.cacheControls(any()))
+            .called(greaterThanOrEqualTo(1));
       });
     });
 

@@ -62,8 +62,7 @@ class ControlCard extends StatelessWidget {
               ),
             ),
             // Loading overlay
-            if (isExecuting)
-              _LoadingOverlay(colorScheme: colorScheme),
+            if (isExecuting) _LoadingOverlay(colorScheme: colorScheme),
           ],
         ),
       ),

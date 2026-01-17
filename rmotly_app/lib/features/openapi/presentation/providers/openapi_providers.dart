@@ -18,7 +18,8 @@ final openApiViewModelProvider =
 });
 
 /// Provider for the currently selected operation
-final selectedOperationProvider = StateProvider<OpenApiOperation?>((ref) => null);
+final selectedOperationProvider =
+    StateProvider<OpenApiOperation?>((ref) => null);
 
 /// Provider for operations filtered by tag
 final filteredOperationsProvider = Provider<List<OpenApiOperation>>((ref) {
