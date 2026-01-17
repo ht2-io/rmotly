@@ -1,18 +1,44 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rmotly_app/core/repositories/action_repository.dart';
+import 'package:rmotly_app/core/services/error_handler_service.dart';
+import 'package:rmotly_app/core/services/local_storage_service.dart';
+import 'package:rmotly_app/core/services/connectivity_service.dart';
 import 'package:rmotly_client/rmotly_client.dart';
 
 // Mock classes
 class MockClient extends Mock implements Client {}
 
+class MockErrorHandlerService extends Mock implements ErrorHandlerService {}
+
+class MockLocalStorageService extends Mock implements LocalStorageService {}
+
+class MockConnectivityService extends Mock implements ConnectivityService {}
+
 void main() {
   late MockClient mockClient;
+  late MockErrorHandlerService mockErrorHandler;
+  late MockLocalStorageService mockLocalStorage;
+  late MockConnectivityService mockConnectivityService;
   late ActionRepository repository;
 
   setUp(() {
     mockClient = MockClient();
-    repository = ActionRepository(mockClient);
+    mockErrorHandler = MockErrorHandlerService();
+    mockLocalStorage = MockLocalStorageService();
+    mockConnectivityService = MockConnectivityService();
+
+    // Default behavior
+    when(() => mockConnectivityService.isOnline).thenReturn(true);
+    when(() => mockLocalStorage.getCachedActions())
+        .thenAnswer((_) async => <Action>[]);
+
+    repository = ActionRepository(
+      mockClient,
+      mockErrorHandler,
+      mockLocalStorage,
+      mockConnectivityService,
+    );
   });
 
   group('ActionRepository', () {
@@ -44,7 +70,7 @@ void main() {
           userId: 1,
           name: 'Test Action',
           httpMethod: 'GET',
-          url: 'https://api.example.com/test',
+          urlTemplate: 'https://api.example.com/test',
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
@@ -65,7 +91,7 @@ void main() {
           userId: 1,
           name: 'Test Action',
           httpMethod: 'GET',
-          url: 'https://api.example.com/test',
+          urlTemplate: 'https://api.example.com/test',
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );

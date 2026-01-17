@@ -6,13 +6,6 @@ import 'package:mocktail/mocktail.dart';
 // Mock classes
 class MockFlutterSecureStorage extends Mock implements FlutterSecureStorage {}
 
-// Extension to expose internal storage for testing
-class TestableSecureStorageService extends SecureStorageService {
-  final FlutterSecureStorage mockStorage;
-
-  TestableSecureStorageService(this.mockStorage);
-}
-
 void main() {
   late SecureStorageService storageService;
 

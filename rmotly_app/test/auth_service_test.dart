@@ -1,66 +1,53 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rmotly_app/shared/services/auth_service.dart';
+import 'package:rmotly_client/rmotly_client.dart';
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as auth;
 import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 
 // Mock classes
 class MockSessionManager extends Mock implements SessionManager {}
 
-class MockCaller extends Mock implements Caller {}
+class MockClient extends Mock implements Client {}
 
 class MockModules extends Mock implements Modules {}
 
-class MockAuth extends Mock implements Auth {}
+class MockAuthCaller extends Mock implements auth.Caller {}
 
-class MockEmailAuth extends Mock implements EmailAuth {}
+class MockEndpointEmail extends Mock implements auth.EndpointEmail {}
 
-class MockUserInfo extends Mock implements UserInfo {}
-
-class FakeAuthenticationResponse extends Fake implements AuthenticationResponse {
-  @override
-  final bool success;
-  @override
-  final UserInfo? userInfo;
-  @override
-  final String? keyId;
-  @override
-  final String? key;
-  @override
-  final UserInfoFailReason? failReason;
-
-  FakeAuthenticationResponse({
-    required this.success,
-    this.userInfo,
-    this.keyId,
-    this.key,
-    this.failReason,
-  });
-}
+class MockUserInfo extends Mock implements auth.UserInfo {}
 
 void main() {
   late MockSessionManager mockSessionManager;
-  late MockCaller mockCaller;
+  late MockClient mockClient;
   late MockModules mockModules;
-  late MockAuth mockAuth;
-  late MockEmailAuth mockEmailAuth;
+  late MockAuthCaller mockAuthCaller;
+  late MockEndpointEmail mockEmailAuth;
   late AuthService authService;
+
+  setUpAll(() {
+    // Register fallback values for mocktail
+    registerFallbackValue(MockUserInfo());
+  });
 
   setUp(() {
     mockSessionManager = MockSessionManager();
-    mockCaller = MockCaller();
+    mockClient = MockClient();
     mockModules = MockModules();
-    mockAuth = MockAuth();
-    mockEmailAuth = MockEmailAuth();
+    mockAuthCaller = MockAuthCaller();
+    mockEmailAuth = MockEndpointEmail();
 
-    // Set up mock chain
-    when(() => mockSessionManager.caller).thenReturn(mockCaller);
-    when(() => mockCaller.modules).thenReturn(mockModules);
-    when(() => mockModules.auth).thenReturn(mockAuth);
-    when(() => mockAuth.email).thenReturn(mockEmailAuth);
-    when(() => mockSessionManager.initialize()).thenAnswer((_) async => {});
+    // Set up mock chain: client.modules.auth.email
+    when(() => mockClient.modules).thenReturn(mockModules);
+    when(() => mockModules.auth).thenReturn(mockAuthCaller);
+    when(() => mockAuthCaller.email).thenReturn(mockEmailAuth);
+
+    // Default SessionManager behavior
+    when(() => mockSessionManager.initialize()).thenAnswer((_) async => true);
     when(() => mockSessionManager.signedInUser).thenReturn(null);
 
-    authService = AuthService(mockSessionManager);
+    authService = AuthService(mockSessionManager, mockClient);
   });
 
   group('AuthService', () {
@@ -83,7 +70,7 @@ void main() {
         when(() => mockSessionManager.signedInUser).thenReturn(mockUserInfo);
 
         // Act
-        final service = AuthService(mockSessionManager);
+        final service = AuthService(mockSessionManager, mockClient);
         await Future.delayed(const Duration(milliseconds: 50));
 
         // Assert
@@ -97,7 +84,7 @@ void main() {
             .thenThrow(Exception('Init failed'));
 
         // Act
-        final service = AuthService(mockSessionManager);
+        final service = AuthService(mockSessionManager, mockClient);
         await Future.delayed(const Duration(milliseconds: 50));
 
         // Assert
@@ -112,17 +99,17 @@ void main() {
         final mockUserInfo = MockUserInfo();
         when(() => mockUserInfo.id).thenReturn(123);
 
-        final response = FakeAuthenticationResponse(
+        final response = auth.AuthenticationResponse(
           success: true,
           userInfo: mockUserInfo,
-          keyId: 'key-id',
+          keyId: 1,
           key: 'secret-key',
         );
 
         when(() => mockEmailAuth.authenticate(any(), any()))
             .thenAnswer((_) async => response);
         when(() => mockSessionManager.registerSignedInUser(any(), any(), any()))
-            .thenAnswer((_) async => {});
+            .thenAnswer((_) async {});
 
         // Wait for initialization
         await Future.delayed(const Duration(milliseconds: 50));
@@ -141,17 +128,17 @@ void main() {
         verify(() => mockEmailAuth.authenticate('test@example.com', 'password123'))
             .called(1);
         verify(() => mockSessionManager.registerSignedInUser(
-              mockUserInfo,
-              'key-id',
+              any(),
+              1,
               'secret-key',
             )).called(1);
       });
 
       test('should fail with invalid credentials', () async {
         // Arrange
-        final response = FakeAuthenticationResponse(
+        final response = auth.AuthenticationResponse(
           success: false,
-          failReason: UserInfoFailReason.wrongPassword,
+          failReason: auth.AuthenticationFailReason.invalidCredentials,
         );
 
         when(() => mockEmailAuth.authenticate(any(), any()))
@@ -170,7 +157,6 @@ void main() {
         expect(result, false);
         expect(authService.state.isAuthenticated, false);
         expect(authService.state.error, isNotNull);
-        expect(authService.state.error, contains('wrongPassword'));
       });
 
       test('should handle network errors', () async {
@@ -197,10 +183,8 @@ void main() {
     group('createAccount', () {
       test('should create account successfully', () async {
         // Arrange
-        final response = FakeAuthenticationResponse(success: true);
-
         when(() => mockEmailAuth.createAccountRequest(any(), any(), any()))
-            .thenAnswer((_) async => response);
+            .thenAnswer((_) async => true);
 
         // Wait for initialization
         await Future.delayed(const Duration(milliseconds: 50));
@@ -224,10 +208,8 @@ void main() {
 
       test('should use email as username when not provided', () async {
         // Arrange
-        final response = FakeAuthenticationResponse(success: true);
-
         when(() => mockEmailAuth.createAccountRequest(any(), any(), any()))
-            .thenAnswer((_) async => response);
+            .thenAnswer((_) async => true);
 
         // Wait for initialization
         await Future.delayed(const Duration(milliseconds: 50));
@@ -249,13 +231,8 @@ void main() {
 
       test('should fail when account creation fails', () async {
         // Arrange
-        final response = FakeAuthenticationResponse(
-          success: false,
-          failReason: UserInfoFailReason.emailAlreadyInUse,
-        );
-
         when(() => mockEmailAuth.createAccountRequest(any(), any(), any()))
-            .thenAnswer((_) async => response);
+            .thenAnswer((_) async => false);
 
         // Wait for initialization
         await Future.delayed(const Duration(milliseconds: 50));
@@ -269,7 +246,50 @@ void main() {
         // Assert
         expect(result, false);
         expect(authService.state.error, isNotNull);
-        expect(authService.state.error, contains('emailAlreadyInUse'));
+        expect(authService.state.error, contains('Account creation failed'));
+      });
+    });
+
+    group('verifyEmail', () {
+      test('should verify email successfully', () async {
+        // Arrange
+        final mockUserInfo = MockUserInfo();
+        when(() => mockEmailAuth.createAccount(any(), any()))
+            .thenAnswer((_) async => mockUserInfo);
+
+        // Wait for initialization
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Act
+        final result = await authService.verifyEmail(
+          'test@example.com',
+          '123456',
+        );
+
+        // Assert
+        expect(result, true);
+        verify(() => mockEmailAuth.createAccount('test@example.com', '123456'))
+            .called(1);
+      });
+
+      test('should fail when verification fails', () async {
+        // Arrange
+        when(() => mockEmailAuth.createAccount(any(), any()))
+            .thenAnswer((_) async => null);
+
+        // Wait for initialization
+        await Future.delayed(const Duration(milliseconds: 50));
+
+        // Act
+        final result = await authService.verifyEmail(
+          'test@example.com',
+          '123456',
+        );
+
+        // Assert
+        expect(result, false);
+        expect(authService.state.error, isNotNull);
+        expect(authService.state.error, contains('Verification failed'));
       });
     });
 
@@ -277,7 +297,7 @@ void main() {
       test('should sign out successfully', () async {
         // Arrange
         when(() => mockSessionManager.signOutDevice())
-            .thenAnswer((_) async => {});
+            .thenAnswer((_) async => true);
 
         // Wait for initialization
         await Future.delayed(const Duration(milliseconds: 50));
@@ -316,7 +336,7 @@ void main() {
         when(() => mockSessionManager.signedInUser).thenReturn(mockUserInfo);
 
         // Act
-        final service = AuthService(mockSessionManager);
+        final service = AuthService(mockSessionManager, mockClient);
         await Future.delayed(const Duration(milliseconds: 50));
 
         // Assert

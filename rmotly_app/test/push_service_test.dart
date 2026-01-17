@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rmotly_app/shared/services/push_service.dart';
+import 'package:rmotly_client/rmotly_client.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -199,18 +200,20 @@ void main() {
 
     group('WebSocket handlers', () {
       test('onWebSocketNotification emits notification', () async {
-        final data = {
-          'id': 'ws-1',
-          'title': 'WebSocket Test',
-          'body': 'WebSocket Body',
-        };
+        final notification = StreamNotification(
+          id: 'ws-1',
+          title: 'WebSocket Test',
+          body: 'WebSocket Body',
+          priority: 'normal',
+          timestamp: DateTime.now(),
+        );
 
         final notifications = <PushNotification>[];
         final subscription = pushService.notifications.listen(
-          (notification) => notifications.add(notification),
+          (n) => notifications.add(n),
         );
 
-        pushService.onWebSocketNotification(data);
+        pushService.onWebSocketNotification(notification);
 
         // Wait for stream to process
         await Future.delayed(const Duration(milliseconds: 10));
