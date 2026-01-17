@@ -1,5 +1,35 @@
 services:
-  # Development services
+  # Rmotly Server
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rmotly-server
+    ports:
+      - "8080:8080"   # API server
+      - "8081:8081"   # Insights server
+      - "8082:8082"   # Web server
+    environment:
+      - runmode=production
+      - serverid=default
+      - logging=normal
+      - role=monolith
+    volumes:
+      - ./config:/app/config:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  # PostgreSQL Database
   postgres:
     image: pgvector/pgvector:pg16
     container_name: rmotly-postgres
@@ -8,7 +38,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: rmotly
-      POSTGRES_PASSWORD: "mf5Iv4YBBIo4EOLP1gdbQGdB4fUWufQa"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-rmotly_dev_pass}"
     volumes:
       - rmotly_data:/var/lib/postgresql/data
     healthcheck:
@@ -18,26 +48,25 @@ services:
       retries: 5
     restart: unless-stopped
 
+  # Redis Cache
   redis:
     image: redis:8-alpine
     container_name: rmotly-redis
     ports:
       - "8091:6379"
-    command: redis-server --requirepass "SLwaRYlYACotsMBQsR3q-l2GZDN6yN1H"
+    command: redis-server --requirepass "${REDIS_PASSWORD:-rmotly_redis_pass}"
     environment:
       - REDIS_REPLICATION_MODE=master
     volumes:
       - rmotly_redis:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "SLwaRYlYACotsMBQsR3q-l2GZDN6yN1H", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-rmotly_redis_pass}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: unless-stopped
 
   # ntfy - Self-hosted push notification server
-  # Acts as UnifiedPush distributor for mobile apps
-  # See: https://docs.ntfy.sh/
   ntfy:
     image: binwiederhier/ntfy
     container_name: rmotly-ntfy
@@ -64,7 +93,7 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  # Test services
+  # Test services (activated with --profile test)
   postgres_test:
     image: pgvector/pgvector:pg16
     container_name: rmotly-postgres-test
@@ -73,7 +102,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: rmotly_test
-      POSTGRES_PASSWORD: "yVuux268YzSotcU9ul2R4Bw3UH8K8RHU"
+      POSTGRES_PASSWORD: "postgres"
     volumes:
       - rmotly_test_data:/var/lib/postgresql/data
     profiles:
@@ -84,9 +113,6 @@ services:
     container_name: rmotly-redis-test
     ports:
       - "9091:6379"
-    command: redis-server --requirepass "-dK3zvfXTxmUrIen8QXfmUb6NhPRZ0xA"
-    environment:
-      - REDIS_REPLICATION_MODE=master
     profiles:
       - test
 

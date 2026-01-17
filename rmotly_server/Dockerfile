@@ -1,14 +1,30 @@
 # Build stage
-FROM dart:3.5.0 AS build
+FROM dart:3.6.2 AS build
 WORKDIR /app
+
+# Copy pubspec files first for better caching
+COPY pubspec.* ./
+RUN dart pub get
+
+# Copy the rest of the app
 COPY . .
 
-# Install dependencies and compile the server executable
-RUN dart pub get
+# Generate Serverpod code
+RUN dart pub global activate serverpod_cli
+RUN dart pub global run serverpod_cli generate
+
+# Compile the server executable
 RUN dart compile exe bin/main.dart -o bin/server
 
 # Final stage
-FROM alpine:latest
+FROM debian:bookworm-slim
+
+# Install required runtime libraries
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
 
 # Environment variables
 ENV runmode=production
@@ -16,24 +32,29 @@ ENV serverid=default
 ENV logging=normal
 ENV role=monolith
 
-# Copy runtime dependencies
-COPY --from=build /runtime/ /
-
 # Copy compiled server executable
-COPY --from=build /app/bin/server server
+COPY --from=build /app/bin/server /app/server
 
 # Copy configuration files and resources
-COPY --from=build /app/config/ config/
-COPY --from=build /app/web/ web/
-COPY --from=build /app/migrations/ migrations/
+COPY --from=build /app/config/ /app/config/
+COPY --from=build /app/web/ /app/web/
+COPY --from=build /app/migrations/ /app/migrations/
 
 # This file is required to enable the endpoint log filter in Insights.
-COPY --from=build /app/lib/src/generated/protocol.yaml lib/src/generated/protocol.yaml
+COPY --from=build /app/lib/src/generated/protocol.yaml /app/lib/src/generated/protocol.yaml
 
 # Expose ports
+# 8080 - API server
+# 8081 - Insights server
+# 8082 - Web server
 EXPOSE 8080
 EXPOSE 8081
 EXPOSE 8082
 
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/ || exit 1
+
 # Define the entrypoint command
-ENTRYPOINT ./server --mode=$runmode --server-id=$serverid --logging=$logging --role=$role
+ENTRYPOINT ["/app/server"]
+CMD ["--mode", "production", "--server-id", "default", "--logging", "normal", "--role", "monolith"]
