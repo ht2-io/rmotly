@@ -1,23 +1,56 @@
 import 'package:rmotly_client/rmotly_client.dart';
+import '../services/error_handler_service.dart';
+import '../services/local_storage_service.dart';
+import '../services/connectivity_service.dart';
 
 /// Repository for managing Control entities.
 ///
 /// Provides methods for CRUD operations on controls.
-/// Once the Serverpod ControlEndpoint is implemented, this repository
-/// will communicate with the API to perform these operations.
+/// Includes offline caching and error handling.
 class ControlRepository {
   final Client _client;
+  final ErrorHandlerService _errorHandler;
+  final LocalStorageService _localStorage;
+  final ConnectivityService _connectivityService;
 
-  ControlRepository(this._client);
+  ControlRepository(
+    this._client,
+    this._errorHandler,
+    this._localStorage,
+    this._connectivityService,
+  );
 
   /// Lists all controls for the current user.
   ///
   /// Returns a list of [Control] objects.
-  /// Throws an exception if the operation fails.
+  /// If offline, returns cached controls.
+  /// Throws an exception if the operation fails and no cache is available.
   Future<List<Control>> listControls() async {
-    // TODO: Implement once ControlEndpoint is available
-    // return await _client.control.listControls();
-    throw UnimplementedError('ControlEndpoint not yet implemented in Serverpod');
+    try {
+      // TODO: Implement once ControlEndpoint is available
+      // final controls = await _client.control.listControls();
+      // 
+      // // Cache the controls
+      // await _localStorage.cacheControls(controls);
+      // 
+      // return controls;
+      throw UnimplementedError('ControlEndpoint not yet implemented in Serverpod');
+    } catch (error) {
+      // If offline or error, try to return cached data
+      if (!_connectivityService.isOnline || _errorHandler.isRetryable(error)) {
+        try {
+          final cachedControls = await _localStorage.getCachedControls();
+          if (cachedControls.isNotEmpty) {
+            return cachedControls;
+          }
+        } catch (_) {
+          // Cache read failed, fall through to error handling
+        }
+      }
+
+      // Map error to AppException
+      throw _errorHandler.mapToAppException(error);
+    }
   }
 
   /// Gets a specific control by ID.

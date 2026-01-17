@@ -1,14 +1,25 @@
 import 'package:rmotly_client/rmotly_client.dart';
+import '../services/error_handler_service.dart';
+import '../services/connectivity_service.dart';
+import '../services/offline_queue_service.dart';
+import '../exceptions.dart';
 
 /// Repository for managing Event entities.
 ///
 /// Provides methods for sending and retrieving events.
-/// Once the Serverpod EventEndpoint is implemented, this repository
-/// will communicate with the API to perform these operations.
+/// Includes offline support and error handling.
 class EventRepository {
   final Client _client;
+  final ErrorHandlerService _errorHandler;
+  final ConnectivityService _connectivityService;
+  final OfflineQueueService _offlineQueue;
 
-  EventRepository(this._client);
+  EventRepository(
+    this._client,
+    this._errorHandler,
+    this._connectivityService,
+    this._offlineQueue,
+  );
 
   /// Lists events for the current user.
   ///
@@ -45,18 +56,39 @@ class EventRepository {
   /// - [payload]: Optional event payload as JSON string
   ///
   /// Returns the created [Event].
+  /// If offline, the event is queued and an [OfflineException] is thrown.
   /// Throws an exception if the operation fails.
   Future<Event> sendEvent({
     required int controlId,
     required String eventType,
     String? payload,
   }) async {
-    // TODO: Implement once EventEndpoint is available
-    // return await _client.event.sendEvent(
-    //   controlId: controlId,
-    //   eventType: eventType,
-    //   payload: payload,
-    // );
-    throw UnimplementedError('EventEndpoint not yet implemented in Serverpod');
+    // Check connectivity
+    if (!_connectivityService.isOnline) {
+      // Queue the event for later
+      await _offlineQueue.queueEvent(
+        controlId: controlId,
+        eventType: eventType,
+        payload: payload,
+      );
+      
+      throw const OfflineException(
+        'Device is offline. Event queued for later.',
+        code: 'OFFLINE',
+      );
+    }
+
+    try {
+      // TODO: Implement once EventEndpoint is available
+      // return await _client.event.sendEvent(
+      //   controlId: controlId,
+      //   eventType: eventType,
+      //   payload: payload,
+      // );
+      throw UnimplementedError('EventEndpoint not yet implemented in Serverpod');
+    } catch (error) {
+      // Map error to AppException
+      throw _errorHandler.mapToAppException(error);
+    }
   }
 }
