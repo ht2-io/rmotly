@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 env:
-  FLUTTER_VERSION: '3.27.4'
+  FLUTTER_VERSION: '3.29.0'
 
 jobs:
   # Build Android APK
@@ -146,8 +146,9 @@ jobs:
         run: serverpod generate
 
       - name: Compile server
-        working-directory: rmotly_server
-        run: dart compile exe bin/main.dart -o bin/server
+        run: |
+          cd rmotly_server
+          dart compile exe bin/main.dart -o bin/server
 
       - name: Create server package
         env:
