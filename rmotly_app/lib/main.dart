@@ -9,6 +9,8 @@ import 'core/adapters/notification_topic_adapter.dart';
 import 'core/providers/api_client_provider.dart';
 import 'core/theme/theme.dart';
 import 'features/dashboard/dashboard.dart';
+import 'core/services/local_storage_service.dart';
+import 'core/services/offline_queue_service.dart';
 import 'shared/services/auth_service.dart';
 import 'shared/services/push_service.dart';
 
@@ -22,6 +24,13 @@ void main() async {
   Hive.registerAdapter(ControlAdapter());
   Hive.registerAdapter(ActionAdapter());
   Hive.registerAdapter(NotificationTopicAdapter());
+
+  // Initialize local storage and offline queue
+  final localStorage = LocalStorageService();
+  await localStorage.init();
+
+  final offlineQueue = OfflineQueueService();
+  await offlineQueue.init();
 
   runApp(
     const ProviderScope(

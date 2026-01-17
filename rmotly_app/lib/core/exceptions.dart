@@ -83,6 +83,32 @@ class AuthException extends AppException {
   const AuthException(super.message, {super.code, super.originalError});
 }
 
+/// Exception thrown when a server error occurs.
+///
+/// This includes HTTP 500 errors, server unavailable, and other
+/// server-side failures.
+class ServerException extends AppException {
+  /// The HTTP status code, if applicable.
+  final int? statusCode;
+
+  /// Creates a [ServerException] with the given [message].
+  const ServerException(
+    super.message, {
+    this.statusCode,
+    super.code,
+    super.originalError,
+  });
+
+  @override
+  String toString() {
+    final buffer = StringBuffer(super.toString());
+    if (statusCode != null) {
+      buffer.write('\nStatus Code: $statusCode');
+    }
+    return buffer.toString();
+  }
+}
+
 /// Exception thrown when an action execution fails.
 ///
 /// This occurs when HTTP requests configured in actions fail,
@@ -124,4 +150,13 @@ class ActionExecutionException extends AppException {
     }
     return buffer.toString();
   }
+}
+
+/// Exception thrown when the app is offline and an operation requires connectivity.
+class OfflineException extends AppException {
+  /// Creates an [OfflineException] with the given [message].
+  const OfflineException(
+    super.message, {
+    super.code,
+  });
 }

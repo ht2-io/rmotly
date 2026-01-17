@@ -1,23 +1,56 @@
 import 'package:rmotly_client/rmotly_client.dart';
+import '../services/error_handler_service.dart';
+import '../services/local_storage_service.dart';
+import '../services/connectivity_service.dart';
 
 /// Repository for managing Action entities.
 ///
 /// Provides methods for CRUD operations on actions.
-/// Once the Serverpod ActionEndpoint is implemented, this repository
-/// will communicate with the API to perform these operations.
+/// Includes offline caching and error handling.
 class ActionRepository {
   final Client _client;
+  final ErrorHandlerService _errorHandler;
+  final LocalStorageService _localStorage;
+  final ConnectivityService _connectivityService;
 
-  ActionRepository(this._client);
+  ActionRepository(
+    this._client,
+    this._errorHandler,
+    this._localStorage,
+    this._connectivityService,
+  );
 
   /// Lists all actions for the current user.
   ///
   /// Returns a list of [Action] objects.
-  /// Throws an exception if the operation fails.
+  /// If offline, returns cached actions.
+  /// Throws an exception if the operation fails and no cache is available.
   Future<List<Action>> listActions() async {
-    // TODO: Implement once ActionEndpoint is available
-    // return await _client.action.listActions();
-    throw UnimplementedError('ActionEndpoint not yet implemented in Serverpod');
+    try {
+      // TODO: Implement once ActionEndpoint is available
+      // final actions = await _client.action.listActions();
+      // 
+      // // Cache the actions
+      // await _localStorage.cacheActions(actions);
+      // 
+      // return actions;
+      throw UnimplementedError('ActionEndpoint not yet implemented in Serverpod');
+    } catch (error) {
+      // If offline or error, try to return cached data
+      if (!_connectivityService.isOnline || _errorHandler.isRetryable(error)) {
+        try {
+          final cachedActions = await _localStorage.getCachedActions();
+          if (cachedActions.isNotEmpty) {
+            return cachedActions;
+          }
+        } catch (_) {
+          // Cache read failed, fall through to error handling
+        }
+      }
+
+      // Map error to AppException
+      throw _errorHandler.mapToAppException(error);
+    }
   }
 
   /// Gets a specific action by ID.
