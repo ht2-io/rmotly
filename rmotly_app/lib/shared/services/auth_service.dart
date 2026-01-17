@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rmotly_client/rmotly_client.dart';
 import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 
 import '../../core/providers/api_client_provider.dart';
@@ -41,8 +42,9 @@ class AuthState {
 /// Authentication service using Serverpod auth module
 class AuthService extends StateNotifier<AuthState> {
   final SessionManager _sessionManager;
+  final Client _client;
 
-  AuthService(this._sessionManager) : super(AuthState.initial) {
+  AuthService(this._sessionManager, this._client) : super(AuthState.initial) {
     _init();
   }
 
@@ -73,7 +75,7 @@ class AuthService extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final serverResponse = await _sessionManager.caller.modules.auth.email
+      final serverResponse = await _client.modules.auth.email
           .authenticate(email, password);
 
       if (serverResponse.success) {
@@ -110,10 +112,10 @@ class AuthService extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final serverResponse = await _sessionManager.caller.modules.auth.email
+      final success = await _client.modules.auth.email
           .createAccountRequest(userName ?? email, email, password);
 
-      if (serverResponse.success) {
+      if (success) {
         // Account created but needs email verification
         state = state.copyWith(
           isLoading: false,
@@ -123,7 +125,7 @@ class AuthService extends StateNotifier<AuthState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          error: serverResponse.failReason?.name ?? 'Account creation failed',
+          error: 'Account creation failed',
         );
         return false;
       }
@@ -141,10 +143,10 @@ class AuthService extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final serverResponse = await _sessionManager.caller.modules.auth.email
+      final serverResponse = await _client.modules.auth.email
           .createAccount(email, verificationCode);
 
-      if (serverResponse.success) {
+      if (serverResponse != null && serverResponse.success) {
         // Automatically sign in after verification
         await _sessionManager.registerSignedInUser(
           serverResponse.userInfo!,
@@ -160,7 +162,7 @@ class AuthService extends StateNotifier<AuthState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          error: serverResponse.failReason?.name ?? 'Verification failed',
+          error: serverResponse?.failReason?.name ?? 'Verification failed',
         );
         return false;
       }
@@ -178,7 +180,7 @@ class AuthService extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final success = await _sessionManager.caller.modules.auth.email
+      final success = await _client.modules.auth.email
           .initiatePasswordReset(email);
 
       state = state.copyWith(isLoading: false);
@@ -198,8 +200,9 @@ class AuthService extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final success = await _sessionManager.caller.modules.auth.email
-          .resetPassword(email, verificationCode, newPassword);
+      // Note: Serverpod auth API expects (verificationCode, newPassword)
+      final success = await _client.modules.auth.email
+          .resetPassword(verificationCode, newPassword);
 
       state = state.copyWith(isLoading: false);
       return success;
@@ -248,7 +251,8 @@ class AuthService extends StateNotifier<AuthState> {
 final authServiceProvider =
     StateNotifierProvider<AuthService, AuthState>((ref) {
   final sessionManager = ref.watch(sessionManagerProvider);
-  return AuthService(sessionManager);
+  final client = ref.watch(apiClientProvider);
+  return AuthService(sessionManager, client);
 });
 
 /// Provider for checking if user is authenticated

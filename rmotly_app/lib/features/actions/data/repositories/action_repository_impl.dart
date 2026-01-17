@@ -14,10 +14,13 @@ class ActionRepositoryImpl implements ActionRepository {
 
   ActionRepositoryImpl(this._client);
 
+  // TODO: Get actual userId from auth when implemented
+  int get _currentUserId => 1;
+
   @override
   Future<List<Action>> getActions() async {
     try {
-      return await _client.action.listActions();
+      return await _client.action.listActions(userId: _currentUserId);
     } catch (e) {
       debugPrint('ActionRepository: Using mock data - $e');
       return List.from(_mockActions);
@@ -42,6 +45,7 @@ class ActionRepositoryImpl implements ActionRepository {
   Future<Action> createAction(Action action) async {
     try {
       return await _client.action.createAction(
+        userId: _currentUserId,
         name: action.name,
         httpMethod: action.httpMethod,
         urlTemplate: action.urlTemplate,
@@ -87,6 +91,10 @@ class ActionRepositoryImpl implements ActionRepository {
         headersTemplate: action.headersTemplate,
         bodyTemplate: action.bodyTemplate,
         parameters: action.parameters,
+        clearDescription: false,
+        clearHeadersTemplate: false,
+        clearBodyTemplate: false,
+        clearParameters: false,
       );
     } catch (e) {
       debugPrint('ActionRepository: Using mock update - $e');
@@ -120,7 +128,7 @@ class ActionRepositoryImpl implements ActionRepository {
     try {
       final result = await _client.action.testAction(
         actionId: actionId,
-        parameters: parameters,
+        testParameters: parameters,
       );
       return ActionTestResult.fromJson(result);
     } catch (e) {

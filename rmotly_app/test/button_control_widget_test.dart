@@ -34,7 +34,7 @@ void main() {
           ),
         ),
       );
-    });
+    }
 
     testWidgets('should display button with label from config', (tester) async {
       // Act
