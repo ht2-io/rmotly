@@ -30,9 +30,9 @@ webServer:
 # This is the database setup for your server.
 database:
   host: localhost
-  port: 5432
+  port: 8090
   name: rmotly
-  user: rmotly_user
+  user: postgres
   #requireSsl: true # defaults to false
   #isUnixSocket: true # defaults to false
 
@@ -40,7 +40,7 @@ database:
 redis:
   enabled: true
   host: localhost
-  port: 6379
+  port: 8091
   #user: # defaults to empty
   #requireSsl: true # defaults to false
 

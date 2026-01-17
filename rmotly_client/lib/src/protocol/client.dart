@@ -25,10 +25,10 @@ import 'package:rmotly_client/src/protocol/greeting.dart' as _i11;
 import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i12;
 import 'protocol.dart' as _i13;
 
-/// Endpoint for managing HTTP actions (request templates).
+/// Serverpod endpoint for managing actions (HTTP request templates).
 ///
-/// Actions define HTTP requests that can be triggered by controls or events.
-/// They support template variables ({{variable}}) for dynamic content.
+/// Provides methods to create, read, update, delete, and test actions
+/// that can be triggered by controls or other events.
 /// {@category Endpoint}
 class EndpointAction extends _i1.EndpointRef {
   EndpointAction(_i1.EndpointCaller caller) : super(caller);
@@ -36,20 +36,26 @@ class EndpointAction extends _i1.EndpointRef {
   @override
   String get name => 'action';
 
-  /// Create a new action.
+  /// Create a new action
+  ///
+  /// Creates an HTTP action template that can be triggered by controls.
   ///
   /// Parameters:
   /// - [session]: The current session
+  /// - [userId]: ID of the user creating the action
   /// - [name]: Display name for the action
   /// - [httpMethod]: HTTP method (GET, POST, PUT, DELETE, PATCH)
   /// - [urlTemplate]: URL template with {{variable}} placeholders
-  /// - [description]: Optional description
+  /// - [description]: Optional description of what the action does
   /// - [headersTemplate]: Optional headers template as JSON string
   /// - [bodyTemplate]: Optional body template with {{variable}} placeholders
   /// - [parameters]: Optional parameters definition as JSON string
   ///
-  /// Returns: The created [Action].
+  /// Returns: The created [Action] with generated ID
+  ///
+  /// Throws: [ArgumentError] if validation fails
   _i2.Future<_i3.Action> createAction({
+    required int userId,
     required String name,
     required String httpMethod,
     required String urlTemplate,
@@ -62,6 +68,7 @@ class EndpointAction extends _i1.EndpointRef {
         'action',
         'createAction',
         {
+          'userId': userId,
           'name': name,
           'httpMethod': httpMethod,
           'urlTemplate': urlTemplate,
@@ -72,39 +79,45 @@ class EndpointAction extends _i1.EndpointRef {
         },
       );
 
-  /// List all actions for the authenticated user.
+  /// List all actions for a user
+  ///
+  /// Returns actions ordered by creation date (newest first).
   ///
   /// Parameters:
   /// - [session]: The current session
+  /// - [userId]: ID of the user whose actions to list
   ///
-  /// Returns: List of [Action] objects.
-  _i2.Future<List<_i3.Action>> listActions() =>
+  /// Returns: List of [Action] ordered by creation date
+  _i2.Future<List<_i3.Action>> listActions({required int userId}) =>
       caller.callServerEndpoint<List<_i3.Action>>(
         'action',
         'listActions',
-        {},
+        {'userId': userId},
       );
 
-  /// Get a specific action by ID.
+  /// Get a single action by ID
   ///
   /// Parameters:
   /// - [session]: The current session
-  /// - [actionId]: The ID of the action to retrieve
+  /// - [actionId]: ID of the action to retrieve
   ///
-  /// Returns: The [Action] if found and owned by user.
-  _i2.Future<_i3.Action> getAction({required int actionId}) =>
-      caller.callServerEndpoint<_i3.Action>(
+  /// Returns: The [Action] or null if not found
+  _i2.Future<_i3.Action?> getAction({required int actionId}) =>
+      caller.callServerEndpoint<_i3.Action?>(
         'action',
         'getAction',
         {'actionId': actionId},
       );
 
-  /// Update an existing action.
+  /// Update an action
+  ///
+  /// Updates the specified fields of an action. All fields are optional
+  /// except actionId. Only provided fields will be updated.
   ///
   /// Parameters:
   /// - [session]: The current session
-  /// - [actionId]: The ID of the action to update
-  /// - [name]: New name (optional)
+  /// - [actionId]: ID of the action to update
+  /// - [name]: New display name (optional)
   /// - [description]: New description (optional)
   /// - [httpMethod]: New HTTP method (optional)
   /// - [urlTemplate]: New URL template (optional)
@@ -112,7 +125,9 @@ class EndpointAction extends _i1.EndpointRef {
   /// - [bodyTemplate]: New body template (optional)
   /// - [parameters]: New parameters definition (optional)
   ///
-  /// Returns: The updated [Action].
+  /// Returns: The updated [Action]
+  ///
+  /// Throws: [ArgumentError] if action not found or validation fails
   _i2.Future<_i3.Action> updateAction({
     required int actionId,
     String? name,
@@ -122,6 +137,10 @@ class EndpointAction extends _i1.EndpointRef {
     String? headersTemplate,
     String? bodyTemplate,
     String? parameters,
+    required bool clearDescription,
+    required bool clearHeadersTemplate,
+    required bool clearBodyTemplate,
+    required bool clearParameters,
   }) =>
       caller.callServerEndpoint<_i3.Action>(
         'action',
@@ -135,16 +154,23 @@ class EndpointAction extends _i1.EndpointRef {
           'headersTemplate': headersTemplate,
           'bodyTemplate': bodyTemplate,
           'parameters': parameters,
+          'clearDescription': clearDescription,
+          'clearHeadersTemplate': clearHeadersTemplate,
+          'clearBodyTemplate': clearBodyTemplate,
+          'clearParameters': clearParameters,
         },
       );
 
-  /// Delete an action.
+  /// Delete an action
+  ///
+  /// Permanently deletes an action from the database.
+  /// Note: This will leave any associated controls without an action.
   ///
   /// Parameters:
   /// - [session]: The current session
-  /// - [actionId]: The ID of the action to delete
+  /// - [actionId]: ID of the action to delete
   ///
-  /// Returns: True if the action was deleted.
+  /// Returns: true if deleted, false if not found
   _i2.Future<bool> deleteAction({required int actionId}) =>
       caller.callServerEndpoint<bool>(
         'action',
@@ -152,63 +178,43 @@ class EndpointAction extends _i1.EndpointRef {
         {'actionId': actionId},
       );
 
-  /// Test an action by executing it with provided parameters.
+  /// Test an action with provided parameters
   ///
-  /// This performs the HTTP request defined by the action template
-  /// and returns the result for verification.
+  /// Executes the action with test parameters to verify it works correctly.
+  /// This performs the actual HTTP request.
   ///
   /// Parameters:
   /// - [session]: The current session
-  /// - [actionId]: The ID of the action to test
-  /// - [parameters]: Optional parameters for template substitution
+  /// - [actionId]: ID of the action to test
+  /// - [testParameters]: Parameters to use for template substitution
   ///
-  /// Returns: Map containing test result (success, statusCode, body, etc.)
+  /// Returns: Map containing execution result with keys:
+  ///   - success: bool
+  ///   - statusCode: int?
+  ///   - responseBody: String?
+  ///   - responseHeaders: Map<String, String>?
+  ///   - executionTimeMs: int
+  ///   - error: String? (if failed)
+  ///
+  /// Throws: [ArgumentError] if action not found
   _i2.Future<Map<String, dynamic>> testAction({
     required int actionId,
-    Map<String, dynamic>? parameters,
+    required Map<String, dynamic> testParameters,
   }) =>
       caller.callServerEndpoint<Map<String, dynamic>>(
         'action',
         'testAction',
         {
           'actionId': actionId,
-          'parameters': parameters,
-        },
-      );
-
-  /// Create an action from an OpenAPI specification.
-  ///
-  /// Fetches the OpenAPI spec and creates an action from
-  /// the specified operation.
-  ///
-  /// Parameters:
-  /// - [session]: The current session
-  /// - [specUrl]: URL of the OpenAPI specification
-  /// - [operationId]: ID of the operation to import
-  /// - [name]: Optional custom name (defaults to operation summary)
-  ///
-  /// Returns: The created [Action].
-  _i2.Future<_i3.Action> createFromOpenApi({
-    required String specUrl,
-    required String operationId,
-    String? name,
-  }) =>
-      caller.callServerEndpoint<_i3.Action>(
-        'action',
-        'createFromOpenApi',
-        {
-          'specUrl': specUrl,
-          'operationId': operationId,
-          'name': name,
+          'testParameters': testParameters,
         },
       );
 }
 
-/// Endpoint for managing controls (UI widgets on the dashboard).
+/// Serverpod endpoint for managing controls (dashboard UI elements).
 ///
-/// Controls are user-configurable widgets that can trigger actions
-/// when interacted with. They support different types (button, toggle,
-/// slider, text_input) and can be arranged on the dashboard.
+/// Provides methods to create, read, update, and delete controls,
+/// as well as reorder them within a user's dashboard.
 /// {@category Endpoint}
 class EndpointControl extends _i1.EndpointRef {
   EndpointControl(_i1.EndpointCaller caller) : super(caller);
@@ -216,82 +222,98 @@ class EndpointControl extends _i1.EndpointRef {
   @override
   String get name => 'control';
 
-  /// Create a new control.
+  /// Create a new control
+  ///
+  /// Creates a control that can trigger actions from the dashboard.
   ///
   /// Parameters:
   /// - [session]: The current session
+  /// - [userId]: ID of the user creating the control (temporary until auth is implemented)
   /// - [name]: Display name for the control
-  /// - [controlType]: Type of control (button, toggle, slider, text_input)
+  /// - [controlType]: Type of control (button, toggle, slider, input, dropdown)
+  /// - [config]: Control configuration as JSON string
+  /// - [position]: Position/order in the dashboard
   /// - [actionId]: Optional ID of the action to trigger
-  /// - [config]: Configuration as JSON string (label, colors, min/max, etc.)
-  /// - [position]: Position in the dashboard grid (optional, auto-assigned)
   ///
-  /// Returns: The created [Control].
+  /// Returns: The created [Control] with generated ID
+  ///
+  /// Throws: [ArgumentError] if validation fails
   _i2.Future<_i4.Control> createControl({
+    required int userId,
     required String name,
     required String controlType,
+    required String config,
+    required int position,
     int? actionId,
-    String? config,
-    int? position,
   }) =>
       caller.callServerEndpoint<_i4.Control>(
         'control',
         'createControl',
         {
+          'userId': userId,
           'name': name,
           'controlType': controlType,
-          'actionId': actionId,
           'config': config,
           'position': position,
+          'actionId': actionId,
         },
       );
 
-  /// List all controls for the authenticated user.
+  /// List all controls for a user
   ///
-  /// Returns controls ordered by position for dashboard layout.
+  /// Returns controls ordered by position.
   ///
   /// Parameters:
   /// - [session]: The current session
+  /// - [userId]: ID of the user whose controls to list
   ///
-  /// Returns: List of [Control] objects ordered by position.
-  _i2.Future<List<_i4.Control>> listControls() =>
+  /// Returns: List of [Control] ordered by position
+  _i2.Future<List<_i4.Control>> listControls({required int userId}) =>
       caller.callServerEndpoint<List<_i4.Control>>(
         'control',
         'listControls',
-        {},
+        {'userId': userId},
       );
 
-  /// Get a specific control by ID.
+  /// Get a single control by ID
   ///
   /// Parameters:
   /// - [session]: The current session
-  /// - [controlId]: The ID of the control to retrieve
+  /// - [controlId]: ID of the control to retrieve
   ///
-  /// Returns: The [Control] if found and owned by user.
-  _i2.Future<_i4.Control> getControl({required int controlId}) =>
-      caller.callServerEndpoint<_i4.Control>(
+  /// Returns: The [Control] or null if not found
+  _i2.Future<_i4.Control?> getControl({required int controlId}) =>
+      caller.callServerEndpoint<_i4.Control?>(
         'control',
         'getControl',
         {'controlId': controlId},
       );
 
-  /// Update an existing control.
+  /// Update a control
+  ///
+  /// Updates the specified fields of a control. All fields are optional
+  /// except controlId. Only provided fields will be updated.
   ///
   /// Parameters:
   /// - [session]: The current session
-  /// - [controlId]: The ID of the control to update
-  /// - [name]: New name (optional)
+  /// - [controlId]: ID of the control to update
+  /// - [name]: New display name (optional)
   /// - [controlType]: New control type (optional)
-  /// - [actionId]: New action ID (optional, use -1 to unlink)
-  /// - [config]: New configuration (optional)
+  /// - [config]: New configuration JSON (optional)
+  /// - [position]: New position (optional)
+  /// - [actionId]: New action ID (optional, can be null to remove association)
   ///
-  /// Returns: The updated [Control].
+  /// Returns: The updated [Control]
+  ///
+  /// Throws: [ArgumentError] if control not found or validation fails
   _i2.Future<_i4.Control> updateControl({
     required int controlId,
     String? name,
     String? controlType,
-    int? actionId,
     String? config,
+    int? position,
+    int? actionId,
+    required bool clearActionId,
   }) =>
       caller.callServerEndpoint<_i4.Control>(
         'control',
@@ -300,18 +322,22 @@ class EndpointControl extends _i1.EndpointRef {
           'controlId': controlId,
           'name': name,
           'controlType': controlType,
-          'actionId': actionId,
           'config': config,
+          'position': position,
+          'actionId': actionId,
+          'clearActionId': clearActionId,
         },
       );
 
-  /// Delete a control.
+  /// Delete a control
+  ///
+  /// Permanently deletes a control from the database.
   ///
   /// Parameters:
   /// - [session]: The current session
-  /// - [controlId]: The ID of the control to delete
+  /// - [controlId]: ID of the control to delete
   ///
-  /// Returns: True if the control was deleted.
+  /// Returns: true if deleted, false if not found
   _i2.Future<bool> deleteControl({required int controlId}) =>
       caller.callServerEndpoint<bool>(
         'control',
@@ -319,43 +345,29 @@ class EndpointControl extends _i1.EndpointRef {
         {'controlId': controlId},
       );
 
-  /// Reorder controls on the dashboard.
+  /// Reorder controls for a user
   ///
-  /// Updates the position of multiple controls in a single transaction.
+  /// Updates the position field for multiple controls at once.
+  /// This is useful for drag-and-drop reordering in the UI.
   ///
   /// Parameters:
   /// - [session]: The current session
-  /// - [controlIds]: List of control IDs in the new order
+  /// - [userId]: ID of the user whose controls to reorder
+  /// - [controlPositions]: Map of control ID to new position
   ///
-  /// Returns: List of updated [Control] objects.
-  _i2.Future<List<_i4.Control>> reorderControls(
-          {required List<int> controlIds}) =>
+  /// Returns: List of updated controls ordered by position
+  ///
+  /// Throws: [ArgumentError] if any control is not found or doesn't belong to user
+  _i2.Future<List<_i4.Control>> reorderControls({
+    required int userId,
+    required Map<int, int> controlPositions,
+  }) =>
       caller.callServerEndpoint<List<_i4.Control>>(
         'control',
         'reorderControls',
-        {'controlIds': controlIds},
-      );
-
-  /// Duplicate a control.
-  ///
-  /// Creates a copy of an existing control with a new name.
-  ///
-  /// Parameters:
-  /// - [session]: The current session
-  /// - [controlId]: The ID of the control to duplicate
-  /// - [newName]: Name for the duplicated control (optional)
-  ///
-  /// Returns: The newly created [Control].
-  _i2.Future<_i4.Control> duplicateControl({
-    required int controlId,
-    String? newName,
-  }) =>
-      caller.callServerEndpoint<_i4.Control>(
-        'control',
-        'duplicateControl',
         {
-          'controlId': controlId,
-          'newName': newName,
+          'userId': userId,
+          'controlPositions': controlPositions,
         },
       );
 }

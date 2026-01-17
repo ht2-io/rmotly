@@ -142,18 +142,13 @@ class Protocol extends _i1.SerializationManager {
       return (data as Map).map((k, v) =>
           MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
-    if (t == _i1.getType<Map<String, dynamic>?>()) {
-      return (data != null
-          ? (data as Map).map((k, v) =>
-              MapEntry(deserialize<String>(k), deserialize<dynamic>(v)))
-          : null) as T;
-    }
     if (t == List<_i14.Control>) {
       return (data as List).map((e) => deserialize<_i14.Control>(e)).toList()
           as T;
     }
-    if (t == List<int>) {
-      return (data as List).map((e) => deserialize<int>(e)).toList() as T;
+    if (t == Map<int, int>) {
+      return Map.fromEntries((data as List).map((e) =>
+          MapEntry(deserialize<int>(e['k']), deserialize<int>(e['v'])))) as T;
     }
     if (t == List<_i15.Event>) {
       return (data as List).map((e) => deserialize<_i15.Event>(e)).toList()

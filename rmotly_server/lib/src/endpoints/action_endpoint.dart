@@ -12,12 +12,12 @@ class ActionEndpoint extends Endpoint {
   late final ActionExecutorService _actionExecutor;
 
   @override
-  Future<void> initialize(
+  void initialize(
     Server server,
     String name,
-    String? defaultRoutePrefix,
-  ) async {
-    await super.initialize(server, name, defaultRoutePrefix);
+    String? moduleName,
+  ) {
+    super.initialize(server, name, moduleName);
     _actionExecutor = ActionExecutorService();
   }
 

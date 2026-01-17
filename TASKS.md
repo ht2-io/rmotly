@@ -337,11 +337,11 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 
 ### 2.5 Authentication
 
-- [ ] **2.5.1** Set up Serverpod authentication module
+- [x] **2.5.1** Set up Serverpod authentication module
   - Email/password authentication
   - Session management
 
-- [ ] **2.5.2** Implement push subscription management
+- [x] **2.5.2** Implement push subscription management
   - Store UnifiedPush endpoints per user
   - Handle endpoint rotation
   - Clean up stale subscriptions
