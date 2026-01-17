@@ -109,18 +109,27 @@ class PushServiceState {
 /// 3. SSE (fallback) - for restricted networks
 class PushService extends StateNotifier<PushServiceState> {
   final Client? _client;
+  final Function(String?)? _onNotificationTappedCallback;
   
-  PushService({Client? client}) 
+  PushService({
+    Client? client,
+    Function(String?)? onNotificationTapped,
+  }) 
     : _client = client,
+      _onNotificationTappedCallback = onNotificationTapped,
       super(const PushServiceState());
 
   final _notificationController = StreamController<PushNotification>.broadcast();
+  final _notificationTapController = StreamController<String?>.broadcast();
   final _localNotifications = FlutterLocalNotificationsPlugin();
   StreamSubscription<SSEModel>? _sseSubscription;
   StreamSubscription<StreamNotification>? _webSocketSubscription;
 
   /// Stream of received notifications
   Stream<PushNotification> get notifications => _notificationController.stream;
+  
+  /// Stream of notification tap events (contains action URL if available)
+  Stream<String?> get notificationTaps => _notificationTapController.stream;
 
   /// Initialize the push service
   Future<void> initialize() async {
@@ -220,8 +229,26 @@ class PushService extends StateNotifier<PushServiceState> {
   /// Handle notification tap
   void _onNotificationTapped(NotificationResponse response) {
     debugPrint('PushService: Notification tapped: ${response.payload}');
-    // TODO: Handle notification tap navigation
-    // Could parse the payload and navigate to specific screens
+    
+    String? actionUrl;
+    
+    // Parse the payload to get action URL
+    if (response.payload != null && response.payload!.isNotEmpty) {
+      try {
+        final data = jsonDecode(response.payload!) as Map<String, dynamic>;
+        actionUrl = data['actionUrl'] as String?;
+      } catch (e) {
+        debugPrint('PushService: Failed to parse notification payload: $e');
+      }
+    }
+    
+    // Emit the tap event
+    _notificationTapController.add(actionUrl);
+    
+    // Call the callback if provided
+    if (_onNotificationTappedCallback != null) {
+      _onNotificationTappedCallback!(actionUrl);
+    }
   }
 
   /// Handle UnifiedPush endpoint registration
@@ -485,6 +512,7 @@ class PushService extends StateNotifier<PushServiceState> {
   @override
   void dispose() {
     _notificationController.close();
+    _notificationTapController.close();
     _sseSubscription?.cancel();
     _webSocketSubscription?.cancel();
     super.dispose();
@@ -502,4 +530,10 @@ final pushServiceProvider =
 final notificationStreamProvider = StreamProvider<PushNotification>((ref) {
   final pushService = ref.watch(pushServiceProvider.notifier);
   return pushService.notifications;
+});
+
+/// Stream provider for notification taps
+final notificationTapStreamProvider = StreamProvider<String?>((ref) {
+  final pushService = ref.watch(pushServiceProvider.notifier);
+  return pushService.notificationTaps;
 });
