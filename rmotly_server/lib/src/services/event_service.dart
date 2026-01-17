@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:serverpod/serverpod.dart';
 
+import '../generated/protocol.dart';
 import 'action_executor_service.dart';
 
 /// Service for handling events from controls and external sources.
@@ -84,31 +85,40 @@ class EventService {
     required String eventType,
     String? payload,
   }) async {
+    // Parse control ID
+    final controlIdInt = int.tryParse(controlId);
+    if (controlIdInt == null) {
+      session.log('Invalid control ID: $controlId', level: LogLevel.warning);
+      return null;
+    }
+
     // Look up the control
-    // TODO: Replace with actual model once generated
-    // final control = await Control.db.findById(session, int.parse(controlId));
-    // if (control == null) {
-    //   session.log('Control not found: $controlId', level: LogLevel.warning);
-    //   return null;
-    // }
-    //
-    // // Verify ownership
-    // if (control.userId != userId) {
-    //   throw UnauthorizedAccessException('Control does not belong to user');
-    // }
-    //
-    // // Check if control has an associated action
-    // if (control.actionId == null) {
-    //   session.log('Control has no associated action', level: LogLevel.debug);
-    //   return null;
-    // }
-    //
-    // // Look up the action
-    // final action = await Action.db.findById(session, control.actionId!);
-    // if (action == null) {
-    //   session.log('Action not found: ${control.actionId}', level: LogLevel.warning);
-    //   return null;
-    // }
+    final control = await Control.db.findById(session, controlIdInt);
+    if (control == null) {
+      session.log('Control not found: $controlId', level: LogLevel.warning);
+      return null;
+    }
+
+    // Verify ownership
+    if (control.userId != userId) {
+      throw UnauthorizedAccessException('Control does not belong to user');
+    }
+
+    // Check if control has an associated action
+    if (control.actionId == null) {
+      session.log('Control has no associated action', level: LogLevel.debug);
+      return null;
+    }
+
+    // Look up the action
+    final action = await Action.db.findById(session, control.actionId!);
+    if (action == null) {
+      session.log(
+        'Action not found: ${control.actionId}',
+        level: LogLevel.warning,
+      );
+      return null;
+    }
 
     // Parse payload parameters
     Map<String, dynamic>? parameters;
@@ -124,21 +134,24 @@ class EventService {
     }
 
     // Execute the action
-    // TODO: Enable once models are generated
-    // final result = await _actionExecutor.execute(action, parameters);
-    // return jsonEncode(result.toJson());
+    final result = await _actionExecutor.executeAction(
+      action,
+      parameters,
+      session: session,
+    );
 
     session.log(
-      'Event processed: $eventType from control $controlId',
-      level: LogLevel.debug,
+      'Event processed: $eventType from control $controlId -> ${result.success ? 'success' : 'failed'}',
+      level: LogLevel.info,
     );
-    return null;
+
+    return jsonEncode(result.toJson());
   }
 
   /// Create and save a new event
   ///
   /// Returns the created event.
-  Future<Map<String, dynamic>> createEvent(
+  Future<Event> createEvent(
     Session session, {
     required int userId,
     required String sourceType,
@@ -156,39 +169,28 @@ class EventService {
     );
 
     // Create the event
-    // TODO: Replace with actual model once generated
-    // final event = Event(
-    //   userId: userId,
-    //   sourceType: sourceType,
-    //   sourceId: sourceId,
-    //   eventType: eventType,
-    //   payload: payload,
-    //   actionResult: actionResult,
-    //   timestamp: DateTime.now(),
-    // );
-    //
-    // final savedEvent = await Event.db.insertRow(session, event);
-    // return savedEvent;
+    final event = Event(
+      userId: userId,
+      sourceType: sourceType,
+      sourceId: sourceId,
+      eventType: eventType,
+      payload: payload,
+      actionResult: actionResult,
+      timestamp: DateTime.now(),
+    );
 
-    final timestamp = DateTime.now();
+    final savedEvent = await Event.db.insertRow(session, event);
+
     session.log(
       'Event created: $eventType from $sourceType:$sourceId',
       level: LogLevel.info,
     );
 
-    return {
-      'userId': userId,
-      'sourceType': sourceType,
-      'sourceId': sourceId,
-      'eventType': eventType,
-      'payload': payload,
-      'actionResult': actionResult,
-      'timestamp': timestamp.toIso8601String(),
-    };
+    return savedEvent;
   }
 
   /// Get events for a user with pagination
-  Future<List<Map<String, dynamic>>> getEventsForUser(
+  Future<List<Event>> getEventsForUser(
     Session session, {
     required int userId,
     int limit = 50,
@@ -197,30 +199,26 @@ class EventService {
     String? eventType,
     DateTime? since,
   }) async {
-    // TODO: Replace with actual model queries once generated
-    // var query = Event.db.find(
-    //   session,
-    //   where: (t) {
-    //     var condition = t.userId.equals(userId);
-    //     if (sourceType != null) {
-    //       condition = condition & t.sourceType.equals(sourceType);
-    //     }
-    //     if (eventType != null) {
-    //       condition = condition & t.eventType.equals(eventType);
-    //     }
-    //     if (since != null) {
-    //       condition = condition & t.timestamp.greaterThan(since);
-    //     }
-    //     return condition;
-    //   },
-    //   orderBy: (t) => t.timestamp,
-    //   orderDescending: true,
-    //   limit: limit,
-    //   offset: offset,
-    // );
-    // return query;
-
-    return [];
+    return await Event.db.find(
+      session,
+      where: (t) {
+        var condition = t.userId.equals(userId);
+        if (sourceType != null) {
+          condition = condition & t.sourceType.equals(sourceType);
+        }
+        if (eventType != null) {
+          condition = condition & t.eventType.equals(eventType);
+        }
+        if (since != null) {
+          condition = condition & t.timestamp.greaterThan(since);
+        }
+        return condition;
+      },
+      orderBy: (t) => t.timestamp,
+      orderDescending: true,
+      limit: limit,
+      offset: offset,
+    );
   }
 }
 
