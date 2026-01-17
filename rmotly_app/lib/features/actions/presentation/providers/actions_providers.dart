@@ -7,8 +7,10 @@ import '../state/actions_state.dart';
 import '../viewmodel/actions_viewmodel.dart';
 
 /// Provider for the action repository implementation
-final actionRepositoryProvider = Provider<ActionRepository>((ref) {
+/// Returns null if server is not configured
+final actionRepositoryProvider = Provider<ActionRepository?>((ref) {
   final client = ref.watch(apiClientProvider);
+  if (client == null) return null;
   return ActionRepositoryImpl(client);
 });
 
@@ -16,6 +18,9 @@ final actionRepositoryProvider = Provider<ActionRepository>((ref) {
 final actionsViewModelProvider =
     StateNotifierProvider<ActionsViewModel, ActionsState>((ref) {
   final repository = ref.watch(actionRepositoryProvider);
+  if (repository == null) {
+    return ActionsViewModel.withError('Server not configured');
+  }
   return ActionsViewModel(repository);
 });
 

@@ -7,15 +7,22 @@ import '../state/topics_state.dart';
 
 /// View model for the topics feature
 class TopicsViewModel extends StateNotifier<TopicsState> {
-  final TopicRepository _repository;
+  final TopicRepository? _repository;
 
-  TopicsViewModel(this._repository) : super(TopicsState.initial) {
+  TopicsViewModel(TopicRepository repository)
+      : _repository = repository,
+        super(TopicsState.initial) {
     loadTopics();
   }
 
+  /// Create a view model with an initial error state (e.g., server not configured)
+  TopicsViewModel.withError(String error)
+      : _repository = null,
+        super(TopicsState(error: error));
+
   /// Load topics from the repository
   Future<void> loadTopics() async {
-    if (state.isLoading) return;
+    if (_repository == null || state.isLoading) return;
 
     state = state.copyWith(isLoading: true, clearError: true);
 
@@ -36,7 +43,7 @@ class TopicsViewModel extends StateNotifier<TopicsState> {
 
   /// Refresh topics (pull-to-refresh)
   Future<void> refreshTopics() async {
-    if (state.isRefreshing) return;
+    if (_repository == null || state.isRefreshing) return;
 
     state = state.copyWith(isRefreshing: true, clearError: true);
 
@@ -57,6 +64,8 @@ class TopicsViewModel extends StateNotifier<TopicsState> {
 
   /// Create a new topic
   Future<NotificationTopic?> createTopic(NotificationTopic topic) async {
+    if (_repository == null) return null;
+
     try {
       final created = await _repository.createTopic(topic);
 
@@ -75,6 +84,8 @@ class TopicsViewModel extends StateNotifier<TopicsState> {
 
   /// Update an existing topic
   Future<NotificationTopic?> updateTopic(NotificationTopic topic) async {
+    if (_repository == null) return null;
+
     try {
       final updated = await _repository.updateTopic(topic);
 
@@ -95,6 +106,8 @@ class TopicsViewModel extends StateNotifier<TopicsState> {
 
   /// Delete a topic
   Future<void> deleteTopic(int topicId) async {
+    if (_repository == null) return;
+
     try {
       final success = await _repository.deleteTopic(topicId);
 
@@ -111,6 +124,8 @@ class TopicsViewModel extends StateNotifier<TopicsState> {
 
   /// Toggle a topic's enabled state
   Future<void> toggleTopic(int topicId, bool enabled) async {
+    if (_repository == null) return;
+
     state = state.copyWith(togglingTopicId: topicId);
 
     try {
@@ -136,6 +151,8 @@ class TopicsViewModel extends StateNotifier<TopicsState> {
 
   /// Regenerate API key for a topic
   Future<NotificationTopic?> regenerateApiKey(int topicId) async {
+    if (_repository == null) return null;
+
     state = state.copyWith(regeneratingTopicId: topicId);
 
     try {
@@ -164,7 +181,7 @@ class TopicsViewModel extends StateNotifier<TopicsState> {
 
   /// Get webhook URL for a topic
   String getWebhookUrl(int topicId) {
-    return _repository.getWebhookUrl(topicId);
+    return _repository?.getWebhookUrl(topicId) ?? '';
   }
 
   /// Clear error
