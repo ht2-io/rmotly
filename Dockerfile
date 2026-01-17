@@ -1,8 +1,8 @@
 # Dockerfile for rmotly-server
 # Build context should be the repository root
 
-# Build stage
-FROM dart:3.6.2 AS build
+# Build stage - using Flutter image since serverpod generate requires Flutter
+FROM ghcr.io/cirruslabs/flutter:3.29.0 AS build
 WORKDIR /app
 
 # Copy the entire project for serverpod generate
@@ -16,7 +16,8 @@ RUN dart pub get
 
 # Generate Serverpod code
 RUN dart pub global activate serverpod_cli
-RUN dart pub global run serverpod_cli generate
+ENV PATH="$PATH:/root/.pub-cache/bin"
+RUN serverpod generate
 
 # Compile the server executable
 RUN dart compile exe bin/main.dart -o bin/server
