@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:serverpod/serverpod.dart';
 
@@ -34,9 +33,6 @@ class _UserConnection {
 class NotificationStreamService {
   /// Map of userId -> list of active connections
   final Map<int, List<_UserConnection>> _connections = {};
-
-  /// Lock for thread-safe connection management
-  final _lock = Object();
 
   /// Total active connections
   int get totalConnections =>
