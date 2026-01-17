@@ -210,7 +210,7 @@ class EventService {
           condition = condition & t.eventType.equals(eventType);
         }
         if (since != null) {
-          condition = condition & t.timestamp.greaterThan(since);
+          condition = condition & (t.timestamp > since);
         }
         return condition;
       },
