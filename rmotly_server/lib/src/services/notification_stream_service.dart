@@ -1,40 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:serverpod/serverpod.dart';
 
-/// A notification to be streamed to clients
-class StreamNotification {
-  final String id;
-  final String title;
-  final String body;
-  final Map<String, dynamic>? data;
-  final String? imageUrl;
-  final String? actionUrl;
-  final String priority;
-  final DateTime timestamp;
-
-  StreamNotification({
-    required this.id,
-    required this.title,
-    required this.body,
-    this.data,
-    this.imageUrl,
-    this.actionUrl,
-    this.priority = 'normal',
-    DateTime? timestamp,
-  }) : timestamp = timestamp ?? DateTime.now();
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'body': body,
-        if (data != null) 'data': data,
-        if (imageUrl != null) 'imageUrl': imageUrl,
-        if (actionUrl != null) 'actionUrl': actionUrl,
-        'priority': priority,
-        'timestamp': timestamp.toIso8601String(),
-      };
-}
+import '../generated/protocol.dart';
 
 /// Connection info for a user's stream
 class _UserConnection {

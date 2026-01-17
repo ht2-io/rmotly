@@ -1,0 +1,20 @@
+# StreamNotification model for Rmotly
+# Represents a notification streamed to clients via WebSocket
+class: StreamNotification
+fields:
+  ### Unique notification ID
+  id: String
+  ### Notification title
+  title: String
+  ### Notification body text
+  body: String
+  ### Additional notification data as JSON map
+  data: String?
+  ### Optional image URL
+  imageUrl: String?
+  ### Optional action URL for tap handling
+  actionUrl: String?
+  ### Notification priority (low, normal, high, urgent)
+  priority: String
+  ### Timestamp when notification was created
+  timestamp: DateTime

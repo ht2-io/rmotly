@@ -99,7 +99,7 @@ class SseHandler {
           userId: userId,
           title: notification.title,
           body: notification.body,
-          data: notification.data,
+          data: notification.data != null ? jsonDecode(notification.data!) : null,
           priority: notification.priority,
         ));
       }

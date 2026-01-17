@@ -15,8 +15,7 @@ import 'package:rmotly_client/src/protocol/action.dart' as _i3;
 import 'package:rmotly_client/src/protocol/control.dart' as _i4;
 import 'package:rmotly_client/src/protocol/event.dart' as _i5;
 import 'package:rmotly_client/src/protocol/notification_topic.dart' as _i6;
-import 'package:rmotly_client/src/services/notification_stream_service.dart'
-    as _i7;
+import 'package:rmotly_client/src/protocol/stream_notification.dart' as _i7;
 import 'package:rmotly_client/src/protocol/openapi_spec.dart' as _i8;
 import 'package:rmotly_client/src/protocol/openapi_operation.dart' as _i9;
 import 'package:rmotly_client/src/protocol/push_subscription.dart' as _i10;

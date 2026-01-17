@@ -18,8 +18,7 @@ import 'package:rmotly_server/src/generated/action.dart' as _i4;
 import 'package:rmotly_server/src/generated/control.dart' as _i5;
 import 'package:rmotly_server/src/generated/event.dart' as _i6;
 import 'package:rmotly_server/src/generated/notification_topic.dart' as _i7;
-import 'package:rmotly_server/src/services/notification_stream_service.dart'
-    as _i8;
+import 'package:rmotly_server/src/generated/stream_notification.dart' as _i8;
 import 'package:rmotly_server/src/generated/openapi_spec.dart' as _i9;
 import 'package:rmotly_server/src/generated/openapi_operation.dart' as _i10;
 import 'package:rmotly_server/src/generated/push_subscription.dart' as _i11;

@@ -7,6 +7,9 @@ import 'package:unifiedpush/unifiedpush.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
+import 'package:rmotly_client/rmotly_client.dart';
+
+import '../../core/providers/api_client_provider.dart';
 
 /// Push notification delivery method
 enum DeliveryMethod {
@@ -105,11 +108,16 @@ class PushServiceState {
 /// 2. WebPush (background) - via UnifiedPush distributor (ntfy)
 /// 3. SSE (fallback) - for restricted networks
 class PushService extends StateNotifier<PushServiceState> {
-  PushService() : super(const PushServiceState());
+  final Client? _client;
+  
+  PushService({Client? client}) 
+    : _client = client,
+      super(const PushServiceState());
 
   final _notificationController = StreamController<PushNotification>.broadcast();
   final _localNotifications = FlutterLocalNotificationsPlugin();
   StreamSubscription<SSEModel>? _sseSubscription;
+  StreamSubscription<StreamNotification>? _webSocketSubscription;
 
   /// Stream of received notifications
   Stream<PushNotification> get notifications => _notificationController.stream;
@@ -284,15 +292,56 @@ class PushService extends StateNotifier<PushServiceState> {
 
   /// Connect to WebSocket stream for real-time notifications (foreground)
   Future<void> connectWebSocket() async {
-    // TODO: Implement Serverpod streaming connection
-    debugPrint('PushService: WebSocket connection placeholder');
-    state = state.copyWith(isWebSocketConnected: true);
+    if (_client == null) {
+      debugPrint('PushService: Cannot connect WebSocket - client is null');
+      return;
+    }
+
+    try {
+      debugPrint('PushService: Connecting to WebSocket notification stream');
+      
+      // Cancel any existing subscription
+      await _webSocketSubscription?.cancel();
+      
+      // Subscribe to the notification stream
+      final stream = _client!.notificationStream.streamNotifications();
+      _webSocketSubscription = stream.listen(
+        (notification) {
+          debugPrint('PushService: Received WebSocket notification: ${notification.title}');
+          onWebSocketNotification(notification);
+        },
+        onError: (error) {
+          debugPrint('PushService: WebSocket error: $error');
+          state = state.copyWith(
+            isWebSocketConnected: false,
+            error: 'WebSocket error: $error',
+          );
+        },
+        onDone: () {
+          debugPrint('PushService: WebSocket connection closed');
+          state = state.copyWith(isWebSocketConnected: false);
+        },
+        cancelOnError: false,
+      );
+      
+      state = state.copyWith(isWebSocketConnected: true, clearError: true);
+      debugPrint('PushService: WebSocket connected');
+    } catch (e) {
+      debugPrint('PushService: Failed to connect WebSocket: $e');
+      state = state.copyWith(
+        isWebSocketConnected: false,
+        error: 'Failed to connect WebSocket: $e',
+      );
+      rethrow;
+    }
   }
 
   /// Disconnect from WebSocket stream
   Future<void> disconnectWebSocket() async {
-    // TODO: Implement disconnect
+    await _webSocketSubscription?.cancel();
+    _webSocketSubscription = null;
     state = state.copyWith(isWebSocketConnected: false);
+    debugPrint('PushService: WebSocket disconnected');
   }
 
   /// Connect to SSE endpoint (fallback)
@@ -356,9 +405,26 @@ class PushService extends StateNotifier<PushServiceState> {
   }
 
   /// Handle notification received via WebSocket
-  void onWebSocketNotification(Map<String, dynamic> data) {
-    final notification = PushNotification.fromJson(data, DeliveryMethod.websocket);
-    _notificationController.add(notification);
+  void onWebSocketNotification(StreamNotification notification) {
+    final data = <String, dynamic>{
+      'id': notification.id,
+      'title': notification.title,
+      'body': notification.body,
+      'imageUrl': notification.imageUrl,
+      'actionUrl': notification.actionUrl,
+    };
+    
+    // Parse the data field if it exists
+    if (notification.data != null && notification.data!.isNotEmpty) {
+      try {
+        data['data'] = jsonDecode(notification.data!);
+      } catch (e) {
+        debugPrint('Failed to parse notification data: $e');
+      }
+    }
+    
+    final pushNotification = PushNotification.fromJson(data, DeliveryMethod.websocket);
+    _notificationController.add(pushNotification);
 
     // In foreground, we might want to show an in-app notification
     // instead of a system notification
@@ -420,6 +486,7 @@ class PushService extends StateNotifier<PushServiceState> {
   void dispose() {
     _notificationController.close();
     _sseSubscription?.cancel();
+    _webSocketSubscription?.cancel();
     super.dispose();
   }
 }
@@ -427,7 +494,8 @@ class PushService extends StateNotifier<PushServiceState> {
 /// Provider for the push service
 final pushServiceProvider =
     StateNotifierProvider<PushService, PushServiceState>((ref) {
-  return PushService();
+  final client = ref.watch(apiClientProvider);
+  return PushService(client: client);
 });
 
 /// Stream provider for notifications
