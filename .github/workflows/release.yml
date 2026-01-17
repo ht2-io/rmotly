@@ -264,10 +264,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download all artifacts
+      - name: Download Android APK
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          name: android-apk
+          path: artifacts/android-apk
+
+      - name: Download Web build
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: artifacts/web-build
+
+      - name: Download Server binary
+        uses: actions/download-artifact@v4
+        with:
+          name: server-binary
+          path: artifacts/server-binary
+
+      - name: Download Client package
+        uses: actions/download-artifact@v4
+        with:
+          name: client-package
+          path: artifacts/client-package
 
       - name: Display artifacts
         run: |
