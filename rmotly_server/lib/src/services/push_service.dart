@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:serverpod/serverpod.dart';
@@ -278,8 +277,7 @@ class PushService {
     //
     // For now, we return a simplified version that works with ntfy
     // The full WebPush implementation requires the web_push package
-
-    final origin = '${endpoint.scheme}://${endpoint.host}';
+    // TODO: Use endpoint origin for JWT audience when implementing full VAPID
 
     // Placeholder - actual JWT creation requires crypto libraries
     // In production, use the web_push package for proper VAPID signing
