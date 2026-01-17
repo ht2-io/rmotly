@@ -38,5 +38,6 @@ abstract class ControlRepository {
   /// [controlId] - The ID of the control being interacted with
   /// [eventType] - The type of event (e.g., 'button_pressed', 'toggle_changed')
   /// [payload] - The event data (e.g., {"state": true} for toggle)
-  Future<void> sendControlEvent(int controlId, String eventType, Map<String, dynamic> payload);
+  Future<void> sendControlEvent(
+      int controlId, String eventType, Map<String, dynamic> payload);
 }

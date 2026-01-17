@@ -50,7 +50,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       textTheme: AppTypography.getTextTheme(),
-      
+
       // AppBar theme
       appBarTheme: AppBarTheme(
         centerTitle: false,
@@ -241,7 +241,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       textTheme: AppTypography.getTextTheme(),
-      
+
       // AppBar theme
       appBarTheme: AppBarTheme(
         centerTitle: false,

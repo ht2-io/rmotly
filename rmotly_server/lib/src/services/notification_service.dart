@@ -157,8 +157,9 @@ class NotificationService {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: notification.title,
       body: notification.body,
-      data: notification.data,
+      data: notification.data != null ? jsonEncode(notification.data) : null,
       priority: notification.priority,
+      timestamp: DateTime.now(),
     );
 
     // Send to all user's connections

@@ -62,7 +62,8 @@ class DashboardViewModel extends StateNotifier<DashboardState> {
   }
 
   /// Execute a control interaction
-  Future<void> executeControl(Control control, Map<String, dynamic> payload) async {
+  Future<void> executeControl(
+      Control control, Map<String, dynamic> payload) async {
     if (control.id == null) return;
 
     state = state.copyWith(executingControlId: control.id);
@@ -71,7 +72,8 @@ class DashboardViewModel extends StateNotifier<DashboardState> {
       final eventType = _getEventTypeForControl(control.controlType);
       await _repository.sendControlEvent(control.id!, eventType.value, payload);
 
-      debugPrint('DashboardViewModel: Control ${control.name} executed successfully');
+      debugPrint(
+          'DashboardViewModel: Control ${control.name} executed successfully');
 
       state = state.copyWith(clearExecutingControl: true);
     } catch (e) {

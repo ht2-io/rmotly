@@ -7,6 +7,9 @@ import 'package:unifiedpush/unifiedpush.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
+import 'package:rmotly_client/rmotly_client.dart';
+
+import '../../core/providers/api_client_provider.dart';
 
 /// Push notification delivery method
 enum DeliveryMethod {
@@ -47,7 +50,8 @@ class PushNotification {
     DeliveryMethod method,
   ) {
     return PushNotification(
-      id: json['id'] as String? ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      id: json['id'] as String? ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
       title: json['title'] as String? ?? '',
       body: json['body'] as String? ?? json['message'] as String? ?? '',
       data: json['data'] as Map<String, dynamic>?,
@@ -89,7 +93,9 @@ class PushServiceState {
   }) {
     return PushServiceState(
       isInitialized: isInitialized ?? this.isInitialized,
-      unifiedPushEndpoint: clearUnifiedPushEndpoint ? null : (unifiedPushEndpoint ?? this.unifiedPushEndpoint),
+      unifiedPushEndpoint: clearUnifiedPushEndpoint
+          ? null
+          : (unifiedPushEndpoint ?? this.unifiedPushEndpoint),
       isWebSocketConnected: isWebSocketConnected ?? this.isWebSocketConnected,
       isSseConnected: isSseConnected ?? this.isSseConnected,
       pendingNotifications: pendingNotifications ?? this.pendingNotifications,
@@ -105,14 +111,28 @@ class PushServiceState {
 /// 2. WebPush (background) - via UnifiedPush distributor (ntfy)
 /// 3. SSE (fallback) - for restricted networks
 class PushService extends StateNotifier<PushServiceState> {
-  PushService() : super(const PushServiceState());
+  final Client? _client;
+  final Function(String?)? _onNotificationTappedCallback;
 
-  final _notificationController = StreamController<PushNotification>.broadcast();
+  PushService({
+    Client? client,
+    Function(String?)? onNotificationTapped,
+  })  : _client = client,
+        _onNotificationTappedCallback = onNotificationTapped,
+        super(const PushServiceState());
+
+  final _notificationController =
+      StreamController<PushNotification>.broadcast();
+  final _notificationTapController = StreamController<String?>.broadcast();
   final _localNotifications = FlutterLocalNotificationsPlugin();
   StreamSubscription<SSEModel>? _sseSubscription;
+  StreamSubscription<StreamNotification>? _webSocketSubscription;
 
   /// Stream of received notifications
   Stream<PushNotification> get notifications => _notificationController.stream;
+
+  /// Stream of notification tap events (contains action URL if available)
+  Stream<String?> get notificationTaps => _notificationTapController.stream;
 
   /// Initialize the push service
   Future<void> initialize() async {
@@ -139,22 +159,26 @@ class PushService extends StateNotifier<PushServiceState> {
     // Register UnifiedPush callbacks (synchronous callbacks)
     await UnifiedPush.initialize(
       onNewEndpoint: (String endpoint, String instance) {
-        debugPrint('PushService: New UnifiedPush endpoint: $endpoint (instance: $instance)');
+        debugPrint(
+            'PushService: New UnifiedPush endpoint: $endpoint (instance: $instance)');
         // Call async handler in a separate execution context
         onUnifiedPushEndpoint(endpoint);
       },
       onMessage: (Uint8List message, String instance) {
-        debugPrint('PushService: Received UnifiedPush message (instance: $instance)');
+        debugPrint(
+            'PushService: Received UnifiedPush message (instance: $instance)');
         // Decode and handle message
         final messageStr = utf8.decode(message);
         onUnifiedPushMessage(messageStr);
       },
       onUnregistered: (String instance) {
-        debugPrint('PushService: UnifiedPush unregistered (instance: $instance)');
+        debugPrint(
+            'PushService: UnifiedPush unregistered (instance: $instance)');
         onUnifiedPushUnregistered();
       },
       onRegistrationFailed: (String instance) {
-        debugPrint('PushService: UnifiedPush registration failed (instance: $instance)');
+        debugPrint(
+            'PushService: UnifiedPush registration failed (instance: $instance)');
         state = state.copyWith(error: 'UnifiedPush registration failed');
       },
     );
@@ -165,7 +189,8 @@ class PushService extends StateNotifier<PushServiceState> {
     debugPrint('PushService: Initializing local notifications');
 
     // Android initialization settings
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
 
     // iOS initialization settings
     const iosSettings = DarwinInitializationSettings(
@@ -212,8 +237,26 @@ class PushService extends StateNotifier<PushServiceState> {
   /// Handle notification tap
   void _onNotificationTapped(NotificationResponse response) {
     debugPrint('PushService: Notification tapped: ${response.payload}');
-    // TODO: Handle notification tap navigation
-    // Could parse the payload and navigate to specific screens
+
+    String? actionUrl;
+
+    // Parse the payload to get action URL
+    if (response.payload != null && response.payload!.isNotEmpty) {
+      try {
+        final data = jsonDecode(response.payload!) as Map<String, dynamic>;
+        actionUrl = data['actionUrl'] as String?;
+      } catch (e) {
+        debugPrint('PushService: Failed to parse notification payload: $e');
+      }
+    }
+
+    // Emit the tap event
+    _notificationTapController.add(actionUrl);
+
+    // Call the callback if provided
+    if (_onNotificationTappedCallback != null) {
+      _onNotificationTappedCallback!(actionUrl);
+    }
   }
 
   /// Handle UnifiedPush endpoint registration
@@ -231,7 +274,8 @@ class PushService extends StateNotifier<PushServiceState> {
 
     try {
       final json = jsonDecode(message) as Map<String, dynamic>;
-      final notification = PushNotification.fromJson(json, DeliveryMethod.webpush);
+      final notification =
+          PushNotification.fromJson(json, DeliveryMethod.webpush);
 
       _notificationController.add(notification);
       await _showLocalNotification(notification);
@@ -284,21 +328,64 @@ class PushService extends StateNotifier<PushServiceState> {
 
   /// Connect to WebSocket stream for real-time notifications (foreground)
   Future<void> connectWebSocket() async {
-    // TODO: Implement Serverpod streaming connection
-    debugPrint('PushService: WebSocket connection placeholder');
-    state = state.copyWith(isWebSocketConnected: true);
+    if (_client == null) {
+      debugPrint('PushService: Cannot connect WebSocket - client is null');
+      return;
+    }
+
+    try {
+      debugPrint('PushService: Connecting to WebSocket notification stream');
+
+      // Cancel any existing subscription
+      await _webSocketSubscription?.cancel();
+
+      // Subscribe to the notification stream
+      final stream = _client!.notificationStream.streamNotifications();
+      _webSocketSubscription = stream.listen(
+        (notification) {
+          debugPrint(
+              'PushService: Received WebSocket notification: ${notification.title}');
+          onWebSocketNotification(notification);
+        },
+        onError: (error) {
+          debugPrint('PushService: WebSocket error: $error');
+          state = state.copyWith(
+            isWebSocketConnected: false,
+            error: 'WebSocket error: $error',
+          );
+        },
+        onDone: () {
+          debugPrint('PushService: WebSocket connection closed');
+          state = state.copyWith(isWebSocketConnected: false);
+        },
+        cancelOnError: false,
+      );
+
+      state = state.copyWith(isWebSocketConnected: true, clearError: true);
+      debugPrint('PushService: WebSocket connected');
+    } catch (e) {
+      debugPrint('PushService: Failed to connect WebSocket: $e');
+      state = state.copyWith(
+        isWebSocketConnected: false,
+        error: 'Failed to connect WebSocket: $e',
+      );
+      rethrow;
+    }
   }
 
   /// Disconnect from WebSocket stream
   Future<void> disconnectWebSocket() async {
-    // TODO: Implement disconnect
+    await _webSocketSubscription?.cancel();
+    _webSocketSubscription = null;
     state = state.copyWith(isWebSocketConnected: false);
+    debugPrint('PushService: WebSocket disconnected');
   }
 
   /// Connect to SSE endpoint (fallback)
   Future<void> connectSse(String baseUrl) async {
     try {
-      debugPrint('PushService: Connecting to SSE endpoint: $baseUrl/notifications/sse');
+      debugPrint(
+          'PushService: Connecting to SSE endpoint: $baseUrl/notifications/sse');
 
       // Close existing connection if any
       await disconnectSse();
@@ -356,9 +443,33 @@ class PushService extends StateNotifier<PushServiceState> {
   }
 
   /// Handle notification received via WebSocket
-  void onWebSocketNotification(Map<String, dynamic> data) {
-    final notification = PushNotification.fromJson(data, DeliveryMethod.websocket);
-    _notificationController.add(notification);
+  void onWebSocketNotification(StreamNotification notification) {
+    final data = <String, dynamic>{
+      'id': notification.id,
+      'title': notification.title,
+      'body': notification.body,
+      'imageUrl': notification.imageUrl,
+      'actionUrl': notification.actionUrl,
+    };
+
+    // Parse the data field if it exists
+    if (notification.data != null && notification.data!.isNotEmpty) {
+      try {
+        data['data'] = jsonDecode(notification.data!);
+      } catch (e) {
+        final dataPreview = notification.data!.length > 100
+            ? '${notification.data!.substring(0, 100)}...'
+            : notification.data!;
+        debugPrint(
+          'Failed to parse notification data for ${notification.id}: $e. '
+          'Data: $dataPreview',
+        );
+      }
+    }
+
+    final pushNotification =
+        PushNotification.fromJson(data, DeliveryMethod.websocket);
+    _notificationController.add(pushNotification);
 
     // In foreground, we might want to show an in-app notification
     // instead of a system notification
@@ -376,12 +487,13 @@ class PushService extends StateNotifier<PushServiceState> {
 
   /// Request registration with UnifiedPush distributor
   Future<void> registerWithDistributor([String? distributor]) async {
-    debugPrint('PushService: Registering with UnifiedPush distributor${distributor != null ? ': $distributor' : ''}');
-    
+    debugPrint(
+        'PushService: Registering with UnifiedPush distributor${distributor != null ? ': $distributor' : ''}');
+
     try {
       // Register with UnifiedPush (user will choose distributor)
       await UnifiedPush.registerApp();
-      
+
       debugPrint('PushService: UnifiedPush registration requested');
     } catch (e) {
       debugPrint('PushService: Failed to register with UnifiedPush: $e');
@@ -393,7 +505,7 @@ class PushService extends StateNotifier<PushServiceState> {
   /// Unregister from UnifiedPush
   Future<void> unregisterUnifiedPush() async {
     debugPrint('PushService: Unregistering from UnifiedPush');
-    
+
     try {
       await UnifiedPush.unregister();
       state = state.copyWith(clearUnifiedPushEndpoint: true);
@@ -419,7 +531,9 @@ class PushService extends StateNotifier<PushServiceState> {
   @override
   void dispose() {
     _notificationController.close();
+    _notificationTapController.close();
     _sseSubscription?.cancel();
+    _webSocketSubscription?.cancel();
     super.dispose();
   }
 }
@@ -427,11 +541,18 @@ class PushService extends StateNotifier<PushServiceState> {
 /// Provider for the push service
 final pushServiceProvider =
     StateNotifierProvider<PushService, PushServiceState>((ref) {
-  return PushService();
+  final client = ref.watch(apiClientProvider);
+  return PushService(client: client);
 });
 
 /// Stream provider for notifications
 final notificationStreamProvider = StreamProvider<PushNotification>((ref) {
   final pushService = ref.watch(pushServiceProvider.notifier);
   return pushService.notifications;
+});
+
+/// Stream provider for notification taps
+final notificationTapStreamProvider = StreamProvider<String?>((ref) {
+  final pushService = ref.watch(pushServiceProvider.notifier);
+  return pushService.notificationTaps;
 });

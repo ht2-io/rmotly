@@ -4,9 +4,11 @@ import 'dart:io';
 
 import 'package:serverpod/serverpod.dart';
 
+import '../generated/protocol.dart';
 import '../services/notification_service.dart';
 import '../services/payload_parser_service.dart';
 import '../services/rate_limit_service.dart';
+import '../services/push_service.dart';
 
 /// Webhook handler for external notification ingestion.
 ///
@@ -97,28 +99,52 @@ class WebhookHandler {
         priority: parsedPayload.priority,
       );
 
-      // Deliver the notification
-      final result = await _notificationService.deliver(
-        await _pod.createSession(),
-        notificationData,
-      );
+      // Fetch user's push subscriptions
+      final session = await _pod.createSession();
+      List<PushSubscriptionData> pushSubscriptions = [];
+      try {
+        final subscriptions = await PushSubscription.db.find(
+          session,
+          where: (s) => s.userId.equals(topic['userId'] as int) & s.active.equals(true),
+        );
+        
+        pushSubscriptions = subscriptions.map((s) => PushSubscriptionData(
+          endpoint: s.endpoint,
+          p256dh: s.p256dh,
+          authSecret: s.auth,
+        )).toList();
+      } finally {
+        await session.close();
+      }
 
-      // Log the request
-      final duration = DateTime.now().difference(startTime);
-      _pod.logVerbose(
-        'Webhook processed: topic=$topicId, format=${parsedPayload.sourceFormat.name}, '
-        'status=${result.status}, duration=${duration.inMilliseconds}ms',
-      );
+      // Deliver the notification with push subscriptions
+      final deliverySession = await _pod.createSession();
+      try {
+        final result = await _notificationService.deliver(
+          deliverySession,
+          notificationData,
+          pushSubscriptions: pushSubscriptions,
+        );
 
-      // Send success response
-      response.statusCode = HttpStatus.ok;
-      response.headers.set('Content-Type', 'application/json');
-      response.write(jsonEncode({
-        'status': 'queued',
-        'deliveryStatus': result.status.name,
-        'timestamp': DateTime.now().toIso8601String(),
-      }));
-      await response.close();
+        // Log the request
+        final duration = DateTime.now().difference(startTime);
+        _pod.logVerbose(
+          'Webhook processed: topic=$topicId, format=${parsedPayload.sourceFormat.name}, '
+          'status=${result.status}, duration=${duration.inMilliseconds}ms',
+        );
+
+        // Send success response
+        response.statusCode = HttpStatus.ok;
+        response.headers.set('Content-Type', 'application/json');
+        response.write(jsonEncode({
+          'status': 'queued',
+          'deliveryStatus': result.status.name,
+          'timestamp': DateTime.now().toIso8601String(),
+        }));
+        await response.close();
+      } finally {
+        await deliverySession.close();
+      }
     } catch (e, st) {
       _pod.logVerbose('Webhook error: $e\n$st');
       await _sendError(response, HttpStatus.internalServerError, 'Internal error');
@@ -130,32 +156,32 @@ class WebhookHandler {
     String apiKey,
     String topicId,
   ) async {
-    // TODO: Implement actual API key validation
-    // This should:
-    // 1. Look up the API key in the database
-    // 2. Verify it belongs to the specified topic
-    // 3. Check the topic is enabled
-    // 4. Return topic info including userId
+    // Parse topic ID
+    final topicIdInt = int.tryParse(topicId);
+    if (topicIdInt == null) {
+      return null;
+    }
 
-    // Placeholder implementation
-    // In production:
-    // final session = await _pod.createSession();
-    // try {
-    //   final topic = await NotificationTopic.db.findFirstRow(
-    //     session,
-    //     where: (t) => t.apiKey.equals(apiKey) & t.id.equals(int.parse(topicId)),
-    //   );
-    //   if (topic == null || !topic.enabled) return null;
-    //   return {
-    //     'id': topic.id,
-    //     'userId': topic.userId,
-    //     'name': topic.name,
-    //   };
-    // } finally {
-    //   await session.close();
-    // }
-
-    return null;
+    // Look up the topic and validate API key
+    final session = await _pod.createSession();
+    try {
+      final topic = await NotificationTopic.db.findFirstRow(
+        session,
+        where: (t) => t.apiKey.equals(apiKey) & t.id.equals(topicIdInt),
+      );
+      
+      if (topic == null || !topic.enabled) {
+        return null;
+      }
+      
+      return {
+        'id': topic.id,
+        'userId': topic.userId,
+        'name': topic.name,
+      };
+    } finally {
+      await session.close();
+    }
   }
 
   /// Send error response

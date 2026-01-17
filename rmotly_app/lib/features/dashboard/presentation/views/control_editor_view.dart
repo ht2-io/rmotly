@@ -46,13 +46,15 @@ class _ControlEditorViewState extends ConsumerState<ControlEditorView> {
   int _sliderDivisions = 10;
 
   // Input config
-  final _inputPlaceholderController = TextEditingController(text: 'Enter text...');
+  final _inputPlaceholderController =
+      TextEditingController(text: 'Enter text...');
   final _inputButtonLabelController = TextEditingController(text: 'Send');
   String _inputType = 'text';
 
   // Dropdown config
   final _dropdownOptionsController = TextEditingController();
-  final _dropdownPlaceholderController = TextEditingController(text: 'Select an option');
+  final _dropdownPlaceholderController =
+      TextEditingController(text: 'Select an option');
 
   @override
   void initState() {
@@ -98,14 +100,18 @@ class _ControlEditorViewState extends ConsumerState<ControlEditorView> {
           _toggleState = config['state'] as bool? ?? false;
           break;
         case ControlType.slider:
-          _sliderMinController.text = (config['min'] as num?)?.toString() ?? '0';
-          _sliderMaxController.text = (config['max'] as num?)?.toString() ?? '100';
+          _sliderMinController.text =
+              (config['min'] as num?)?.toString() ?? '0';
+          _sliderMaxController.text =
+              (config['max'] as num?)?.toString() ?? '100';
           _sliderUnitController.text = config['unit'] as String? ?? '';
           _sliderDivisions = config['divisions'] as int? ?? 10;
           break;
         case ControlType.input:
-          _inputPlaceholderController.text = config['placeholder'] as String? ?? 'Enter text...';
-          _inputButtonLabelController.text = config['buttonLabel'] as String? ?? 'Send';
+          _inputPlaceholderController.text =
+              config['placeholder'] as String? ?? 'Enter text...';
+          _inputButtonLabelController.text =
+              config['buttonLabel'] as String? ?? 'Send';
           _inputType = config['inputType'] as String? ?? 'text';
           break;
         case ControlType.dropdown:
@@ -118,7 +124,8 @@ class _ControlEditorViewState extends ConsumerState<ControlEditorView> {
               return o.toString();
             }).join('\n');
           }
-          _dropdownPlaceholderController.text = config['placeholder'] as String? ?? 'Select an option';
+          _dropdownPlaceholderController.text =
+              config['placeholder'] as String? ?? 'Select an option';
           break;
       }
     } catch (_) {
@@ -171,16 +178,17 @@ class _ControlEditorViewState extends ConsumerState<ControlEditorView> {
         };
       case ControlType.dropdown:
         final lines = _dropdownOptionsController.text.split('\n');
-        final options = lines
-            .where((line) => line.trim().isNotEmpty)
-            .map((line) {
-              final parts = line.split(':');
-              if (parts.length >= 2) {
-                return {'id': parts[0].trim(), 'label': parts.sublist(1).join(':').trim()};
-              }
-              return {'id': line.trim(), 'label': line.trim()};
-            })
-            .toList();
+        final options =
+            lines.where((line) => line.trim().isNotEmpty).map((line) {
+          final parts = line.split(':');
+          if (parts.length >= 2) {
+            return {
+              'id': parts[0].trim(),
+              'label': parts.sublist(1).join(':').trim()
+            };
+          }
+          return {'id': line.trim(), 'label': line.trim()};
+        }).toList();
         return {
           'options': options,
           'placeholder': _dropdownPlaceholderController.text,
@@ -475,7 +483,8 @@ class _ControlEditorViewState extends ConsumerState<ControlEditorView> {
                 max: 100,
                 divisions: 99,
                 label: _sliderDivisions.toString(),
-                onChanged: (value) => setState(() => _sliderDivisions = value.round()),
+                onChanged: (value) =>
+                    setState(() => _sliderDivisions = value.round()),
               ),
             ),
             Text(_sliderDivisions.toString()),

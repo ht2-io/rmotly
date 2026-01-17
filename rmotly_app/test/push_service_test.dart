@@ -97,7 +97,8 @@ void main() {
         );
 
         expect(updatedState.isInitialized, true);
-        expect(updatedState.unifiedPushEndpoint, 'https://push.example.com/endpoint');
+        expect(updatedState.unifiedPushEndpoint,
+            'https://push.example.com/endpoint');
         expect(updatedState.isWebSocketConnected, false); // unchanged
       });
 
@@ -114,7 +115,8 @@ void main() {
 
         expect(updatedState.isInitialized, true);
         expect(updatedState.isWebSocketConnected, true);
-        expect(updatedState.unifiedPushEndpoint, 'https://push.example.com/endpoint');
+        expect(updatedState.unifiedPushEndpoint,
+            'https://push.example.com/endpoint');
         expect(updatedState.isSseConnected, true);
       });
 
@@ -146,7 +148,7 @@ void main() {
     group('UnifiedPush handlers', () {
       test('onUnifiedPushEndpoint updates state', () async {
         final endpoint = 'https://push.example.com/test-endpoint';
-        
+
         await pushService.onUnifiedPushEndpoint(endpoint);
 
         expect(pushService.state.unifiedPushEndpoint, endpoint);
@@ -181,10 +183,12 @@ void main() {
 
       test('onUnifiedPushUnregistered clears endpoint', () async {
         // First set an endpoint and wait for it to complete
-        await pushService.onUnifiedPushEndpoint('https://push.example.com/endpoint');
-        
+        await pushService
+            .onUnifiedPushEndpoint('https://push.example.com/endpoint');
+
         // Verify it was set
-        expect(pushService.state.unifiedPushEndpoint, 'https://push.example.com/endpoint');
+        expect(pushService.state.unifiedPushEndpoint,
+            'https://push.example.com/endpoint');
 
         // Now unregister and verify it was cleared
         await pushService.onUnifiedPushUnregistered();

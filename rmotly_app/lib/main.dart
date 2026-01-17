@@ -49,7 +49,7 @@ class RmotlyApp extends ConsumerWidget {
 
     // Initialize push service
     final pushService = ref.watch(pushServiceProvider.notifier);
-    
+
     // Initialize push service when app starts
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
@@ -342,7 +342,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Account created! Check your email for verification.'),
+            content:
+                Text('Account created! Check your email for verification.'),
           ),
         );
         context.go('/login');

@@ -20,14 +20,15 @@ import 'openapi_operation.dart' as _i8;
 import 'openapi_parameter.dart' as _i9;
 import 'openapi_spec.dart' as _i10;
 import 'push_subscription.dart' as _i11;
-import 'user.dart' as _i12;
-import 'package:rmotly_client/src/protocol/action.dart' as _i13;
-import 'package:rmotly_client/src/protocol/control.dart' as _i14;
-import 'package:rmotly_client/src/protocol/event.dart' as _i15;
-import 'package:rmotly_client/src/protocol/notification_topic.dart' as _i16;
-import 'package:rmotly_client/src/protocol/openapi_operation.dart' as _i17;
-import 'package:rmotly_client/src/protocol/push_subscription.dart' as _i18;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i19;
+import 'stream_notification.dart' as _i12;
+import 'user.dart' as _i13;
+import 'package:rmotly_client/src/protocol/action.dart' as _i14;
+import 'package:rmotly_client/src/protocol/control.dart' as _i15;
+import 'package:rmotly_client/src/protocol/event.dart' as _i16;
+import 'package:rmotly_client/src/protocol/notification_topic.dart' as _i17;
+import 'package:rmotly_client/src/protocol/openapi_operation.dart' as _i18;
+import 'package:rmotly_client/src/protocol/push_subscription.dart' as _i19;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i20;
 export 'greeting.dart';
 export 'action.dart';
 export 'control.dart';
@@ -38,6 +39,7 @@ export 'openapi_operation.dart';
 export 'openapi_parameter.dart';
 export 'openapi_spec.dart';
 export 'push_subscription.dart';
+export 'stream_notification.dart';
 export 'user.dart';
 export 'client.dart';
 
@@ -84,8 +86,11 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i11.PushSubscription) {
       return _i11.PushSubscription.fromJson(data) as T;
     }
-    if (t == _i12.User) {
-      return _i12.User.fromJson(data) as T;
+    if (t == _i12.StreamNotification) {
+      return _i12.StreamNotification.fromJson(data) as T;
+    }
+    if (t == _i13.User) {
+      return _i13.User.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.Greeting?>()) {
       return (data != null ? _i2.Greeting.fromJson(data) : null) as T;
@@ -117,8 +122,12 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i11.PushSubscription?>()) {
       return (data != null ? _i11.PushSubscription.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i12.User?>()) {
-      return (data != null ? _i12.User.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i12.StreamNotification?>()) {
+      return (data != null ? _i12.StreamNotification.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i13.User?>()) {
+      return (data != null ? _i13.User.fromJson(data) : null) as T;
     }
     if (t == List<_i9.OpenApiParameter>) {
       return (data as List)
@@ -133,43 +142,43 @@ class Protocol extends _i1.SerializationManager {
           .map((e) => deserialize<_i8.OpenApiOperation>(e))
           .toList() as T;
     }
-    if (t == List<_i13.Action>) {
-      return (data as List).map((e) => deserialize<_i13.Action>(e)).toList()
+    if (t == List<_i14.Action>) {
+      return (data as List).map((e) => deserialize<_i14.Action>(e)).toList()
           as T;
     }
     if (t == Map<String, dynamic>) {
       return (data as Map).map((k, v) =>
           MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
     }
-    if (t == List<_i14.Control>) {
-      return (data as List).map((e) => deserialize<_i14.Control>(e)).toList()
+    if (t == List<_i15.Control>) {
+      return (data as List).map((e) => deserialize<_i15.Control>(e)).toList()
           as T;
     }
     if (t == Map<int, int>) {
       return Map.fromEntries((data as List).map((e) =>
           MapEntry(deserialize<int>(e['k']), deserialize<int>(e['v'])))) as T;
     }
-    if (t == List<_i15.Event>) {
-      return (data as List).map((e) => deserialize<_i15.Event>(e)).toList()
+    if (t == List<_i16.Event>) {
+      return (data as List).map((e) => deserialize<_i16.Event>(e)).toList()
           as T;
     }
     if (t == Map<String, int>) {
       return (data as Map).map(
           (k, v) => MapEntry(deserialize<String>(k), deserialize<int>(v))) as T;
     }
-    if (t == List<_i16.NotificationTopic>) {
+    if (t == List<_i17.NotificationTopic>) {
       return (data as List)
-          .map((e) => deserialize<_i16.NotificationTopic>(e))
+          .map((e) => deserialize<_i17.NotificationTopic>(e))
           .toList() as T;
     }
-    if (t == List<_i17.OpenApiOperation>) {
+    if (t == List<_i18.OpenApiOperation>) {
       return (data as List)
-          .map((e) => deserialize<_i17.OpenApiOperation>(e))
+          .map((e) => deserialize<_i18.OpenApiOperation>(e))
           .toList() as T;
     }
-    if (t == List<_i18.PushSubscription>) {
+    if (t == List<_i19.PushSubscription>) {
       return (data as List)
-          .map((e) => deserialize<_i18.PushSubscription>(e))
+          .map((e) => deserialize<_i19.PushSubscription>(e))
           .toList() as T;
     }
     if (t == List<Map<String, dynamic>>) {
@@ -178,7 +187,7 @@ class Protocol extends _i1.SerializationManager {
           .toList() as T;
     }
     try {
-      return _i19.Protocol().deserialize<T>(data, t);
+      return _i20.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -217,10 +226,13 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i11.PushSubscription) {
       return 'PushSubscription';
     }
-    if (data is _i12.User) {
+    if (data is _i12.StreamNotification) {
+      return 'StreamNotification';
+    }
+    if (data is _i13.User) {
       return 'User';
     }
-    className = _i19.Protocol().getClassNameForObject(data);
+    className = _i20.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth.$className';
     }
@@ -263,12 +275,15 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'PushSubscription') {
       return deserialize<_i11.PushSubscription>(data['data']);
     }
+    if (dataClassName == 'StreamNotification') {
+      return deserialize<_i12.StreamNotification>(data['data']);
+    }
     if (dataClassName == 'User') {
-      return deserialize<_i12.User>(data['data']);
+      return deserialize<_i13.User>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth.')) {
       data['className'] = dataClassName.substring(15);
-      return _i19.Protocol().deserializeByClassName(data);
+      return _i20.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }

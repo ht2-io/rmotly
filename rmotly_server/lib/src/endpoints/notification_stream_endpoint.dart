@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 
 import '../services/notification_stream_service.dart';
+import '../generated/protocol.dart';
 
 /// Endpoint for real-time notification streaming via WebSocket.
 ///
@@ -99,8 +101,9 @@ class NotificationStreamEndpoint extends Endpoint {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
       body: body,
-      data: {'test': true},
+      data: jsonEncode({'test': true}),
       priority: 'normal',
+      timestamp: DateTime.now(),
     );
 
     final delivered = notificationStreamService.sendToUser(userId, notification);
