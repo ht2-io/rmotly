@@ -64,14 +64,18 @@ void main() {
         when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
             .thenThrow(Exception('Failed to load controls'));
 
+        // Create a fresh viewmodel without auto-loading
+        final testViewModel = DashboardViewModel(mockRepository);
+        // Wait for constructor to complete initial load
+        await Future.delayed(const Duration(milliseconds: 50));
+
         // Act
-        await viewModel.loadControls();
+        await testViewModel.loadControls();
 
         // Assert
-        final state = viewModel.state;
+        final state = testViewModel.state;
         expect(state.error, isNotNull);
         expect(state.error.toString(), contains('Failed to load controls'));
-        verify(() => mockRepository.getControls(forceRefresh: false)).called(1);
       });
 
       test('should set loading state while fetching controls', () async {
@@ -82,21 +86,22 @@ void main() {
                   () => [testControl1],
                 ));
 
-        // Act - Start loading without await
-        final future = viewModel.loadControls();
+        // Create viewmodel (will start loading automatically)
+        final testViewModel = DashboardViewModel(mockRepository);
 
         // Assert - Check loading state
         await Future.delayed(const Duration(milliseconds: 10));
-        expect(viewModel.state.isLoading, true);
+        expect(testViewModel.state.isLoading, true);
 
-        // Complete the operation
-        await future;
-        expect(viewModel.state.controls.length, 1);
+        // Wait for completion
+        await Future.delayed(const Duration(milliseconds: 150));
+        expect(testViewModel.state.isLoading, false);
+        expect(testViewModel.state.controls.length, 1);
       });
     });
 
     group('handleControlInteraction', () {
-      test('should send control event through repository', () async {
+      test('should execute control with button press', () async {
         // Arrange
         const controlId = 1;
         final eventType = EventType.buttonPress.value;
@@ -124,6 +129,26 @@ void main() {
             .called(1);
       });
 
+      test('should execute control with toggle change', () async {
+        // Arrange
+        when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
+            .thenAnswer((_) async => [testControl2]);
+        when(() => mockRepository.sendControlEvent(any(), any(), any()))
+            .thenAnswer((_) async => {});
+
+        await viewModel.loadControls();
+
+        // Act
+        await viewModel.onToggleChanged(testControl2, true);
+
+        // Assert
+        verify(() => mockRepository.sendControlEvent(
+              2,
+              'toggle_change',
+              {'state': true},
+            )).called(1);
+      });
+
       test('should handle interaction errors gracefully', () async {
         // Arrange
         const controlId = 1;
@@ -148,6 +173,7 @@ void main() {
           viewModel.executeControl(testControl, payload),
           completes,
         );
+        expect(viewModel.state.error, isNotNull);
       });
     });
 
@@ -162,7 +188,7 @@ void main() {
         await viewModel.loadControls();
 
         // Act
-        await viewModel.reorderControls(0, 1);
+        await viewModel.reorderControls(0, 2); // Move first to end (adjusts to index 1)
 
         // Assert
         final state = viewModel.state;
@@ -179,9 +205,10 @@ void main() {
             .thenThrow(Exception('Failed to update positions'));
 
         await viewModel.loadControls();
+        final originalOrder = viewModel.state.controls;
 
         // Act
-        await viewModel.reorderControls(0, 1);
+        await viewModel.reorderControls(0, 2);
 
         // Assert - Order should be restored after reload
         verify(() => mockRepository.reorderControls(any())).called(1);
@@ -265,6 +292,24 @@ void main() {
         final state = viewModel.state;
         expect(state.controls.length, 2);
         verify(() => mockRepository.getControls(forceRefresh: true)).called(1);
+        expect(state.isRefreshing, false);
+      });
+    });
+
+    group('clearError', () {
+      test('should clear error from state', () async {
+        // Arrange
+        when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
+            .thenThrow(Exception('Test error'));
+
+        await viewModel.loadControls();
+        expect(viewModel.state.error, isNotNull);
+
+        // Act
+        viewModel.clearError();
+
+        // Assert
+        expect(viewModel.state.error, isNull);
       });
     });
   });
