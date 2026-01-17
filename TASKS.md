@@ -10,7 +10,7 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 | Phase 2: API Core | In Progress | 26% |
 | Phase 3: App Core | Complete | 100% |
 | Phase 4: Features | In Progress | 55% |
-| Phase 5: Integration | Not Started | 0% |
+| Phase 5: Integration | In Progress | 33% |
 | Phase 6: Polish | In Progress | 17% |
 
 ---
@@ -673,18 +673,18 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 
 ### 5.3 End-to-End Testing
 
-- [ ] **5.3.1** Test control → action flow
+- [x] **5.3.1** Test control → action flow
   - Create action
   - Create control linked to action
   - Trigger control
   - Verify action executed
 
-- [ ] **5.3.2** Test webhook → notification flow
+- [x] **5.3.2** Test webhook → notification flow
   - Create topic
   - Send webhook request
   - Verify notification received
 
-- [ ] **5.3.3** Test OpenAPI import flow
+- [x] **5.3.3** Test OpenAPI import flow
   - Provide OpenAPI spec URL
   - Import operation
   - Test generated action

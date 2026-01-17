@@ -31,7 +31,7 @@ webServer:
 # This is the database setup for your test server.
 database:
   host: localhost
-  port: 9090
+  port: 5432
   name: rmotly_test
   user: postgres
 
@@ -39,7 +39,7 @@ database:
 redis:
   enabled: false
   host: localhost
-  port: 9091
+  port: 6379
   #user: # defaults to empty
   #requireSsl: true # defaults to false
 
