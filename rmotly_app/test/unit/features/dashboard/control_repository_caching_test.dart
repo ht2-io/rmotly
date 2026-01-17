@@ -3,14 +3,23 @@ import 'package:mocktail/mocktail.dart';
 import 'package:rmotly_app/core/services/local_storage_service.dart';
 import 'package:rmotly_app/features/dashboard/data/repositories/control_repository_impl.dart';
 import 'package:rmotly_client/rmotly_client.dart';
+import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 
 // Mock classes
 class MockClient extends Mock implements Client {}
 class MockLocalStorageService extends Mock implements LocalStorageService {}
+class MockSessionManager extends Mock implements SessionManager {}
+class MockEndpointControl extends Mock {
+  Future<List<Control>> listControls({required int userId});
+}
+class MockUserInfo extends Mock implements UserInfo {}
 
 void main() {
   late MockClient mockClient;
   late MockLocalStorageService mockStorage;
+  late MockSessionManager mockSessionManager;
+  late MockEndpointControl mockControlEndpoint;
+  late MockUserInfo mockUserInfo;
   late ControlRepositoryImpl repository;
 
   // Test data
@@ -40,11 +49,24 @@ void main() {
   setUp(() {
     mockClient = MockClient();
     mockStorage = MockLocalStorageService();
-    repository = ControlRepositoryImpl(mockClient, mockStorage);
+    mockSessionManager = MockSessionManager();
+    mockControlEndpoint = MockEndpointControl();
+    mockUserInfo = MockUserInfo();
+    
+    // Set up user authentication
+    when(() => mockUserInfo.id).thenReturn(100);
+    when(() => mockSessionManager.signedInUser).thenReturn(mockUserInfo);
+    
+    repository = ControlRepositoryImpl(mockClient, mockStorage, mockSessionManager);
 
     // Set up default storage behavior
     when(() => mockStorage.cacheControls(any()))
         .thenAnswer((_) async => {});
+    
+    // Set up default client behavior - return test controls
+    when(() => mockClient.control).thenReturn(mockControlEndpoint as dynamic);
+    when(() => mockControlEndpoint.listControls(userId: any(named: 'userId')))
+        .thenAnswer((_) async => testControls);
   });
 
   group('ControlRepositoryImpl Caching', () {

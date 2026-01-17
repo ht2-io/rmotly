@@ -11,7 +11,8 @@ import '../viewmodel/dashboard_viewmodel.dart';
 final dashboardControlRepositoryProvider = Provider<ControlRepository>((ref) {
   final client = ref.watch(apiClientProvider);
   final storage = ref.watch(localStorageServiceProvider);
-  return ControlRepositoryImpl(client, storage);
+  final sessionManager = ref.watch(sessionManagerProvider);
+  return ControlRepositoryImpl(client, storage, sessionManager);
 });
 
 /// Provider for the dashboard view model

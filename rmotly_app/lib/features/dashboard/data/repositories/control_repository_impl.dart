@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:rmotly_client/rmotly_client.dart';
+import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 import '../../domain/repositories/control_repository.dart';
 import '../../../../core/services/local_storage_service.dart';
 
@@ -6,13 +8,14 @@ import '../../../../core/services/local_storage_service.dart';
 class ControlRepositoryImpl implements ControlRepository {
   final Client _client;
   final LocalStorageService _storage;
+  final SessionManager _sessionManager;
   
   // Track pending requests to prevent duplicate API calls
   Future<List<Control>>? _pendingGetControls;
   DateTime? _lastFetch;
   static const _cacheDuration = Duration(minutes: 5);
 
-  ControlRepositoryImpl(this._client, this._storage);
+  ControlRepositoryImpl(this._client, this._storage, this._sessionManager);
 
   @override
   Future<List<Control>> getControls({bool forceRefresh = false}) async {
@@ -49,30 +52,13 @@ class ControlRepositoryImpl implements ControlRepository {
   }
 
   Future<List<Control>> _fetchAndCache() async {
-    // TODO: Replace with actual endpoint call when ControlEndpoint is implemented
-    // For now, return mock data for development
-    final controls = [
-      Control(
-        id: 1,
-        userId: 1,
-        name: 'Living Room Light',
-        controlType: 'button',
-        config: '{"label": "Toggle"}',
-        position: 0,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      Control(
-        id: 2,
-        userId: 1,
-        name: 'Thermostat',
-        controlType: 'slider',
-        config: '{"min": 60, "max": 80}',
-        position: 1,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-    ];
+    final userId = _sessionManager.signedInUser?.id;
+    if (userId == null) {
+      throw Exception('User not authenticated');
+    }
+
+    // Fetch from API
+    final controls = await _client.control.listControls(userId: userId);
 
     // Cache the results
     try {
@@ -93,36 +79,71 @@ class ControlRepositoryImpl implements ControlRepository {
 
   @override
   Future<Control> createControl(Control control) async {
-    // TODO: Replace with actual endpoint call
-    // return await _client.control.createControl(control);
+    final userId = _sessionManager.signedInUser?.id;
+    if (userId == null) {
+      throw Exception('User not authenticated');
+    }
+
+    final createdControl = await _client.control.createControl(
+      userId: userId,
+      name: control.name,
+      controlType: control.controlType,
+      config: control.config,
+      position: control.position,
+      actionId: control.actionId,
+    );
     
     // Invalidate cache on create
     _lastFetch = null;
-    throw UnimplementedError('createControl endpoint not yet implemented');
+    
+    return createdControl;
   }
 
   @override
   Future<Control> updateControl(Control control) async {
-    // TODO: Replace with actual endpoint call
-    // return await _client.control.updateControl(control);
+    if (control.id == null) {
+      throw ArgumentError('Control ID cannot be null for update');
+    }
+
+    final updatedControl = await _client.control.updateControl(
+      controlId: control.id!,
+      name: control.name,
+      controlType: control.controlType,
+      config: control.config,
+      position: control.position,
+      actionId: control.actionId,
+      clearActionId: control.actionId == null,
+    );
     
     // Invalidate cache on update
     _lastFetch = null;
-    throw UnimplementedError('updateControl endpoint not yet implemented');
+    
+    return updatedControl;
   }
 
   @override
   Future<void> deleteControl(int controlId) async {
-    // TODO: Replace with actual endpoint call
-    // await _client.control.deleteControl(controlId);
+    await _client.control.deleteControl(controlId: controlId);
     
     // Invalidate cache on delete
     _lastFetch = null;
-    throw UnimplementedError('deleteControl endpoint not yet implemented');
   }
 
   @override
   Future<void> reorderControls(List<Control> controls) async {
+    final userId = _sessionManager.signedInUser?.id;
+    if (userId == null) {
+      throw Exception('User not authenticated');
+    }
+
+    // Build map of control ID to position
+    final controlPositions = <int, int>{};
+    for (var control in controls) {
+      if (control.id != null) {
+        controlPositions[control.id!] = control.position;
+      }
+    }
+
     // Optimistically update cache
     try {
       await _storage.cacheControls(controls);
@@ -131,9 +152,11 @@ class ControlRepositoryImpl implements ControlRepository {
       // Continue even if caching fails
     }
     
-    // TODO: Replace with actual endpoint call
-    // await _client.control.reorderControls(controls);
-    throw UnimplementedError('reorderControls endpoint not yet implemented');
+    // Call API to persist reorder
+    await _client.control.reorderControls(
+      userId: userId,
+      controlPositions: controlPositions,
+    );
   }
 
   @override
@@ -142,8 +165,11 @@ class ControlRepositoryImpl implements ControlRepository {
     String eventType,
     Map<String, dynamic> payload,
   ) async {
-    // TODO: Replace with actual endpoint call
-    // await _client.event.sendEvent(controlId, eventType, payload);
-    throw UnimplementedError('sendControlEvent endpoint not yet implemented');
+    await _client.event.sendEvent(
+      sourceType: 'control',
+      sourceId: controlId.toString(),
+      eventType: eventType,
+      payload: jsonEncode(payload),
+    );
   }
 }
