@@ -1,6 +1,6 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 
+import '../generated/protocol.dart';
 import '../services/subscription_manager_service.dart';
 import 'notification_stream_endpoint.dart' show AuthenticationException;
 
@@ -43,18 +43,22 @@ class PushSubscriptionEndpoint extends Endpoint {
   /// [endpoint] - The push endpoint URL from the UnifiedPush distributor
   /// [p256dh] - Optional P-256 public key for WebPush encryption (base64url)
   /// [authSecret] - Optional authentication secret for WebPush (base64url)
-  /// [deliveryMethod] - The delivery method: 'webpush', 'sse', or 'websocket'
+  /// [subscriptionType] - The subscription type: 'unifiedpush' or 'webpush'
+  /// [deviceId] - Unique identifier for the device
+  /// [userAgent] - Optional user agent string
   ///
-  /// Returns the registered subscription information.
+  /// Returns the registered subscription.
   ///
   /// Throws [AuthenticationException] if user is not authenticated.
-  /// Throws [ArgumentError] if deliveryMethod is invalid.
-  Future<PushSubscriptionInfo> registerEndpoint(
+  /// Throws [ArgumentError] if subscriptionType is invalid.
+  Future<PushSubscription> registerEndpoint(
     Session session, {
     required String endpoint,
     String? p256dh,
     String? authSecret,
-    required String deliveryMethod,
+    required String subscriptionType,
+    required String deviceId,
+    String? userAgent,
   }) async {
     // Authenticate user
     final authInfo = await session.authenticated;
@@ -82,9 +86,13 @@ class PushSubscriptionEndpoint extends Endpoint {
       throw ArgumentError('Invalid endpoint URL: $e');
     }
 
+    if (deviceId.trim().isEmpty) {
+      throw ArgumentError('Device ID cannot be empty');
+    }
+
     // Register the subscription
     session.log(
-      'Registering push endpoint for user $userId: $deliveryMethod',
+      'Registering push endpoint for user $userId device $deviceId: $subscriptionType',
       level: LogLevel.info,
     );
 
@@ -94,24 +102,26 @@ class PushSubscriptionEndpoint extends Endpoint {
       endpoint: endpoint,
       p256dh: p256dh,
       authSecret: authSecret,
-      deliveryMethod: deliveryMethod,
+      subscriptionType: subscriptionType,
+      deviceId: deviceId,
+      userAgent: userAgent,
     );
   }
 
   /// Unregister a push endpoint.
   ///
-  /// Removes the specified endpoint from the user's subscriptions.
+  /// Removes the specified device's endpoint from the user's subscriptions.
   /// This should be called when:
   /// - User explicitly disables push notifications
   /// - UnifiedPush distributor is uninstalled
   /// - Endpoint becomes invalid
   ///
-  /// [endpoint] - The endpoint URL to unregister
+  /// [deviceId] - The device ID to unregister
   ///
   /// Returns true if the endpoint was found and removed, false otherwise.
   ///
   /// Throws [AuthenticationException] if user is not authenticated.
-  Future<bool> unregisterEndpoint(Session session, String endpoint) async {
+  Future<bool> unregisterEndpoint(Session session, String deviceId) async {
     // Authenticate user
     final authInfo = await session.authenticated;
     final userId = authInfo?.userId;
@@ -123,19 +133,19 @@ class PushSubscriptionEndpoint extends Endpoint {
       throw AuthenticationException('User not authenticated');
     }
 
-    if (endpoint.trim().isEmpty) {
-      throw ArgumentError('Endpoint cannot be empty');
+    if (deviceId.trim().isEmpty) {
+      throw ArgumentError('Device ID cannot be empty');
     }
 
     session.log(
-      'Unregistering push endpoint for user $userId',
+      'Unregistering push endpoint for user $userId device $deviceId',
       level: LogLevel.info,
     );
 
     return await _subscriptionManager.unregisterSubscription(
       session,
       userId: userId,
-      endpoint: endpoint,
+      deviceId: deviceId,
     );
   }
 
@@ -147,7 +157,7 @@ class PushSubscriptionEndpoint extends Endpoint {
   /// Returns an empty list if the user has no subscriptions.
   ///
   /// Throws [AuthenticationException] if user is not authenticated.
-  Future<List<PushSubscriptionInfo>> listSubscriptions(Session session) async {
+  Future<List<PushSubscription>> listSubscriptions(Session session) async {
     // Authenticate user
     final authInfo = await session.authenticated;
     final userId = authInfo?.userId;
@@ -173,16 +183,16 @@ class PushSubscriptionEndpoint extends Endpoint {
   /// Useful for temporary notification silencing.
   ///
   /// [subscriptionId] - The ID of the subscription to update
-  /// [enabled] - Whether the subscription should be enabled
+  /// [active] - Whether the subscription should be active
   ///
-  /// Returns the updated subscription information.
+  /// Returns the updated subscription.
   ///
   /// Throws [AuthenticationException] if user is not authenticated.
   /// Throws [StateError] if the subscription doesn't exist or belongs to another user.
-  Future<PushSubscriptionInfo> updateSubscription(
+  Future<PushSubscription> updateSubscription(
     Session session,
     int subscriptionId, {
-    bool? enabled,
+    bool? active,
   }) async {
     // Authenticate user
     final authInfo = await session.authenticated;
@@ -195,7 +205,7 @@ class PushSubscriptionEndpoint extends Endpoint {
       throw AuthenticationException('User not authenticated');
     }
 
-    if (enabled == null) {
+    if (active == null) {
       throw ArgumentError('At least one parameter must be provided to update');
     }
 
@@ -204,61 +214,31 @@ class PushSubscriptionEndpoint extends Endpoint {
       level: LogLevel.info,
     );
 
-    // TODO: This requires the PushSubscription model to be generated.
-    // For now, we'll verify the subscription exists and belongs to the user,
-    // then perform the update.
-    //
-    // The implementation will be similar to:
-    // 1. Fetch subscription by ID
-    // 2. Verify it belongs to the authenticated user
-    // 3. Update the enabled field
-    // 4. Save and return
-    //
-    // Once the PushSubscription model is generated, uncomment:
-    //
-    // final subscription = await PushSubscription.db.findById(
-    //   session,
-    //   subscriptionId,
-    // );
-    //
-    // if (subscription == null) {
-    //   throw StateError('Subscription not found: $subscriptionId');
-    // }
-    //
-    // if (subscription.userId != userId) {
-    //   session.log(
-    //     'User $userId attempted to update subscription $subscriptionId '
-    //     'belonging to user ${subscription.userId}',
-    //     level: LogLevel.warning,
-    //   );
-    //   throw StateError('Subscription not found: $subscriptionId');
-    // }
-    //
-    // if (enabled != null) {
-    //   subscription.enabled = enabled;
-    // }
-    // subscription.updatedAt = DateTime.now();
-    //
-    // await PushSubscription.db.updateRow(session, subscription);
-    //
-    // return PushSubscriptionInfo(
-    //   id: subscription.id!,
-    //   userId: subscription.userId,
-    //   endpoint: subscription.endpoint,
-    //   p256dh: subscription.p256dh,
-    //   authSecret: subscription.authSecret,
-    //   deliveryMethod: subscription.deliveryMethod,
-    //   enabled: subscription.enabled,
-    //   lastUsed: subscription.lastUsed,
-    //   failureCount: subscription.failureCount,
-    //   createdAt: subscription.createdAt,
-    //   updatedAt: subscription.updatedAt,
-    // );
-
-    // Placeholder implementation until model is generated
-    throw StateError(
-      'updateSubscription requires PushSubscription model to be generated. '
-      'Create lib/src/models/push_subscription.yaml and run serverpod generate.',
+    // Fetch subscription by ID
+    final subscription = await PushSubscription.db.findById(
+      session,
+      subscriptionId,
     );
+
+    if (subscription == null) {
+      throw StateError('Subscription not found: $subscriptionId');
+    }
+
+    // Verify it belongs to the authenticated user
+    if (subscription.userId != userId) {
+      session.log(
+        'User $userId attempted to update subscription $subscriptionId '
+        'belonging to user ${subscription.userId}',
+        level: LogLevel.warning,
+      );
+      throw StateError('Subscription not found: $subscriptionId');
+    }
+
+    // Update the active field
+    subscription.active = active;
+    subscription.updatedAt = DateTime.now();
+
+    // Save and return
+    return await PushSubscription.db.updateRow(session, subscription);
   }
 }
