@@ -87,7 +87,9 @@ class ControlRepositoryImpl implements ControlRepository {
 
   void _refreshInBackground() {
     // Refresh cache in background without blocking
-    _fetchAndCache().catchError((_) {
+    _fetchAndCache().then((_) {
+      // Successfully refreshed in background
+    }).catchError((_) {
       // Silently fail background refresh
       return <Control>[];
     });
@@ -128,6 +130,7 @@ class ControlRepositoryImpl implements ControlRepository {
     // Optimistically update cache
     try {
       await _storage.cacheControls(controls);
+      _lastFetch = DateTime.now(); // Update timestamp for optimistic cache
     } catch (_) {
       // Continue even if caching fails
     }

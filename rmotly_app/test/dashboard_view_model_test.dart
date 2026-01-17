@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:rmotly_app/core/event_type.dart';
 import 'package:rmotly_app/features/dashboard/domain/repositories/control_repository.dart';
 import 'package:rmotly_app/features/dashboard/presentation/viewmodel/dashboard_viewmodel.dart';
 import 'package:rmotly_client/rmotly_client.dart';
@@ -98,7 +99,7 @@ void main() {
       test('should send control event through repository', () async {
         // Arrange
         const controlId = 1;
-        const eventType = 'button_press';
+        final eventType = EventType.buttonPress.value;
         const payload = {'pressed': true};
         when(() => mockRepository.sendControlEvent(controlId, eventType, payload))
             .thenAnswer((_) async => {});
@@ -126,7 +127,7 @@ void main() {
       test('should handle interaction errors gracefully', () async {
         // Arrange
         const controlId = 1;
-        const eventType = 'button_press';
+        final eventType = EventType.buttonPress.value;
         const payload = {'pressed': true};
         when(() => mockRepository.sendControlEvent(controlId, eventType, payload))
             .thenThrow(Exception('Network error'));
