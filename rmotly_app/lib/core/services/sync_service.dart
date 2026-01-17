@@ -113,11 +113,15 @@ class SyncService {
 }
 
 /// Provider for the sync service
-final syncServiceProvider = Provider<SyncService>((ref) {
+/// Returns null if event repository is not available (server not configured)
+final syncServiceProvider = Provider<SyncService?>((ref) {
   final queueService = ref.watch(offlineQueueServiceProvider);
   final eventRepository = ref.watch(eventRepositoryProvider);
   final connectivityService = ref.watch(connectivityServiceProvider);
   final errorHandler = ref.watch(errorHandlerServiceProvider);
+
+  // Can't sync without event repository
+  if (eventRepository == null) return null;
 
   final service = SyncService(
     queueService: queueService,

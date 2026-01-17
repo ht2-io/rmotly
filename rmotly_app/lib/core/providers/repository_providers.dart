@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rmotly_app/core/providers/api_client_provider.dart';
 import 'package:rmotly_app/core/providers/local_storage_provider.dart';
+import 'package:rmotly_app/core/providers/server_config_provider.dart';
 import 'package:rmotly_app/core/repositories/repositories.dart';
 import 'package:rmotly_app/core/services/error_handler_service.dart';
 import 'package:rmotly_app/core/services/connectivity_service.dart';
@@ -23,12 +24,15 @@ final offlineQueueServiceProvider = Provider<OfflineQueueService>((ref) {
 ///
 /// Provides access to control-related operations.
 /// Includes offline caching and error handling.
-final controlRepositoryProvider = Provider<ControlRepository>((ref) {
+/// Returns null if server is not configured.
+final controlRepositoryProvider = Provider<ControlRepository?>((ref) {
   final client = ref.watch(apiClientProvider);
+  if (client == null) return null;
+
   final errorHandler = ref.watch(errorHandlerServiceProvider);
   final localStorage = ref.watch(localStorageServiceProvider);
   final connectivity = ref.watch(connectivityServiceProvider);
-  
+
   return ControlRepository(
     client,
     errorHandler,
@@ -41,12 +45,15 @@ final controlRepositoryProvider = Provider<ControlRepository>((ref) {
 ///
 /// Provides access to action-related operations.
 /// Includes offline caching and error handling.
-final actionRepositoryProvider = Provider<ActionRepository>((ref) {
+/// Returns null if server is not configured.
+final actionRepositoryProvider = Provider<ActionRepository?>((ref) {
   final client = ref.watch(apiClientProvider);
+  if (client == null) return null;
+
   final errorHandler = ref.watch(errorHandlerServiceProvider);
   final localStorage = ref.watch(localStorageServiceProvider);
   final connectivity = ref.watch(connectivityServiceProvider);
-  
+
   return ActionRepository(
     client,
     errorHandler,
@@ -59,12 +66,15 @@ final actionRepositoryProvider = Provider<ActionRepository>((ref) {
 ///
 /// Provides access to notification topic-related operations.
 /// Includes offline caching and error handling.
-final topicRepositoryProvider = Provider<TopicRepository>((ref) {
+/// Returns null if server is not configured.
+final topicRepositoryProvider = Provider<TopicRepository?>((ref) {
   final client = ref.watch(apiClientProvider);
+  if (client == null) return null;
+
   final errorHandler = ref.watch(errorHandlerServiceProvider);
   final localStorage = ref.watch(localStorageServiceProvider);
   final connectivity = ref.watch(connectivityServiceProvider);
-  
+
   return TopicRepository(
     client,
     errorHandler,
@@ -77,12 +87,15 @@ final topicRepositoryProvider = Provider<TopicRepository>((ref) {
 ///
 /// Provides access to event-related operations.
 /// Includes offline queueing and error handling.
-final eventRepositoryProvider = Provider<EventRepository>((ref) {
+/// Returns null if server is not configured.
+final eventRepositoryProvider = Provider<EventRepository?>((ref) {
   final client = ref.watch(apiClientProvider);
+  if (client == null) return null;
+
   final errorHandler = ref.watch(errorHandlerServiceProvider);
   final connectivity = ref.watch(connectivityServiceProvider);
   final offlineQueue = ref.watch(offlineQueueServiceProvider);
-  
+
   return EventRepository(
     client,
     errorHandler,

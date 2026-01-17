@@ -7,8 +7,10 @@ import '../state/topics_state.dart';
 import '../viewmodel/topics_viewmodel.dart';
 
 /// Provider for the topic repository implementation
-final topicRepositoryProvider = Provider<TopicRepository>((ref) {
+/// Returns null if server is not configured
+final topicRepositoryProvider = Provider<TopicRepository?>((ref) {
   final client = ref.watch(apiClientProvider);
+  if (client == null) return null;
   return TopicRepositoryImpl(client);
 });
 
@@ -16,6 +18,9 @@ final topicRepositoryProvider = Provider<TopicRepository>((ref) {
 final topicsViewModelProvider =
     StateNotifierProvider<TopicsViewModel, TopicsState>((ref) {
   final repository = ref.watch(topicRepositoryProvider);
+  if (repository == null) {
+    return TopicsViewModel.withError('Server not configured');
+  }
   return TopicsViewModel(repository);
 });
 

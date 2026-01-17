@@ -218,6 +218,9 @@ class _ControlEditorViewState extends ConsumerState<ControlEditorView> {
       );
 
       final repository = ref.read(dashboardControlRepositoryProvider);
+      if (repository == null) {
+        throw Exception('Server not configured');
+      }
 
       if (widget.isEditing) {
         await repository.updateControl(control);

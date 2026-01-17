@@ -7,6 +7,7 @@ import 'core/adapters/action_adapter.dart';
 import 'core/adapters/control_adapter.dart';
 import 'core/adapters/notification_topic_adapter.dart';
 import 'core/providers/api_client_provider.dart';
+import 'core/providers/server_config_provider.dart';
 import 'core/theme/theme.dart';
 import 'features/dashboard/dashboard.dart';
 import 'core/services/local_storage_service.dart';
@@ -44,32 +45,36 @@ class RmotlyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Initialize the API client
-    ref.watch(apiClientProvider);
+    // Watch server config first
+    final serverConfig = ref.watch(serverConfigProvider);
 
-    // Initialize push service
-    final pushService = ref.watch(pushServiceProvider.notifier);
+    // Only initialize API client if server is configured
+    if (serverConfig.isConfigured) {
+      ref.watch(apiClientProvider);
 
-    // Initialize push service when app starts
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      try {
-        await pushService.initialize();
-        debugPrint('Push service initialized successfully');
-      } catch (e) {
-        debugPrint('Failed to initialize push service: $e');
-      }
-    });
+      // Initialize push service only when server is configured
+      final pushService = ref.watch(pushServiceProvider.notifier);
 
-    // Listen to notifications
-    ref.listen<AsyncValue<PushNotification>>(
-      notificationStreamProvider,
-      (_, notification) {
-        notification.whenData((notif) {
-          debugPrint('Received notification: ${notif.title}');
-          // TODO: Handle notification actions (e.g., show snackbar, navigate)
-        });
-      },
-    );
+      // Initialize push service when app starts
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        try {
+          await pushService.initialize();
+          debugPrint('Push service initialized successfully');
+        } catch (e) {
+          debugPrint('Failed to initialize push service: $e');
+        }
+      });
+
+      // Listen to notifications
+      ref.listen<AsyncValue<PushNotification>>(
+        notificationStreamProvider,
+        (_, notification) {
+          notification.whenData((notif) {
+            debugPrint('Received notification: ${notif.title}');
+          });
+        },
+      );
+    }
 
     // Watch auth state and theme
     final authState = ref.watch(authServiceProvider);
@@ -80,29 +85,43 @@ class RmotlyApp extends ConsumerWidget {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: themeMode,
-      routerConfig: _createRouter(authState),
+      routerConfig: _createRouter(serverConfig, authState),
     );
   }
 }
 
-/// Create router with auth-aware redirects
-GoRouter _createRouter(AuthState authState) {
+/// Create router with server config and auth-aware redirects
+GoRouter _createRouter(ServerConfig serverConfig, AuthState authState) {
   return GoRouter(
     initialLocation: '/',
     redirect: (context, state) {
+      // If server config is still loading, don't redirect
+      if (serverConfig.isLoading) return null;
+
+      // If server not configured, redirect to server setup
+      if (!serverConfig.isConfigured) {
+        if (state.matchedLocation != '/server-setup') {
+          return '/server-setup';
+        }
+        return null;
+      }
+
       // If still loading auth state, don't redirect
       if (authState.isLoading) return null;
 
       final isOnAuthPage = state.matchedLocation == '/login' ||
-          state.matchedLocation == '/register';
+          state.matchedLocation == '/register' ||
+          state.matchedLocation == '/server-setup';
 
       // If not authenticated and not on auth page, redirect to login
       if (!authState.isAuthenticated && !isOnAuthPage) {
         return '/login';
       }
 
-      // If authenticated and on auth page, redirect to home
-      if (authState.isAuthenticated && isOnAuthPage) {
+      // If authenticated and on auth page (except server-setup), redirect to home
+      if (authState.isAuthenticated &&
+          (state.matchedLocation == '/login' ||
+              state.matchedLocation == '/register')) {
         return '/';
       }
 
@@ -112,6 +131,10 @@ GoRouter _createRouter(AuthState authState) {
       GoRoute(
         path: '/',
         builder: (context, state) => const DashboardView(),
+      ),
+      GoRoute(
+        path: '/server-setup',
+        builder: (context, state) => const ServerSetupScreen(),
       ),
       GoRoute(
         path: '/login',
@@ -138,6 +161,139 @@ GoRouter _createRouter(AuthState authState) {
       ),
     ],
   );
+}
+
+/// Server setup screen - shown when server URL is not configured
+class ServerSetupScreen extends ConsumerStatefulWidget {
+  const ServerSetupScreen({super.key});
+
+  @override
+  ConsumerState<ServerSetupScreen> createState() => _ServerSetupScreenState();
+}
+
+class _ServerSetupScreenState extends ConsumerState<ServerSetupScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _serverUrlController = TextEditingController();
+  bool _isValidating = false;
+  String? _validationError;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill with existing URL if available
+    final currentUrl = ref.read(serverConfigProvider).serverUrl;
+    if (currentUrl != null) {
+      _serverUrlController.text = currentUrl;
+    }
+  }
+
+  @override
+  void dispose() {
+    _serverUrlController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveServerUrl() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isValidating = true;
+      _validationError = null;
+    });
+
+    final serverConfigService = ref.read(serverConfigProvider.notifier);
+    final success =
+        await serverConfigService.setServerUrl(_serverUrlController.text);
+
+    if (!mounted) return;
+
+    if (success) {
+      // Navigate to login
+      context.go('/login');
+    } else {
+      setState(() {
+        _isValidating = false;
+        _validationError =
+            ref.read(serverConfigProvider).error ?? 'Invalid server URL';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Icon(
+                  Icons.cloud_outlined,
+                  size: 80,
+                  color: Colors.deepPurple,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Welcome to Rmotly',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Enter your server address to get started',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 32),
+                TextFormField(
+                  controller: _serverUrlController,
+                  decoration: InputDecoration(
+                    labelText: 'Server Address',
+                    hintText: 'https://rmotly.example.com',
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.dns),
+                    helperText: 'Enter the URL of your Rmotly server',
+                    errorText: _validationError,
+                  ),
+                  keyboardType: TextInputType.url,
+                  autocorrect: false,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter a server address';
+                    }
+                    return null;
+                  },
+                  onFieldSubmitted: (_) => _saveServerUrl(),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: _isValidating ? null : _saveServerUrl,
+                    child: _isValidating
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Connect'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Home screen with sign out option
@@ -222,11 +378,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authServiceProvider);
+    final serverConfig = ref.watch(serverConfigProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sign In'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          // Allow changing server
+          IconButton(
+            icon: const Icon(Icons.dns),
+            tooltip: 'Change Server',
+            onPressed: () => context.go('/server-setup'),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -240,7 +405,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 size: 80,
                 color: Colors.deepPurple,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 16),
+              // Show current server
+              if (serverConfig.serverUrl != null)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.cloud, size: 16, color: Colors.grey[600]),
+                      const SizedBox(width: 6),
+                      Text(
+                        Uri.parse(serverConfig.serverUrl!).host,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 24),
               TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(
@@ -470,6 +660,7 @@ class SettingsPlaceholder extends ConsumerWidget {
     final authService = ref.read(authServiceProvider.notifier);
     final themeNotifier = ref.read(themeModeProvider.notifier);
     final currentTheme = ref.watch(themeModeProvider);
+    final serverConfig = ref.watch(serverConfigProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -477,6 +668,14 @@ class SettingsPlaceholder extends ConsumerWidget {
       ),
       body: ListView(
         children: [
+          // Server section
+          ListTile(
+            leading: const Icon(Icons.dns),
+            title: const Text('Server'),
+            subtitle: Text(serverConfig.serverUrl ?? 'Not configured'),
+            onTap: () => context.go('/server-setup'),
+          ),
+          const Divider(),
           // Theme section
           ListTile(
             leading: const Icon(Icons.palette),

@@ -4,17 +4,20 @@ import 'package:serverpod_auth_client/serverpod_auth_client.dart';
 import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 
 import '../../core/providers/api_client_provider.dart';
+import '../../core/providers/server_config_provider.dart';
 
 /// Authentication state for the app
 class AuthState {
   final bool isAuthenticated;
   final bool isLoading;
+  final bool serverNotConfigured;
   final UserInfo? userInfo;
   final String? error;
 
   const AuthState({
     this.isAuthenticated = false,
     this.isLoading = false,
+    this.serverNotConfigured = false,
     this.userInfo,
     this.error,
   });
@@ -22,12 +25,14 @@ class AuthState {
   AuthState copyWith({
     bool? isAuthenticated,
     bool? isLoading,
+    bool? serverNotConfigured,
     UserInfo? userInfo,
     String? error,
   }) {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       isLoading: isLoading ?? this.isLoading,
+      serverNotConfigured: serverNotConfigured ?? this.serverNotConfigured,
       userInfo: userInfo ?? this.userInfo,
       error: error,
     );
@@ -38,12 +43,15 @@ class AuthState {
 
   /// Loading state
   static const loading = AuthState(isLoading: true);
+
+  /// Server not configured state
+  static const notConfigured = AuthState(serverNotConfigured: true);
 }
 
 /// Authentication service using Serverpod auth module
 class AuthService extends StateNotifier<AuthState> {
-  final SessionManager _sessionManager;
-  final Client _client;
+  final SessionManager? _sessionManager;
+  final Client? _client;
 
   AuthService(this._sessionManager, this._client) : super(AuthState.initial) {
     _init();
@@ -51,6 +59,12 @@ class AuthService extends StateNotifier<AuthState> {
 
   /// Initialize the auth service
   Future<void> _init() async {
+    // If client/session manager not available, server is not configured
+    if (_sessionManager == null || _client == null) {
+      state = AuthState.notConfigured;
+      return;
+    }
+
     state = AuthState.loading;
 
     try {
@@ -73,6 +87,11 @@ class AuthService extends StateNotifier<AuthState> {
 
   /// Sign in with email and password
   Future<bool> signInWithEmail(String email, String password) async {
+    if (_client == null || _sessionManager == null) {
+      state = state.copyWith(error: 'Server not configured');
+      return false;
+    }
+
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -110,6 +129,11 @@ class AuthService extends StateNotifier<AuthState> {
   /// Create a new account with email and password
   Future<bool> createAccount(String email, String password,
       {String? userName}) async {
+    if (_client == null) {
+      state = state.copyWith(error: 'Server not configured');
+      return false;
+    }
+
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -142,6 +166,11 @@ class AuthService extends StateNotifier<AuthState> {
   /// Verify email with validation code
   /// Note: After verification, the user needs to sign in separately
   Future<bool> verifyEmail(String email, String verificationCode) async {
+    if (_client == null) {
+      state = state.copyWith(error: 'Server not configured');
+      return false;
+    }
+
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -171,6 +200,11 @@ class AuthService extends StateNotifier<AuthState> {
 
   /// Request password reset
   Future<bool> requestPasswordReset(String email) async {
+    if (_client == null) {
+      state = state.copyWith(error: 'Server not configured');
+      return false;
+    }
+
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -191,6 +225,11 @@ class AuthService extends StateNotifier<AuthState> {
   /// Reset password with verification code
   Future<bool> resetPassword(
       String email, String verificationCode, String newPassword) async {
+    if (_client == null) {
+      state = state.copyWith(error: 'Server not configured');
+      return false;
+    }
+
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -211,6 +250,11 @@ class AuthService extends StateNotifier<AuthState> {
 
   /// Sign out
   Future<void> signOut() async {
+    if (_sessionManager == null) {
+      state = AuthState.initial;
+      return;
+    }
+
     state = state.copyWith(isLoading: true);
 
     try {
@@ -224,6 +268,11 @@ class AuthService extends StateNotifier<AuthState> {
 
   /// Sign out from all devices
   Future<void> signOutAllDevices() async {
+    if (_sessionManager == null) {
+      state = AuthState.initial;
+      return;
+    }
+
     state = state.copyWith(isLoading: true);
 
     try {
@@ -244,6 +293,13 @@ class AuthService extends StateNotifier<AuthState> {
 /// Provider for the auth service
 final authServiceProvider =
     StateNotifierProvider<AuthService, AuthState>((ref) {
+  final serverConfig = ref.watch(serverConfigProvider);
+
+  // If server not configured, return service with null client
+  if (!serverConfig.isConfigured) {
+    return AuthService(null, null);
+  }
+
   final sessionManager = ref.watch(sessionManagerProvider);
   final client = ref.watch(apiClientProvider);
   return AuthService(sessionManager, client);
