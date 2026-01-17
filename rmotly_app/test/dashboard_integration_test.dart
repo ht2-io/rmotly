@@ -32,6 +32,11 @@ void main() {
 
   setUp(() {
     mockRepository = MockControlRepository();
+    // Set up default stub to return empty list
+    // This prevents null errors when constructor calls loadControls()
+    when(() => mockRepository.getControls(
+            forceRefresh: any(named: 'forceRefresh')))
+        .thenAnswer((_) async => []);
   });
 
   group('Dashboard Integration Tests', () {
@@ -61,7 +66,8 @@ void main() {
         ),
       ];
 
-      when(() => mockRepository.getControls())
+      when(() => mockRepository.getControls(
+              forceRefresh: any(named: 'forceRefresh')))
           .thenAnswer((_) async => testControls);
       when(() => mockRepository.sendControlEvent(any(), any(), any()))
           .thenAnswer((_) async => {});
@@ -120,7 +126,8 @@ void main() {
       expect(find.text('Dashboard'), findsOneWidget);
       expect(find.text('Living Room Light'), findsOneWidget);
       expect(find.text('Thermostat'), findsOneWidget);
-      verify(() => mockRepository.getControls()).called(1);
+      // Constructor calls getControls() once
+      verify(() => mockRepository.getControls(forceRefresh: false)).called(1);
 
       container.dispose();
     });
@@ -138,7 +145,8 @@ void main() {
         updatedAt: DateTime.now(),
       );
 
-      when(() => mockRepository.getControls())
+      when(() => mockRepository.getControls(
+              forceRefresh: any(named: 'forceRefresh')))
           .thenAnswer((_) async => [testControl]);
       when(() => mockRepository.sendControlEvent(any(), any(), any()))
           .thenAnswer(
@@ -209,7 +217,8 @@ void main() {
 
     testWidgets('error handling displays error message', (tester) async {
       // Arrange
-      when(() => mockRepository.getControls())
+      when(() => mockRepository.getControls(
+              forceRefresh: any(named: 'forceRefresh')))
           .thenThrow(Exception('Network error'));
 
       final container = ProviderContainer(
@@ -283,7 +292,8 @@ void main() {
         ),
       ];
 
-      when(() => mockRepository.getControls())
+      when(() => mockRepository.getControls(
+              forceRefresh: any(named: 'forceRefresh')))
           .thenAnswer((_) async => initialControls);
 
       final container = ProviderContainer(
@@ -335,7 +345,8 @@ void main() {
       expect(find.text('Control 1'), findsOneWidget);
 
       // Act - Refresh
-      when(() => mockRepository.getControls())
+      when(() => mockRepository.getControls(
+              forceRefresh: any(named: 'forceRefresh')))
           .thenAnswer((_) async => refreshedControls);
 
       await tester.tap(find.byIcon(Icons.refresh));
@@ -344,7 +355,9 @@ void main() {
       // Assert - New controls loaded
       expect(find.text('Controls: 2'), findsOneWidget);
       expect(find.text('Control 2'), findsOneWidget);
-      verify(() => mockRepository.getControls()).called(2);
+      // Constructor calls once with forceRefresh: false, refresh() calls with forceRefresh: true
+      verify(() => mockRepository.getControls(forceRefresh: false)).called(1);
+      verify(() => mockRepository.getControls(forceRefresh: true)).called(1);
 
       container.dispose();
     });
@@ -374,7 +387,8 @@ void main() {
         ),
       ];
 
-      when(() => mockRepository.getControls())
+      when(() => mockRepository.getControls(
+              forceRefresh: any(named: 'forceRefresh')))
           .thenAnswer((_) async => testControls);
       when(() => mockRepository.deleteControl(any()))
           .thenAnswer((_) async => {});
