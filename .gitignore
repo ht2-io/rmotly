@@ -566,6 +566,10 @@ app.*.symbols
 **/config/passwords.yaml
 **/config/production.yaml
 
+# Dart bin directory - source files (not compiled binaries)
+!rmotly_server/bin/
+!rmotly_server/bin/*.dart
+
 # Database
 *.db
 *.sqlite
