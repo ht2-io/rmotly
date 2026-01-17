@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rmotly_client/rmotly_client.dart';
+import 'package:serverpod_auth_client/serverpod_auth_client.dart';
 import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 
 import '../../core/providers/api_client_provider.dart';
@@ -139,30 +140,23 @@ class AuthService extends StateNotifier<AuthState> {
   }
 
   /// Verify email with validation code
+  /// Note: After verification, the user needs to sign in separately
   Future<bool> verifyEmail(String email, String verificationCode) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final serverResponse = await _client.modules.auth.email
+      final userInfo = await _client.modules.auth.email
           .createAccount(email, verificationCode);
 
-      if (serverResponse != null && serverResponse.success) {
-        // Automatically sign in after verification
-        await _sessionManager.registerSignedInUser(
-          serverResponse.userInfo!,
-          serverResponse.keyId!,
-          serverResponse.key!,
-        );
-
-        state = AuthState(
-          isAuthenticated: true,
-          userInfo: serverResponse.userInfo,
-        );
+      if (userInfo != null) {
+        // Account created and verified successfully
+        // User needs to sign in separately after verification
+        state = state.copyWith(isLoading: false);
         return true;
       } else {
         state = state.copyWith(
           isLoading: false,
-          error: serverResponse?.failReason?.name ?? 'Verification failed',
+          error: 'Verification failed',
         );
         return false;
       }
