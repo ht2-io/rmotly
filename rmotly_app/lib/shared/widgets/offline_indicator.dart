@@ -64,7 +64,7 @@ class SyncStatusIndicator extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final syncService = ref.watch(syncServiceProvider);
 
-    if (!syncService.isSyncing) {
+    if (syncService == null || !syncService.isSyncing) {
       return const SizedBox.shrink();
     }
 
