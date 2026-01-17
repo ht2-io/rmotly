@@ -87,12 +87,8 @@ class ControlRepositoryImpl implements ControlRepository {
 
   void _refreshInBackground() {
     // Refresh cache in background without blocking
-    _fetchAndCache().then((_) {
-      // Successfully refreshed in background
-    }).catchError((_) {
-      // Silently fail background refresh
-      return <Control>[];
-    });
+    // ignore: unawaited_futures
+    _fetchAndCache();
   }
 
   @override
