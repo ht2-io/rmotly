@@ -124,6 +124,7 @@ dart bin/main.dart           # Step 4: Verify server starts
 
 | File | Purpose |
 |------|---------|
+| `AGENTS.md` | Custom agents overview and usage |
 | `TASKS.md` | Task definitions and progress |
 | `.claude/CONVENTIONS.md` | Detailed coding standards |
 | `docs/ARCHITECTURE.md` | System architecture |
@@ -132,6 +133,8 @@ dart bin/main.dart           # Step 4: Verify server starts
 | `docs/CI_CD.md` | CI/CD workflows |
 
 ## Custom Agents
+
+See `AGENTS.md` for detailed information on how to use custom agents.
 
 | Agent | Purpose | Location |
 |-------|---------|----------|
