@@ -34,7 +34,7 @@ void main() {
           ),
         ),
       );
-    });
+    }
 
     testWidgets('should display toggle with initial state from config', (tester) async {
       // Act

@@ -34,7 +34,7 @@ void main() {
           ),
         ),
       );
-    });
+    }
 
     testWidgets('should display slider with initial value from config', (tester) async {
       // Act

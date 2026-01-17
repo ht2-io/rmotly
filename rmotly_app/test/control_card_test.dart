@@ -43,7 +43,7 @@ void main() {
           ),
         ),
       );
-    });
+    }
 
     testWidgets('should display control name', (tester) async {
       // Act
