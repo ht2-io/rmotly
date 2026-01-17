@@ -4,6 +4,8 @@ import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 
 import 'package:rmotly_server/src/web/routes/root.dart';
+import 'package:rmotly_server/src/web/routes/webhook_route.dart';
+import 'package:rmotly_server/src/web/routes/sse_route.dart';
 
 import 'src/generated/protocol.dart';
 import 'src/generated/endpoints.dart';
@@ -48,6 +50,13 @@ void run(List<String> args) async {
   // Setup a default page at the web root.
   pod.webServer.addRoute(RouteRoot(), '/');
   pod.webServer.addRoute(RouteRoot(), '/index.html');
+  
+  // Add webhook endpoint for external notifications
+  pod.webServer.addRoute(WebhookRoute(pod), '/api/notify/*');
+  
+  // Add SSE endpoint for notification fallback
+  pod.webServer.addRoute(SseRoute(pod), '/api/sse/notifications');
+  
   // Serve all files in the /static directory.
   pod.webServer.addRoute(
     RouteStaticDirectory(serverDirectory: 'static', basePath: '/'),
