@@ -77,9 +77,10 @@ jobs:
         working-directory: rmotly_server
         run: dart analyze
 
-      - name: Run tests
+      - name: Run unit tests
         working-directory: rmotly_server
-        run: dart test
+        run: dart test test/unit/
+        # TODO: Add integration tests once database migrations are configured in CI
         env:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
