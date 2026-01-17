@@ -64,6 +64,15 @@ jobs:
         working-directory: rmotly_server
         run: serverpod generate
 
+      - name: Create test passwords file
+        working-directory: rmotly_server
+        run: |
+          cat > config/passwords.yaml << 'EOF'
+          shared:
+          test:
+            database: 'postgres'
+          EOF
+
       - name: Analyze code
         working-directory: rmotly_server
         run: dart analyze
