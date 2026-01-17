@@ -117,3 +117,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+# Dependency overrides to fix compatibility issues
+dependency_overrides:
+  # Force older version of image_cropper_platform_interface compatible with Flutter 3.24.0
+  # The newer version (7.2.0) requires Flutter 3.27+ due to toARGB32() method
+  image_cropper_platform_interface: 7.1.0
