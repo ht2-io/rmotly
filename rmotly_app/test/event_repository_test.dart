@@ -30,6 +30,9 @@ void main() {
 
     // Default behavior
     when(() => mockConnectivityService.isOnline).thenReturn(true);
+    when(() => mockErrorHandler.isRetryable(any())).thenReturn(false);
+    when(() => mockErrorHandler.mapToAppException(any()))
+        .thenAnswer((invocation) => throw invocation.positionalArguments[0]);
 
     repository = EventRepository(
       mockClient,

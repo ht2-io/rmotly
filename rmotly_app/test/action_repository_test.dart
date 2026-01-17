@@ -32,6 +32,9 @@ void main() {
     when(() => mockConnectivityService.isOnline).thenReturn(true);
     when(() => mockLocalStorage.getCachedActions())
         .thenAnswer((_) async => <Action>[]);
+    when(() => mockErrorHandler.isRetryable(any())).thenReturn(false);
+    when(() => mockErrorHandler.mapToAppException(any()))
+        .thenAnswer((invocation) => throw invocation.positionalArguments[0]);
 
     repository = ActionRepository(
       mockClient,

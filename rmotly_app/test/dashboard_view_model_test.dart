@@ -37,6 +37,11 @@ void main() {
 
   setUp(() {
     mockRepository = MockControlRepository();
+    // Set up default stub to return empty list
+    // This prevents null errors when constructor calls loadControls()
+    when(() => mockRepository.getControls(
+            forceRefresh: any(named: 'forceRefresh')))
+        .thenAnswer((_) async => []);
     viewModel = DashboardViewModel(mockRepository);
   });
 
@@ -57,7 +62,8 @@ void main() {
         expect(state.controls[0].id, 1);
         expect(state.controls[1].id, 2);
         expect(state.isLoading, false);
-        verify(() => mockRepository.getControls(forceRefresh: false)).called(1);
+        // Constructor calls loadControls() once, then we call it again = 2 calls
+        verify(() => mockRepository.getControls(forceRefresh: false)).called(2);
       });
 
       test('should set error state when loading fails', () async {
@@ -223,8 +229,9 @@ void main() {
         // Assert - Order should be restored after reload
         verify(() => mockRepository.reorderControls(any())).called(1);
         // The viewModel will reload controls, so we need to verify that call
+        // Constructor calls once, explicit loadControls() once, reload after error once = 3 calls
         verify(() => mockRepository.getControls(forceRefresh: false))
-            .called(2); // Once for initial load, once for reload
+            .called(3);
       });
     });
 
@@ -297,7 +304,8 @@ void main() {
             .thenAnswer((_) async => [testControl1]);
 
         await viewModel.loadControls();
-        verify(() => mockRepository.getControls(forceRefresh: false)).called(1);
+        // Constructor calls once, explicit loadControls() once = 2 calls
+        verify(() => mockRepository.getControls(forceRefresh: false)).called(2);
 
         // Act
         when(() => mockRepository.getControls(forceRefresh: true))
