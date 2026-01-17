@@ -107,7 +107,11 @@ jobs:
           script: |
             set -e
             echo "Starting deployment to dev server..."
-            /opt/rmotly/deploy.sh
+            cd /opt/rmotly
+            git fetch origin
+            git reset --hard origin/master
+            chmod +x scripts/deploy.sh
+            ./scripts/deploy.sh
             echo "Deployment complete!"
 
       - name: Verify deployment
