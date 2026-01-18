@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions & Discussions
+    url: https://github.com/ht2-io/rmotly/discussions
+    about: Have a question or want to discuss ideas? Start a discussion here instead of opening an issue.
+  - name: 📖 Contributing Guide
+    url: https://github.com/ht2-io/rmotly/blob/main/CONTRIBUTING.md
+    about: Learn how to contribute to Rmotly, including development setup and coding conventions.
+  - name: 🚀 Development Setup
+    url: https://github.com/ht2-io/rmotly/blob/main/DEVELOPMENT.md
+    about: Complete guide for setting up your local development environment.
+  - name: 📚 Documentation
+    url: https://github.com/ht2-io/rmotly/tree/main/docs
+    about: Browse the full documentation including architecture, API references, and guides.
