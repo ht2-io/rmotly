@@ -76,17 +76,7 @@ class EventEndpoint extends Endpoint {
       timestamp: DateTime.now(),
     );
 
-    session.log(
-      'DEBUG: Creating event with eventType="$eventType" (before insert)',
-      level: LogLevel.info,
-    );
-
     final savedEvent = await Event.db.insertRow(session, event);
-
-    session.log(
-      'DEBUG: Saved event has eventType="${savedEvent.eventType}" (after insert)',
-      level: LogLevel.info,
-    );
 
     session.log(
       'Event created: ${savedEvent.id} - $eventType from $sourceType:$sourceId',
