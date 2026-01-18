@@ -938,7 +938,13 @@ class EndpointWebhook extends _i1.EndpointRef {
         {'topicId': topicId},
       );
 
-  /// Test webhook endpoint
+  /// Test webhook endpoint for development/testing.
+  ///
+  /// This is a convenience endpoint to test webhook delivery without
+  /// making actual HTTP requests. Returns a success response with the
+  /// test notification details.
+  ///
+  /// **Note**: This is for testing only and may be removed in production.
   _i2.Future<Map<String, dynamic>> testWebhook(
     int topicId, {
     required String title,
