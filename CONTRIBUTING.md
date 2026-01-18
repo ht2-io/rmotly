@@ -2,6 +2,8 @@
 
 Thank you for your interest in contributing to Rmotly! This document provides guidelines for contributing to the project.
 
+> **📖 New to the project?** Start with the [Development Setup Guide](DEVELOPMENT.md) for detailed environment setup instructions.
+
 ## Table of Contents
 
 - [Getting Started](#getting-started)
@@ -416,17 +418,17 @@ Add screenshots for UI changes
 
 We provide issue templates to help you report problems effectively:
 
-**Bug Report Template** (`.github/ISSUE_TEMPLATE/bug_report.md`)
+**Bug Report Template** (`.github/ISSUE_TEMPLATE/bug_report.yml`)
 - Use when reporting unexpected behavior
 - Include steps to reproduce
 - Provide environment details
 
-**Feature Request Template** (`.github/ISSUE_TEMPLATE/feature_request.md`)
+**Feature Request Template** (`.github/ISSUE_TEMPLATE/feature_request.yml`)
 - Use for new feature suggestions
 - Describe the problem it solves
 - Propose a solution
 
-**Documentation Issue Template** (`.github/ISSUE_TEMPLATE/documentation.md`)
+**Documentation Issue Template** (`.github/ISSUE_TEMPLATE/documentation.yml`)
 - Use for doc improvements
 - Specify which doc needs updating
 - Suggest improvements
