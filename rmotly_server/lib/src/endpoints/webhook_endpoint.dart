@@ -238,7 +238,8 @@ class WebhookEndpoint extends Endpoint {
       throw StateError('User not authenticated');
     }
 
-    // TODO: Verify topic ownership and create test notification
+    // TODO(#future): Verify topic ownership and create actual test notification
+    // For now, returns success response without actually queueing a notification
     return {
       'success': true,
       'message': 'Test webhook sent successfully',
