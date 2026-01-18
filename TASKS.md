@@ -11,7 +11,7 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 | Phase 3: App Core | Complete | 100% |
 | Phase 4: Features | In Progress | 55% |
 | Phase 5: Integration | In Progress | 33% |
-| Phase 6: Polish | In Progress | 50% |
+| Phase 6: Polish | In Progress | 58% |
 
 ---
 
@@ -739,10 +739,12 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
 
 ### 6.4 Documentation
 
-- [ ] **6.4.1** Write API documentation
-  - Endpoint documentation (existing in docs/API.md)
-  - Authentication guide (existing in docs/API.md)
-  - [x] Webhook integration guide (comprehensive guide added to docs/API.md)
+- [x] **6.4.1** Write API documentation
+  - [x] Complete endpoint documentation for all endpoints (docs/API.md)
+  - [x] Comprehensive authentication guide with sign-up/sign-in flows (docs/API.md)
+  - [x] Webhook integration guide (comprehensive guide in docs/API.md)
+  - [x] Error handling documentation with examples (docs/API.md)
+  - [x] Rate limiting documentation with best practices (docs/API.md)
 
 - [x] **6.4.2** Write user documentation
   - Getting started guide (docs/GETTING_STARTED.md)
