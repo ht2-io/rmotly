@@ -362,9 +362,18 @@ class ActionEndpoint extends Endpoint {
     // Parse test parameters from JSON
     Map<String, dynamic> testParameters;
     try {
-      testParameters = jsonDecode(testParametersJson) as Map<String, dynamic>;
+      final decoded = jsonDecode(testParametersJson);
+      if (decoded is! Map<String, dynamic>) {
+        throw ArgumentError(
+          'testParametersJson must be a JSON object (got ${decoded.runtimeType})',
+        );
+      }
+      testParameters = decoded;
     } catch (e) {
-      throw ArgumentError('Invalid testParametersJson: must be valid JSON: $e');
+      if (e is ArgumentError) rethrow;
+      throw ArgumentError(
+        'Invalid testParametersJson: must be a valid JSON object: $e',
+      );
     }
 
     session.log(

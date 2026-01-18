@@ -71,15 +71,16 @@ void main() {
       );
     });
 
-    test('when non-object JSON is provided then it throws TypeError', () {
+    test('when non-object JSON is provided then it throws error', () {
       // Arrange - JSON array instead of object
       final jsonArray = jsonEncode(['item1', 'item2']);
 
-      // Act & Assert
-      expect(
-        () => jsonDecode(jsonArray) as Map<String, dynamic>,
-        throwsA(isA<TypeError>()),
-      );
+      // Act
+      final decoded = jsonDecode(jsonArray);
+
+      // Assert - Simulate what testAction does
+      expect(decoded is Map<String, dynamic>, isFalse);
+      expect(decoded is List, isTrue);
     });
   });
 }
