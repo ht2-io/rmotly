@@ -77,11 +77,12 @@ dev_dependencies:
   # Testing
   mocktail: ^1.0.0
 
-# Dependency overrides for compatibility
+# Dependency overrides to ensure Flutter 3.27+ compatibility
 dependency_overrides:
-  # image_cropper_platform_interface 7.2.0 uses toARGB32 which requires newer Flutter
-  # Override to 7.1.0 for Flutter 3.24-3.27 compatibility
-  image_cropper_platform_interface: 7.1.0
+  # Fix image_cropper_platform_interface compatibility with Flutter 3.27+
+  # Downgrade to version 6.1.0 which doesn't use the deprecated toARGB32 method
+  # The toARGB32 method was removed from Color class starting Flutter 3.27
+  image_cropper_platform_interface: 6.1.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

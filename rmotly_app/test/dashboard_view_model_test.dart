@@ -38,7 +38,7 @@ void main() {
   setUp(() {
     mockRepository = MockControlRepository();
 
-    // Default stub to handle auto-loading in constructor
+    // Set up default stub for constructor's automatic loadControls() call
     when(() => mockRepository.getControls(
         forceRefresh: any(named: 'forceRefresh'))).thenAnswer((_) async => []);
 
@@ -48,7 +48,7 @@ void main() {
   group('DashboardViewModel', () {
     group('loadControls', () {
       test('should load controls from repository and update state', () async {
-        // Arrange - reset mock and set up new response
+        // Arrange - reset mock to clear constructor's auto-load call count
         reset(mockRepository);
         when(() => mockRepository.getControls(
                 forceRefresh: any(named: 'forceRefresh')))
@@ -63,6 +63,7 @@ void main() {
         expect(state.controls[0].id, 1);
         expect(state.controls[1].id, 2);
         expect(state.isLoading, false);
+        // After reset: explicit loadControls() call = 1
         verify(() => mockRepository.getControls(forceRefresh: false)).called(1);
       });
 
@@ -213,7 +214,7 @@ void main() {
       });
 
       test('should handle reorder errors and restore original order', () async {
-        // Arrange - reset mock to clear auto-load call count
+        // Arrange - reset mock to clear constructor's auto-load call count
         reset(mockRepository);
         when(() => mockRepository.getControls(
                 forceRefresh: any(named: 'forceRefresh')))
@@ -222,16 +223,14 @@ void main() {
             .thenThrow(Exception('Failed to update positions'));
 
         await viewModel.loadControls();
-        final originalOrder = viewModel.state.controls;
 
         // Act
         await viewModel.reorderControls(0, 2);
 
         // Assert - Order should be restored after reload
         verify(() => mockRepository.reorderControls(any())).called(1);
-        // The viewModel will reload controls, so we need to verify that call
-        verify(() => mockRepository.getControls(forceRefresh: false))
-            .called(2); // Once for initial load, once for reload
+        // After reset: loadControls() once, reload after error once = 2 total
+        verify(() => mockRepository.getControls(forceRefresh: false)).called(2);
       });
     });
 
@@ -298,13 +297,14 @@ void main() {
     group('refreshControls', () {
       test('should reload controls from repository with force refresh',
           () async {
-        // Arrange - reset mock to clear auto-load call count
+        // Arrange - reset mock to clear constructor's auto-load call count
         reset(mockRepository);
         when(() => mockRepository.getControls(
                 forceRefresh: any(named: 'forceRefresh')))
             .thenAnswer((_) async => [testControl1]);
 
         await viewModel.loadControls();
+        // After reset: loadControls() once = 1 total
         verify(() => mockRepository.getControls(forceRefresh: false)).called(1);
 
         // Act

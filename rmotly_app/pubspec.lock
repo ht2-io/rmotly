@@ -593,10 +593,10 @@ packages:
     dependency: "direct overridden"
     description:
       name: image_cropper_platform_interface
-      sha256: "6ca6b81769abff9a4dcc3bbd3d75f5dfa9de6b870ae9613c8cd237333a4283af"
+      sha256: "39c6539571bda7ce666e0a2f450246a5d42187406eef8f486a3d64f1d9381637"
       url: "https://pub.dev"
     source: hosted
-    version: "7.1.0"
+    version: "6.1.0"
   image_picker:
     dependency: transitive
     description:
