@@ -87,7 +87,8 @@ void main() {
 
         // Assert: Should update existing subscription
         expect(updatedSub.id, firstSub.id); // Same ID
-        expect(updatedSub.endpoint, 'https://ntfy.sh/new-endpoint'); // Updated endpoint
+        expect(updatedSub.endpoint,
+            'https://ntfy.sh/new-endpoint'); // Updated endpoint
         expect(updatedSub.failureCount, 0); // Failures reset
       });
     });
@@ -100,7 +101,8 @@ void main() {
         );
 
         // Act
-        final subscriptions = await endpoints.pushSubscription.listSubscriptions(
+        final subscriptions =
+            await endpoints.pushSubscription.listSubscriptions(
           authenticatedSession,
         );
 
@@ -129,7 +131,8 @@ void main() {
         );
 
         // Act
-        final subscriptions = await endpoints.pushSubscription.listSubscriptions(
+        final subscriptions =
+            await endpoints.pushSubscription.listSubscriptions(
           authenticatedSession,
         );
 
@@ -164,7 +167,8 @@ void main() {
         expect(removed, true);
 
         // Verify it's gone
-        final subscriptions = await endpoints.pushSubscription.listSubscriptions(
+        final subscriptions =
+            await endpoints.pushSubscription.listSubscriptions(
           authenticatedSession,
         );
         expect(subscriptions, isEmpty);

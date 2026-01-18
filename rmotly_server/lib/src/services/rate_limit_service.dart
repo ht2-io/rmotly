@@ -154,7 +154,8 @@ class RateLimitService {
 
     final now = DateTime.now();
     final windowStart = now.subtract(config.window);
-    final validRequests = requests.where((t) => t.isAfter(windowStart)).toList();
+    final validRequests =
+        requests.where((t) => t.isAfter(windowStart)).toList();
 
     if (validRequests.length < config.maxRequests) return null;
 

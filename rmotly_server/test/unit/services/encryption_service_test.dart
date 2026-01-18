@@ -4,7 +4,8 @@ import 'package:rmotly_server/src/services/encryption_service.dart';
 void main() {
   group('EncryptionService', () {
     late EncryptionService service;
-    const testKey = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='; // 32 bytes base64
+    const testKey =
+        'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='; // 32 bytes base64
 
     setUp(() {
       service = EncryptionService.withKey(testKey);
@@ -65,7 +66,7 @@ void main() {
     test('throws on corrupted ciphertext', () {
       const plaintext = 'test';
       final encrypted = service.encrypt(plaintext);
-      
+
       // Corrupt the IV part
       final parts = encrypted.split(':');
       final corruptedIv = parts[0].replaceFirst(parts[0][0], 'X');

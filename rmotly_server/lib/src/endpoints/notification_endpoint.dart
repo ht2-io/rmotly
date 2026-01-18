@@ -174,7 +174,8 @@ class NotificationEndpoint extends Endpoint {
       topic.name = name.trim();
     }
     if (description != null) {
-      topic.description = description.trim().isEmpty ? null : description.trim();
+      topic.description =
+          description.trim().isEmpty ? null : description.trim();
     }
     if (enabled != null) {
       topic.enabled = enabled;
@@ -317,7 +318,8 @@ class NotificationEndpoint extends Endpoint {
     // Queue the notification
     final queueEntry = NotificationQueue(
       userId: userId,
-      subscriptionId: null, // Will be populated for each subscription during delivery
+      subscriptionId:
+          null, // Will be populated for each subscription during delivery
       title: title,
       body: body,
       payload: payload,

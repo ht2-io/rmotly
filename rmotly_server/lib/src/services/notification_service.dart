@@ -105,7 +105,8 @@ class NotificationService {
 
     // Tier 1: Try WebSocket delivery
     final wsResult = await _deliverViaWebSocket(session, notification);
-    if (wsResult.webSocketDeliveries != null && wsResult.webSocketDeliveries! > 0) {
+    if (wsResult.webSocketDeliveries != null &&
+        wsResult.webSocketDeliveries! > 0) {
       session.log(
         'Notification delivered via WebSocket to $userId '
         '(${wsResult.webSocketDeliveries} streams)',
@@ -257,8 +258,7 @@ class NotificationService {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       notification: notification,
       queuedAt: DateTime.now(),
-      expiresAt: notification.expiresAt ??
-          DateTime.now().add(sseQueueMaxAge),
+      expiresAt: notification.expiresAt ?? DateTime.now().add(sseQueueMaxAge),
     ));
 
     // TODO: In production, persist to Redis or database

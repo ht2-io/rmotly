@@ -97,8 +97,7 @@ class PushService {
   }) async {
     try {
       // Validate payload size
-      final payloadString =
-          payload is String ? payload : jsonEncode(payload);
+      final payloadString = payload is String ? payload : jsonEncode(payload);
       final payloadBytes = utf8.encode(payloadString);
 
       if (payloadBytes.length > maxPayloadSize) {
@@ -282,8 +281,7 @@ class PushService {
     // Placeholder - actual JWT creation requires crypto libraries
     // In production, use the web_push package for proper VAPID signing
     return {
-      'Authorization':
-          'vapid t=placeholder,k=${_vapidConfig.publicKey}',
+      'Authorization': 'vapid t=placeholder,k=${_vapidConfig.publicKey}',
     };
   }
 

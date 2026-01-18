@@ -47,7 +47,8 @@ class WebhookHandler {
     try {
       // Only accept POST requests
       if (request.method != 'POST') {
-        await _sendError(response, HttpStatus.methodNotAllowed, 'Method not allowed');
+        await _sendError(
+            response, HttpStatus.methodNotAllowed, 'Method not allowed');
         return;
       }
 
@@ -60,7 +61,8 @@ class WebhookHandler {
 
       // Rate limiting by API key
       if (_rateLimiter.isRateLimited(apiKey)) {
-        await _sendError(response, HttpStatus.tooManyRequests, 'Rate limit exceeded');
+        await _sendError(
+            response, HttpStatus.tooManyRequests, 'Rate limit exceeded');
         return;
       }
 
@@ -82,7 +84,8 @@ class WebhookHandler {
       try {
         payload = jsonDecode(body) as Map<String, dynamic>;
       } catch (e) {
-        await _sendError(response, HttpStatus.badRequest, 'Invalid JSON payload');
+        await _sendError(
+            response, HttpStatus.badRequest, 'Invalid JSON payload');
         return;
       }
 
@@ -105,14 +108,17 @@ class WebhookHandler {
       try {
         final subscriptions = await PushSubscription.db.find(
           session,
-          where: (s) => s.userId.equals(topic['userId'] as int) & s.active.equals(true),
+          where: (s) =>
+              s.userId.equals(topic['userId'] as int) & s.active.equals(true),
         );
-        
-        pushSubscriptions = subscriptions.map((s) => PushSubscriptionData(
-          endpoint: s.endpoint,
-          p256dh: s.p256dh,
-          authSecret: s.auth,
-        )).toList();
+
+        pushSubscriptions = subscriptions
+            .map((s) => PushSubscriptionData(
+                  endpoint: s.endpoint,
+                  p256dh: s.p256dh,
+                  authSecret: s.auth,
+                ))
+            .toList();
       } finally {
         await session.close();
       }
@@ -147,7 +153,8 @@ class WebhookHandler {
       }
     } catch (e, st) {
       _pod.logVerbose('Webhook error: $e\n$st');
-      await _sendError(response, HttpStatus.internalServerError, 'Internal error');
+      await _sendError(
+          response, HttpStatus.internalServerError, 'Internal error');
     }
   }
 
@@ -169,11 +176,11 @@ class WebhookHandler {
         session,
         where: (t) => t.apiKey.equals(apiKey) & t.id.equals(topicIdInt),
       );
-      
+
       if (topic == null || !topic.enabled) {
         return null;
       }
-      
+
       return {
         'id': topic.id,
         'userId': topic.userId,
@@ -185,7 +192,8 @@ class WebhookHandler {
   }
 
   /// Send error response
-  Future<void> _sendError(HttpResponse response, int statusCode, String message) async {
+  Future<void> _sendError(
+      HttpResponse response, int statusCode, String message) async {
     response.statusCode = statusCode;
     response.headers.set('Content-Type', 'application/json');
     response.write(jsonEncode({

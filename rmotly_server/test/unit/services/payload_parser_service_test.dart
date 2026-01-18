@@ -40,15 +40,14 @@ void main() {
             'body': 'Body',
           },
           'android': {
-            'notification': {
-              'image': 'https://example.com/android-image.png'
-            }
+            'notification': {'image': 'https://example.com/android-image.png'}
           }
         };
 
         final result = service.parse(payload);
 
-        expect(result.imageUrl, equals('https://example.com/android-image.png'));
+        expect(
+            result.imageUrl, equals('https://example.com/android-image.png'));
         expect(result.sourceFormat, equals(PayloadFormat.firebase));
       });
 
@@ -108,65 +107,42 @@ void main() {
       });
 
       test('converts Pushover priority -2 to low', () {
-        final payload = {
-          'message': 'Test',
-          'priority': -2,
-          'user': 'test'
-        };
+        final payload = {'message': 'Test', 'priority': -2, 'user': 'test'};
 
         final result = service.parse(payload);
         expect(result.priority, equals('low'));
       });
 
       test('converts Pushover priority -1 to low', () {
-        final payload = {
-          'message': 'Test',
-          'priority': -1,
-          'user': 'test'
-        };
+        final payload = {'message': 'Test', 'priority': -1, 'user': 'test'};
 
         final result = service.parse(payload);
         expect(result.priority, equals('low'));
       });
 
       test('converts Pushover priority 0 to normal', () {
-        final payload = {
-          'message': 'Test',
-          'priority': 0,
-          'user': 'test'
-        };
+        final payload = {'message': 'Test', 'priority': 0, 'user': 'test'};
 
         final result = service.parse(payload);
         expect(result.priority, equals('normal'));
       });
 
       test('converts Pushover priority 1 to high', () {
-        final payload = {
-          'message': 'Test',
-          'priority': 1,
-          'user': 'test'
-        };
+        final payload = {'message': 'Test', 'priority': 1, 'user': 'test'};
 
         final result = service.parse(payload);
         expect(result.priority, equals('high'));
       });
 
       test('converts Pushover priority 2 to urgent', () {
-        final payload = {
-          'message': 'Test',
-          'priority': 2,
-          'user': 'test'
-        };
+        final payload = {'message': 'Test', 'priority': 2, 'user': 'test'};
 
         final result = service.parse(payload);
         expect(result.priority, equals('urgent'));
       });
 
       test('handles Pushover with missing optional fields', () {
-        final payload = {
-          'message': 'Message only',
-          'user': 'test'
-        };
+        final payload = {'message': 'Message only', 'user': 'test'};
 
         final result = service.parse(payload);
 
@@ -201,55 +177,35 @@ void main() {
       });
 
       test('converts ntfy priority 1 to low', () {
-        final payload = {
-          'topic': 'test',
-          'message': 'Test',
-          'priority': 1
-        };
+        final payload = {'topic': 'test', 'message': 'Test', 'priority': 1};
 
         final result = service.parse(payload);
         expect(result.priority, equals('low'));
       });
 
       test('converts ntfy priority 2 to low', () {
-        final payload = {
-          'topic': 'test',
-          'message': 'Test',
-          'priority': 2
-        };
+        final payload = {'topic': 'test', 'message': 'Test', 'priority': 2};
 
         final result = service.parse(payload);
         expect(result.priority, equals('low'));
       });
 
       test('converts ntfy priority 3 to normal', () {
-        final payload = {
-          'topic': 'test',
-          'message': 'Test',
-          'priority': 3
-        };
+        final payload = {'topic': 'test', 'message': 'Test', 'priority': 3};
 
         final result = service.parse(payload);
         expect(result.priority, equals('normal'));
       });
 
       test('converts ntfy priority 4 to high', () {
-        final payload = {
-          'topic': 'test',
-          'message': 'Test',
-          'priority': 4
-        };
+        final payload = {'topic': 'test', 'message': 'Test', 'priority': 4};
 
         final result = service.parse(payload);
         expect(result.priority, equals('high'));
       });
 
       test('converts ntfy priority 5 to urgent', () {
-        final payload = {
-          'topic': 'test',
-          'message': 'Test',
-          'priority': 5
-        };
+        final payload = {'topic': 'test', 'message': 'Test', 'priority': 5};
 
         final result = service.parse(payload);
         expect(result.priority, equals('urgent'));
@@ -288,9 +244,7 @@ void main() {
           'priority': 8,
           'extras': {
             'client::notification': {
-              'click': {
-                'url': 'https://example.com'
-              },
+              'click': {'url': 'https://example.com'},
               'bigImageUrl': 'https://example.com/image.png'
             },
             'custom': 'data'
@@ -317,7 +271,8 @@ void main() {
           };
 
           final result = service.parse(payload);
-          expect(result.priority, equals('low'), reason: 'Priority $priority should be low');
+          expect(result.priority, equals('low'),
+              reason: 'Priority $priority should be low');
         }
       });
 
@@ -330,7 +285,8 @@ void main() {
           };
 
           final result = service.parse(payload);
-          expect(result.priority, equals('normal'), reason: 'Priority $priority should be normal');
+          expect(result.priority, equals('normal'),
+              reason: 'Priority $priority should be normal');
         }
       });
 
@@ -343,7 +299,8 @@ void main() {
           };
 
           final result = service.parse(payload);
-          expect(result.priority, equals('high'), reason: 'Priority $priority should be high');
+          expect(result.priority, equals('high'),
+              reason: 'Priority $priority should be high');
         }
       });
 
@@ -356,25 +313,20 @@ void main() {
           };
 
           final result = service.parse(payload);
-          expect(result.priority, equals('urgent'), reason: 'Priority $priority should be urgent');
+          expect(result.priority, equals('urgent'),
+              reason: 'Priority $priority should be urgent');
         }
       });
 
       test('handles Gotify with appid but no extras', () {
-        final payload = {
-          'message': 'Test',
-          'appid': 5
-        };
+        final payload = {'message': 'Test', 'appid': 5};
 
         final result = service.parse(payload);
         expect(result.sourceFormat, equals(PayloadFormat.gotify));
       });
 
       test('handles Gotify with missing optional fields', () {
-        final payload = {
-          'message': 'Message only',
-          'extras': {}
-        };
+        final payload = {'message': 'Message only', 'extras': {}};
 
         final result = service.parse(payload);
 
@@ -390,9 +342,7 @@ void main() {
           'message': 'HA Message',
           'title': 'HA Title',
           'data': {
-            'push': {
-              'priority': 'time-sensitive'
-            },
+            'push': {'priority': 'time-sensitive'},
             'image': 'https://example.com/image.png',
             'url': 'https://example.com',
             'entity_id': 'switch.living_room'
@@ -413,9 +363,7 @@ void main() {
         final payload = {
           'message': 'Test',
           'data': {
-            'push': {
-              'priority': 'critical'
-            },
+            'push': {'priority': 'critical'},
             'entity_id': 'test'
           }
         };
@@ -428,9 +376,7 @@ void main() {
         final payload = {
           'message': 'Test',
           'data': {
-            'push': {
-              'priority': 'time-sensitive'
-            },
+            'push': {'priority': 'time-sensitive'},
             'entity_id': 'test'
           }
         };
@@ -442,9 +388,7 @@ void main() {
       test('defaults to normal priority for Home Assistant', () {
         final payload = {
           'message': 'Test',
-          'data': {
-            'entity_id': 'test'
-          }
+          'data': {'entity_id': 'test'}
         };
 
         final result = service.parse(payload);
@@ -498,9 +442,15 @@ void main() {
 
       test('tries alternative field names for data', () {
         final testCases = [
-          {'payload': {'key': 'value'}},
-          {'extras': {'key': 'value'}},
-          {'extra': {'key': 'value'}},
+          {
+            'payload': {'key': 'value'}
+          },
+          {
+            'extras': {'key': 'value'}
+          },
+          {
+            'extra': {'key': 'value'}
+          },
         ];
 
         for (var payload in testCases) {
@@ -560,8 +510,8 @@ void main() {
           };
 
           final result = service.parse(payload);
-          expect(result.priority, equals(entry.value), 
-                 reason: 'Priority "${entry.key}" should map to "${entry.value}"');
+          expect(result.priority, equals(entry.value),
+              reason: 'Priority "${entry.key}" should map to "${entry.value}"');
         }
       });
 
@@ -577,9 +527,7 @@ void main() {
       });
 
       test('handles generic payload with only priority', () {
-        final payload = {
-          'priority': 'high'
-        };
+        final payload = {'priority': 'high'};
 
         final result = service.parse(payload);
 
@@ -612,10 +560,7 @@ void main() {
       });
 
       test('supports all format types in parseWithFormat', () {
-        final payload = {
-          'title': 'Test',
-          'message': 'Body'
-        };
+        final payload = {'title': 'Test', 'message': 'Body'};
 
         for (var format in PayloadFormat.values) {
           final result = service.parseWithFormat(payload, format);
@@ -626,53 +571,35 @@ void main() {
 
     group('Edge cases', () {
       test('handles null priority gracefully', () {
-        final payload = {
-          'title': 'Test',
-          'priority': null
-        };
+        final payload = {'title': 'Test', 'priority': null};
 
         final result = service.parse(payload);
         expect(result.priority, equals('normal'));
       });
 
       test('handles non-map data field gracefully', () {
-        final payload = {
-          'title': 'Test',
-          'data': 'not a map'
-        };
+        final payload = {'title': 'Test', 'data': 'not a map'};
 
         final result = service.parse(payload);
         expect(result.data, isNull);
       });
 
       test('handles numeric priority as string in Pushover', () {
-        final payload = {
-          'message': 'Test',
-          'priority': '1',
-          'user': 'test'
-        };
+        final payload = {'message': 'Test', 'priority': '1', 'user': 'test'};
 
         final result = service.parse(payload);
         expect(result.priority, equals('high'));
       });
 
       test('handles numeric priority as string in ntfy', () {
-        final payload = {
-          'topic': 'test',
-          'message': 'Test',
-          'priority': '4'
-        };
+        final payload = {'topic': 'test', 'message': 'Test', 'priority': '4'};
 
         final result = service.parse(payload);
         expect(result.priority, equals('high'));
       });
 
       test('handles numeric priority as string in Gotify', () {
-        final payload = {
-          'message': 'Test',
-          'priority': '8',
-          'extras': {}
-        };
+        final payload = {'message': 'Test', 'priority': '8', 'extras': {}};
 
         final result = service.parse(payload);
         expect(result.priority, equals('high'));

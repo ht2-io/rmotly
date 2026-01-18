@@ -119,7 +119,8 @@ class ActionExecutorService {
 
       // Substitute variables in headers
       Map<String, String> headers = {};
-      if (config.headersTemplate != null && config.headersTemplate!.isNotEmpty) {
+      if (config.headersTemplate != null &&
+          config.headersTemplate!.isNotEmpty) {
         final headersJson =
             substituteVariables(config.headersTemplate!, parameters ?? {});
         try {
@@ -314,7 +315,8 @@ class ActionExecutorService {
 
     Map<String, dynamic>? headers;
     if (config.headersTemplate != null && config.headersTemplate!.isNotEmpty) {
-      final headersJson = substituteVariables(config.headersTemplate!, parameters);
+      final headersJson =
+          substituteVariables(config.headersTemplate!, parameters);
       try {
         headers = jsonDecode(headersJson) as Map<String, dynamic>;
       } catch (_) {

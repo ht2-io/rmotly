@@ -26,7 +26,8 @@ class OpenApiEndpoint extends Endpoint {
       final serviceSpec = await parserService.parseFromUrl(url);
       return _convertSpec(serviceSpec);
     } catch (e) {
-      session.log('Failed to parse OpenAPI spec from $url: $e', level: LogLevel.warning);
+      session.log('Failed to parse OpenAPI spec from $url: $e',
+          level: LogLevel.warning);
       rethrow;
     } finally {
       parserService.close();
@@ -54,7 +55,8 @@ class OpenApiEndpoint extends Endpoint {
       final serviceSpec = await parserService.parseFromUrl(specUrl);
       return serviceSpec.operations.map(_convertOperation).toList();
     } catch (e) {
-      session.log('Failed to list operations from $specUrl: $e', level: LogLevel.warning);
+      session.log('Failed to list operations from $specUrl: $e',
+          level: LogLevel.warning);
       rethrow;
     } finally {
       parserService.close();

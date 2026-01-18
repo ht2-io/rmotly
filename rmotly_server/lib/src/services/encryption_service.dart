@@ -55,7 +55,7 @@ class EncryptionService {
     // WARNING: This key is not persisted and will change on restart
     print('⚠️  WARNING: Using temporary encryption key for development');
     print('⚠️  Set RMOTLY_ENCRYPTION_KEY environment variable for production');
-    
+
     final random = Random.secure();
     final keyBytes = Uint8List.fromList(
       List<int>.generate(32, (i) => random.nextInt(256)),
@@ -107,7 +107,8 @@ class EncryptionService {
       // Split IV and ciphertext
       final parts = ciphertext.split(':');
       if (parts.length != 2) {
-        throw FormatException('Invalid encrypted format. Expected IV:CIPHERTEXT');
+        throw FormatException(
+            'Invalid encrypted format. Expected IV:CIPHERTEXT');
       }
 
       final iv = IV.fromBase64(parts[0]);

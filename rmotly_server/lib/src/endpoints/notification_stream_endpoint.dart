@@ -105,7 +105,8 @@ class NotificationStreamEndpoint extends Endpoint {
       timestamp: DateTime.now(),
     );
 
-    final delivered = notificationStreamService.sendToUser(userId, notification);
+    final delivered =
+        notificationStreamService.sendToUser(userId, notification);
 
     session.log(
       'Test notification sent to user $userId: $delivered connections',

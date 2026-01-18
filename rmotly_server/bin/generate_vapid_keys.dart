@@ -75,8 +75,7 @@ VapidKeyPair generateVapidKeyPair() {
 
   // Base64url encode (no padding) for WebPush compatibility
   final publicKeyBase64 = base64UrlEncode(publicKeyBytes).replaceAll('=', '');
-  final privateKeyBase64 =
-      base64UrlEncode(privateKeyBytes).replaceAll('=', '');
+  final privateKeyBase64 = base64UrlEncode(privateKeyBytes).replaceAll('=', '');
 
   return VapidKeyPair(publicKey: publicKeyBase64, privateKey: privateKeyBase64);
 }

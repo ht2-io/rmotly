@@ -168,17 +168,20 @@ void main() {
   group('RateLimitConfig', () {
     test('webhook config has correct defaults', () {
       expect(RateLimitConfig.webhook.maxRequests, equals(100));
-      expect(RateLimitConfig.webhook.window, equals(const Duration(minutes: 1)));
+      expect(
+          RateLimitConfig.webhook.window, equals(const Duration(minutes: 1)));
     });
 
     test('userEvents config has correct defaults', () {
       expect(RateLimitConfig.userEvents.maxRequests, equals(1000));
-      expect(RateLimitConfig.userEvents.window, equals(const Duration(minutes: 1)));
+      expect(RateLimitConfig.userEvents.window,
+          equals(const Duration(minutes: 1)));
     });
 
     test('openApi config has correct defaults', () {
       expect(RateLimitConfig.openApi.maxRequests, equals(10));
-      expect(RateLimitConfig.openApi.window, equals(const Duration(minutes: 1)));
+      expect(
+          RateLimitConfig.openApi.window, equals(const Duration(minutes: 1)));
     });
 
     test('auth config has correct defaults', () {
