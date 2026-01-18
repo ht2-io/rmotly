@@ -797,14 +797,26 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
   - GitHub Actions workflow for automated testing
   - Deployment workflows (AWS and GCP) already configured
 
-- [ ] **6.6.5** Prepare app store assets
-  - Screenshots
-  - Description
-  - Privacy policy
+- [x] **6.6.5** Prepare app store assets
+  - [x] Complete Play Store submission guide created (docs/PLAY_STORE_SUBMISSION.md)
+  - [x] Store assets creation guide created (docs/STORE_ASSETS_GUIDE.md)
+  - [x] Submission checklist created (docs/PLAY_STORE_CHECKLIST.md)
+  - [x] Build script created (rmotly_app/scripts/build-release.sh)
+  - [x] Privacy policy available (docs/PRIVACY_POLICY.md)
+  - [x] Store listing content prepared (docs/STORE_LISTING.md)
+  - [ ] Screenshots (to be created by developer with running app)
+  - [ ] Feature graphic (to be created by developer/designer)
+  - [ ] High-res icon (to be created by developer/designer)
 
 - [ ] **6.6.6** Submit to Google Play Store
-  - Create developer account
-  - Submit for review
+  - [ ] Create Google Play Developer account ($25 one-time fee)
+  - [ ] Generate upload keystore and configure signing
+  - [ ] Create store assets (icon, feature graphic, screenshots)
+  - [ ] Host privacy policy on public URL
+  - [ ] Set up Play Console (app entry, content ratings, store listing)
+  - [ ] Build and upload AAB to Play Console
+  - [ ] Submit for review
+  - **Documentation**: See docs/PLAY_STORE_SUBMISSION.md for complete guide
 
 - [x] **6.6.7** Write deployment documentation
   - Single command deployment guide
