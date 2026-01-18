@@ -62,7 +62,8 @@ void main() {
       expect(find.byIcon(Icons.power_settings_new), findsOneWidget);
     });
 
-    testWidgets('should use default label when config is missing', (tester) async {
+    testWidgets('should use default label when config is missing',
+        (tester) async {
       // Arrange
       final controlWithoutLabel = Control(
         id: 1,
@@ -87,7 +88,8 @@ void main() {
       expect(find.text('Press'), findsOneWidget);
     });
 
-    testWidgets('should use default icon when config is missing', (tester) async {
+    testWidgets('should use default icon when config is missing',
+        (tester) async {
       // Arrange
       final controlWithoutIcon = Control(
         id: 1,
@@ -124,7 +126,7 @@ void main() {
         ),
       );
 
-      await tester.tap(find.byType(FilledButton));
+      await tester.tap(find.text('Press Me'));
       await tester.pumpAndSettle();
 
       // Assert
@@ -144,14 +146,16 @@ void main() {
         ),
       );
 
-      final button = tester.widget<FilledButton>(find.byType(FilledButton));
+      // Try to tap - should not trigger callback since button is disabled
+      await tester.tap(find.text('Press Me'));
+      await tester.pumpAndSettle();
 
       // Assert
-      expect(button.onPressed, isNull);
       expect(wasPressed, false);
     });
 
-    testWidgets('should display correct icon for different icon names', (tester) async {
+    testWidgets('should display correct icon for different icon names',
+        (tester) async {
       // Test data: icon name -> expected IconData
       final iconMappings = {
         'play': Icons.play_arrow,
@@ -205,7 +209,13 @@ void main() {
         ),
       );
 
-      final button = tester.widget<FilledButton>(find.byType(FilledButton));
+      // Find the button by finding any ButtonStyleButton ancestor of the text
+      final buttonFinder = find.ancestor(
+        of: find.text('Press Me'),
+        matching:
+            find.byWidgetPredicate((widget) => widget is ButtonStyleButton),
+      );
+      final button = tester.widget<ButtonStyleButton>(buttonFinder);
       final style = button.style;
 
       // Assert

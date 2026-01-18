@@ -93,7 +93,7 @@ void main() {
               onPressed: () async {
                 result = await ConfirmationDialog.show(
                   context: context,
-                  title: 'Confirm',
+                  title: 'Delete Item',
                   message: 'Are you sure?',
                 );
               },
@@ -124,7 +124,7 @@ void main() {
               onPressed: () async {
                 result = await ConfirmationDialog.show(
                   context: context,
-                  title: 'Confirm',
+                  title: 'Delete Item',
                   message: 'Are you sure?',
                 );
               },
@@ -155,7 +155,7 @@ void main() {
               onPressed: () async {
                 result = await ConfirmationDialog.show(
                   context: context,
-                  title: 'Confirm',
+                  title: 'Delete Item',
                   message: 'Are you sure?',
                 );
               },

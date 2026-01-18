@@ -106,7 +106,8 @@ void main() {
       expect(wasLongPressed, true);
     });
 
-    testWidgets('should show menu button when onEdit or onDelete provided', (tester) async {
+    testWidgets('should show menu button when onEdit or onDelete provided',
+        (tester) async {
       // Act
       await tester.pumpWidget(
         createTestWidget(
@@ -120,7 +121,8 @@ void main() {
       expect(find.byIcon(Icons.more_vert), findsOneWidget);
     });
 
-    testWidgets('should not show menu button when no callbacks provided', (tester) async {
+    testWidgets('should not show menu button when no callbacks provided',
+        (tester) async {
       // Act
       await tester.pumpWidget(
         createTestWidget(control: testControl),
@@ -158,7 +160,8 @@ void main() {
       expect(wasEditCalled, true);
     });
 
-    testWidgets('should show delete menu item and call onDelete', (tester) async {
+    testWidgets('should show delete menu item and call onDelete',
+        (tester) async {
       // Arrange
       var wasDeleteCalled = false;
 
@@ -186,7 +189,8 @@ void main() {
       expect(wasDeleteCalled, true);
     });
 
-    testWidgets('should show both edit and delete when both provided', (tester) async {
+    testWidgets('should show both edit and delete when both provided',
+        (tester) async {
       // Act
       await tester.pumpWidget(
         createTestWidget(
@@ -205,7 +209,8 @@ void main() {
       expect(find.text('Delete'), findsOneWidget);
     });
 
-    testWidgets('should display correct icon for different control types', (tester) async {
+    testWidgets('should display correct icon for different control types',
+        (tester) async {
       // Test data: control type -> expected icon
       final iconMappings = {
         'button': Icons.touch_app,
@@ -233,14 +238,16 @@ void main() {
 
         // Assert
         expect(find.byIcon(entry.value), findsOneWidget,
-            reason: 'Control type ${entry.key} should show icon ${entry.value}');
+            reason:
+                'Control type ${entry.key} should show icon ${entry.value}');
 
         // Cleanup for next iteration
         await tester.pumpWidget(Container());
       }
     });
 
-    testWidgets('should use default icon for unknown control type', (tester) async {
+    testWidgets('should use default icon for unknown control type',
+        (tester) async {
       // Arrange
       final unknownControl = Control(
         id: 1,
@@ -280,13 +287,14 @@ void main() {
 
       // Assert - Should render without overflow
       expect(tester.takeException(), isNull);
-      
+
       final text = tester.widget<Text>(find.text(longNameControl.name));
       expect(text.maxLines, 1);
       expect(text.overflow, TextOverflow.ellipsis);
     });
 
-    testWidgets('should show loading overlay only when executing', (tester) async {
+    testWidgets('should show loading overlay only when executing',
+        (tester) async {
       // Act - Not executing
       await tester.pumpWidget(
         createTestWidget(

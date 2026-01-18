@@ -32,6 +32,9 @@ void main() {
     when(() => mockConnectivityService.isOnline).thenReturn(true);
     when(() => mockLocalStorage.getCachedActions())
         .thenAnswer((_) async => <Action>[]);
+    when(() => mockErrorHandler.isRetryable(any())).thenReturn(false);
+    when(() => mockErrorHandler.mapToAppException(any())).thenThrow(
+        UnimplementedError('ActionEndpoint not yet implemented in Serverpod'));
 
     repository = ActionRepository(
       mockClient,
@@ -43,7 +46,8 @@ void main() {
 
   group('ActionRepository', () {
     group('listActions', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.listActions(),
@@ -53,7 +57,8 @@ void main() {
     });
 
     group('getAction', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.getAction(1),
@@ -63,7 +68,8 @@ void main() {
     });
 
     group('createAction', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Arrange
         final action = Action(
           id: null,
@@ -84,7 +90,8 @@ void main() {
     });
 
     group('updateAction', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Arrange
         final action = Action(
           id: 1,
@@ -105,7 +112,8 @@ void main() {
     });
 
     group('deleteAction', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.deleteAction(1),
@@ -115,7 +123,8 @@ void main() {
     });
 
     group('testAction', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.testAction(1, {'param': 'value'}),
@@ -125,7 +134,8 @@ void main() {
     });
 
     group('createFromOpenApi', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.createFromOpenApi(

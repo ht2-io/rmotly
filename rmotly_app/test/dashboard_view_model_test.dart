@@ -37,14 +37,21 @@ void main() {
 
   setUp(() {
     mockRepository = MockControlRepository();
+
+    // Default stub to handle auto-loading in constructor
+    when(() => mockRepository.getControls(
+        forceRefresh: any(named: 'forceRefresh'))).thenAnswer((_) async => []);
+
     viewModel = DashboardViewModel(mockRepository);
   });
 
   group('DashboardViewModel', () {
     group('loadControls', () {
       test('should load controls from repository and update state', () async {
-        // Arrange
-        when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
+        // Arrange - reset mock and set up new response
+        reset(mockRepository);
+        when(() => mockRepository.getControls(
+                forceRefresh: any(named: 'forceRefresh')))
             .thenAnswer((_) async => [testControl1, testControl2]);
 
         // Act
@@ -61,7 +68,8 @@ void main() {
 
       test('should set error state when loading fails', () async {
         // Arrange
-        when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
+        when(() => mockRepository.getControls(
+                forceRefresh: any(named: 'forceRefresh')))
             .thenThrow(Exception('Failed to load controls'));
 
         // Create a fresh viewmodel without auto-loading
@@ -80,7 +88,8 @@ void main() {
 
       test('should set loading state while fetching controls', () async {
         // Arrange
-        when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
+        when(() => mockRepository.getControls(
+                forceRefresh: any(named: 'forceRefresh')))
             .thenAnswer((_) async => Future.delayed(
                   const Duration(milliseconds: 100),
                   () => [testControl1],
@@ -106,7 +115,8 @@ void main() {
         const controlId = 1;
         final eventType = EventType.buttonPress.value;
         const payload = {'pressed': true};
-        when(() => mockRepository.sendControlEvent(controlId, eventType, payload))
+        when(() =>
+                mockRepository.sendControlEvent(controlId, eventType, payload))
             .thenAnswer((_) async => {});
 
         // Create control for testing
@@ -125,13 +135,15 @@ void main() {
         await viewModel.executeControl(testControl, payload);
 
         // Assert
-        verify(() => mockRepository.sendControlEvent(controlId, eventType, payload))
+        verify(() =>
+                mockRepository.sendControlEvent(controlId, eventType, payload))
             .called(1);
       });
 
       test('should execute control with toggle change', () async {
         // Arrange
-        when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
+        when(() => mockRepository.getControls(
+                forceRefresh: any(named: 'forceRefresh')))
             .thenAnswer((_) async => [testControl2]);
         when(() => mockRepository.sendControlEvent(any(), any(), any()))
             .thenAnswer((_) async => {});
@@ -154,7 +166,8 @@ void main() {
         const controlId = 1;
         final eventType = EventType.buttonPress.value;
         const payload = {'pressed': true};
-        when(() => mockRepository.sendControlEvent(controlId, eventType, payload))
+        when(() =>
+                mockRepository.sendControlEvent(controlId, eventType, payload))
             .thenThrow(Exception('Network error'));
 
         final testControl = Control(
@@ -180,7 +193,8 @@ void main() {
     group('reorderControls', () {
       test('should reorder controls in state and update repository', () async {
         // Arrange
-        when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
+        when(() => mockRepository.getControls(
+                forceRefresh: any(named: 'forceRefresh')))
             .thenAnswer((_) async => [testControl1, testControl2]);
         when(() => mockRepository.reorderControls(any()))
             .thenAnswer((_) async => {});
@@ -188,7 +202,8 @@ void main() {
         await viewModel.loadControls();
 
         // Act
-        await viewModel.reorderControls(0, 2); // Move first to end (adjusts to index 1)
+        await viewModel.reorderControls(
+            0, 2); // Move first to end (adjusts to index 1)
 
         // Assert
         final state = viewModel.state;
@@ -198,8 +213,10 @@ void main() {
       });
 
       test('should handle reorder errors and restore original order', () async {
-        // Arrange
-        when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
+        // Arrange - reset mock to clear auto-load call count
+        reset(mockRepository);
+        when(() => mockRepository.getControls(
+                forceRefresh: any(named: 'forceRefresh')))
             .thenAnswer((_) async => [testControl1, testControl2]);
         when(() => mockRepository.reorderControls(any()))
             .thenThrow(Exception('Failed to update positions'));
@@ -213,14 +230,16 @@ void main() {
         // Assert - Order should be restored after reload
         verify(() => mockRepository.reorderControls(any())).called(1);
         // The viewModel will reload controls, so we need to verify that call
-        verify(() => mockRepository.getControls(forceRefresh: false)).called(2); // Once for initial load, once for reload
+        verify(() => mockRepository.getControls(forceRefresh: false))
+            .called(2); // Once for initial load, once for reload
       });
     });
 
     group('deleteControl', () {
       test('should delete control and remove from state', () async {
         // Arrange
-        when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
+        when(() => mockRepository.getControls(
+                forceRefresh: any(named: 'forceRefresh')))
             .thenAnswer((_) async => [testControl1, testControl2]);
         when(() => mockRepository.deleteControl(1)).thenAnswer((_) async => {});
 
@@ -238,7 +257,8 @@ void main() {
 
       test('should handle delete errors and keep control', () async {
         // Arrange
-        when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
+        when(() => mockRepository.getControls(
+                forceRefresh: any(named: 'forceRefresh')))
             .thenAnswer((_) async => [testControl1, testControl2]);
         when(() => mockRepository.deleteControl(1))
             .thenThrow(Exception('Failed to delete'));
@@ -255,7 +275,8 @@ void main() {
 
       test('should handle deleting non-existent control gracefully', () async {
         // Arrange
-        when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
+        when(() => mockRepository.getControls(
+                forceRefresh: any(named: 'forceRefresh')))
             .thenAnswer((_) async => [testControl1]);
         when(() => mockRepository.deleteControl(999))
             .thenAnswer((_) async => {});
@@ -275,9 +296,12 @@ void main() {
     });
 
     group('refreshControls', () {
-      test('should reload controls from repository with force refresh', () async {
-        // Arrange
-        when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
+      test('should reload controls from repository with force refresh',
+          () async {
+        // Arrange - reset mock to clear auto-load call count
+        reset(mockRepository);
+        when(() => mockRepository.getControls(
+                forceRefresh: any(named: 'forceRefresh')))
             .thenAnswer((_) async => [testControl1]);
 
         await viewModel.loadControls();
@@ -299,7 +323,8 @@ void main() {
     group('clearError', () {
       test('should clear error from state', () async {
         // Arrange
-        when(() => mockRepository.getControls(forceRefresh: any(named: 'forceRefresh')))
+        when(() => mockRepository.getControls(
+                forceRefresh: any(named: 'forceRefresh')))
             .thenThrow(Exception('Test error'));
 
         await viewModel.loadControls();

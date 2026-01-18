@@ -5,6 +5,7 @@ import 'package:rmotly_app/features/dashboard/domain/repositories/control_reposi
 import 'package:rmotly_app/core/services/local_storage_service.dart';
 import 'package:rmotly_client/rmotly_client.dart';
 import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
+import 'package:serverpod_auth_client/serverpod_auth_client.dart';
 
 // Mock classes
 class MockClient extends Mock implements Client {}
@@ -13,21 +14,56 @@ class MockLocalStorageService extends Mock implements LocalStorageService {}
 
 class MockSessionManager extends Mock implements SessionManager {}
 
+class MockEndpointControl extends Mock implements EndpointControl {}
+
+class MockUserInfo extends Mock implements UserInfo {}
+
 void main() {
   late MockClient mockClient;
   late MockLocalStorageService mockStorage;
   late MockSessionManager mockSessionManager;
+  late MockEndpointControl mockEndpointControl;
+  late MockUserInfo mockUserInfo;
   late ControlRepository repository;
 
   setUp(() {
     mockClient = MockClient();
     mockStorage = MockLocalStorageService();
     mockSessionManager = MockSessionManager();
+    mockEndpointControl = MockEndpointControl();
+    mockUserInfo = MockUserInfo();
 
-    // Default behavior
-    when(() => mockSessionManager.signedInUser).thenReturn(null);
+    // Default behavior - authenticated user
+    when(() => mockUserInfo.id).thenReturn(1);
+    when(() => mockSessionManager.signedInUser).thenReturn(mockUserInfo);
+    when(() => mockClient.control).thenReturn(mockEndpointControl);
+    when(() => mockEndpointControl.listControls(userId: any(named: 'userId')))
+        .thenAnswer((_) async => [
+              Control(
+                id: 1,
+                userId: 1,
+                name: 'Living Room Light',
+                controlType: 'button',
+                config: '{"label": "Toggle Light", "icon": "light"}',
+                position: 0,
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+              ),
+              Control(
+                id: 2,
+                userId: 1,
+                name: 'Thermostat',
+                controlType: 'slider',
+                config: '{"min": 60, "max": 80, "label": "Temperature"}',
+                position: 1,
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+              ),
+            ]);
+    when(() => mockStorage.cacheControls(any())).thenAnswer((_) async {});
 
-    repository = ControlRepositoryImpl(mockClient, mockStorage, mockSessionManager);
+    repository =
+        ControlRepositoryImpl(mockClient, mockStorage, mockSessionManager);
   });
 
   group('ControlRepositoryImpl', () {
@@ -73,8 +109,10 @@ void main() {
         for (final control in controls) {
           expect(control.createdAt, isNotNull);
           expect(control.updatedAt, isNotNull);
-          expect(control.updatedAt.isAfter(control.createdAt) ||
-                 control.updatedAt.isAtSameMomentAs(control.createdAt), isTrue);
+          expect(
+              control.updatedAt.isAfter(control.createdAt) ||
+                  control.updatedAt.isAtSameMomentAs(control.createdAt),
+              isTrue);
         }
       });
 
@@ -92,7 +130,8 @@ void main() {
     });
 
     group('createControl', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Arrange
         final control = Control(
           id: null,
@@ -114,7 +153,8 @@ void main() {
     });
 
     group('updateControl', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Arrange
         final control = Control(
           id: 1,
@@ -136,7 +176,8 @@ void main() {
     });
 
     group('deleteControl', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.deleteControl(1),
@@ -146,7 +187,8 @@ void main() {
     });
 
     group('reorderControls', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Arrange
         final controls = [
           Control(
@@ -180,7 +222,8 @@ void main() {
     });
 
     group('sendControlEvent', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.sendControlEvent(
