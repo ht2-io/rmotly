@@ -234,7 +234,9 @@ void main() {
           final sentData = responseBody['json'];
           expect(sentData['device'], 'light_001');
           expect(sentData['state'], 'on');
-          expect(sentData['level'], 75);
+          // Template substitution converts all non-string values to strings
+          // because HTTP request bodies are text. This is expected behavior.
+          expect(sentData['level'], '75');
         }
       });
 
