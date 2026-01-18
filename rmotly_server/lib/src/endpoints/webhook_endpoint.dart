@@ -234,7 +234,8 @@ class WebhookEndpoint extends Endpoint {
 
     // TODO: Verify topic and create test notification
     return {
-      'status': 'sent',
+      'success': true,
+      'message': 'Test webhook sent successfully',
       'title': title,
       'body': body,
       'timestamp': DateTime.now().toIso8601String(),

@@ -410,7 +410,7 @@ void main() {
             user2Session,
             topicId: topic.id!,
           ),
-          throwsA(isA<Exception>()),
+          throwsA(isA<ArgumentError>()),
         );
       });
     });

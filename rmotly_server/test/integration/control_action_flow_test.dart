@@ -234,7 +234,8 @@ void main() {
           final sentData = responseBody['json'];
           expect(sentData['device'], 'light_001');
           expect(sentData['state'], 'on');
-          expect(sentData['level'], 75);
+          // Template substitution converts all values to strings
+          expect(sentData['level'], '75');
         }
       });
 
