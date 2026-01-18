@@ -8,10 +8,13 @@ import '../state/dashboard_state.dart';
 import '../viewmodel/dashboard_viewmodel.dart';
 
 /// Provider for the control repository implementation
-final dashboardControlRepositoryProvider = Provider<ControlRepository>((ref) {
+/// Returns null if server is not configured
+final dashboardControlRepositoryProvider = Provider<ControlRepository?>((ref) {
   final client = ref.watch(apiClientProvider);
-  final storage = ref.watch(localStorageServiceProvider);
   final sessionManager = ref.watch(sessionManagerProvider);
+  if (client == null || sessionManager == null) return null;
+
+  final storage = ref.watch(localStorageServiceProvider);
   return ControlRepositoryImpl(client, storage, sessionManager);
 });
 
@@ -19,6 +22,10 @@ final dashboardControlRepositoryProvider = Provider<ControlRepository>((ref) {
 final dashboardViewModelProvider =
     StateNotifierProvider<DashboardViewModel, DashboardState>((ref) {
   final repository = ref.watch(dashboardControlRepositoryProvider);
+  if (repository == null) {
+    // Return a view model with error state if server not configured
+    return DashboardViewModel.withError('Server not configured');
+  }
   return DashboardViewModel(repository);
 });
 

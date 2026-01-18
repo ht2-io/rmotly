@@ -7,15 +7,22 @@ import '../state/actions_state.dart';
 
 /// View model for the actions feature
 class ActionsViewModel extends StateNotifier<ActionsState> {
-  final ActionRepository _repository;
+  final ActionRepository? _repository;
 
-  ActionsViewModel(this._repository) : super(ActionsState.initial) {
+  ActionsViewModel(ActionRepository repository)
+      : _repository = repository,
+        super(ActionsState.initial) {
     loadActions();
   }
 
+  /// Create a view model with an initial error state (e.g., server not configured)
+  ActionsViewModel.withError(String error)
+      : _repository = null,
+        super(ActionsState(error: error));
+
   /// Load actions from the repository
   Future<void> loadActions() async {
-    if (state.isLoading) return;
+    if (_repository == null || state.isLoading) return;
 
     state = state.copyWith(isLoading: true, clearError: true);
 
@@ -36,7 +43,7 @@ class ActionsViewModel extends StateNotifier<ActionsState> {
 
   /// Refresh actions (pull-to-refresh)
   Future<void> refreshActions() async {
-    if (state.isRefreshing) return;
+    if (_repository == null || state.isRefreshing) return;
 
     state = state.copyWith(isRefreshing: true, clearError: true);
 
@@ -57,6 +64,8 @@ class ActionsViewModel extends StateNotifier<ActionsState> {
 
   /// Create a new action
   Future<Action?> createAction(Action action) async {
+    if (_repository == null) return null;
+
     try {
       final created = await _repository.createAction(action);
 
@@ -75,6 +84,8 @@ class ActionsViewModel extends StateNotifier<ActionsState> {
 
   /// Update an existing action
   Future<Action?> updateAction(Action action) async {
+    if (_repository == null) return null;
+
     try {
       final updated = await _repository.updateAction(action);
 
@@ -95,6 +106,8 @@ class ActionsViewModel extends StateNotifier<ActionsState> {
 
   /// Delete an action
   Future<void> deleteAction(int actionId) async {
+    if (_repository == null) return;
+
     try {
       final success = await _repository.deleteAction(actionId);
 
@@ -111,6 +124,8 @@ class ActionsViewModel extends StateNotifier<ActionsState> {
 
   /// Test an action
   Future<void> testAction(int actionId, Map<String, dynamic> parameters) async {
+    if (_repository == null) return;
+
     state = state.copyWith(
       testingActionId: actionId,
       clearLastTestResult: true,

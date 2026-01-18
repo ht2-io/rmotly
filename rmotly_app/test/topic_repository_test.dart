@@ -30,6 +30,10 @@ void main() {
 
     // Default behavior
     when(() => mockConnectivityService.isOnline).thenReturn(true);
+    when(() => mockErrorHandler.isRetryable(any())).thenReturn(false);
+    when(() => mockErrorHandler.mapToAppException(any())).thenThrow(
+        UnimplementedError(
+            'NotificationEndpoint not yet implemented in Serverpod'));
 
     repository = TopicRepository(
       mockClient,
@@ -41,7 +45,8 @@ void main() {
 
   group('TopicRepository', () {
     group('listTopics', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.listTopics(),
@@ -51,7 +56,8 @@ void main() {
     });
 
     group('getTopic', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.getTopic(1),
@@ -61,7 +67,8 @@ void main() {
     });
 
     group('createTopic', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Arrange
         final topic = NotificationTopic(
           id: null,
@@ -84,7 +91,8 @@ void main() {
     });
 
     group('updateTopic', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Arrange
         final topic = NotificationTopic(
           id: 1,
@@ -107,7 +115,8 @@ void main() {
     });
 
     group('deleteTopic', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.deleteTopic(1),
@@ -117,7 +126,8 @@ void main() {
     });
 
     group('regenerateApiKey', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.regenerateApiKey(1),

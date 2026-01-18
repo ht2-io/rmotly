@@ -30,6 +30,9 @@ void main() {
 
     // Default behavior
     when(() => mockConnectivityService.isOnline).thenReturn(true);
+    when(() => mockErrorHandler.isRetryable(any())).thenReturn(false);
+    when(() => mockErrorHandler.mapToAppException(any())).thenThrow(
+        UnimplementedError('EventEndpoint not yet implemented in Serverpod'));
 
     repository = EventRepository(
       mockClient,
@@ -41,7 +44,8 @@ void main() {
 
   group('EventRepository', () {
     group('listEvents', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.listEvents(),
@@ -59,7 +63,8 @@ void main() {
     });
 
     group('getEvent', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.getEvent(1),
@@ -69,7 +74,8 @@ void main() {
     });
 
     group('sendEvent', () {
-      test('should throw UnimplementedError when endpoint is not available', () {
+      test('should throw UnimplementedError when endpoint is not available',
+          () {
         // Act & Assert
         expect(
           () => repository.sendEvent(

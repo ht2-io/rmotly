@@ -253,13 +253,16 @@ void main() {
     });
 
     group('Connection state', () {
-      test('connectWebSocket updates state', () async {
+      test('connectWebSocket requires client to be configured', () async {
+        // Without a client configured, WebSocket cannot connect
         await pushService.connectWebSocket();
 
-        expect(pushService.state.isWebSocketConnected, true);
+        // Should remain disconnected when no client is available
+        expect(pushService.state.isWebSocketConnected, false);
       });
 
       test('disconnectWebSocket updates state', () async {
+        // Even without successful connection, disconnect should work
         await pushService.connectWebSocket();
         await pushService.disconnectWebSocket();
 

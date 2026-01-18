@@ -11,15 +11,22 @@ import '../state/dashboard_state.dart';
 
 /// View model for the dashboard feature
 class DashboardViewModel extends StateNotifier<DashboardState> {
-  final ControlRepository _repository;
+  final ControlRepository? _repository;
 
-  DashboardViewModel(this._repository) : super(DashboardState.initial) {
+  DashboardViewModel(ControlRepository repository)
+      : _repository = repository,
+        super(DashboardState.initial) {
     loadControls();
   }
 
+  /// Create a view model with an initial error state (e.g., server not configured)
+  DashboardViewModel.withError(String error)
+      : _repository = null,
+        super(DashboardState(error: error));
+
   /// Load controls from the repository
   Future<void> loadControls() async {
-    if (state.isLoading) return;
+    if (_repository == null || state.isLoading) return;
 
     state = state.copyWith(isLoading: true, clearError: true);
 
@@ -41,7 +48,7 @@ class DashboardViewModel extends StateNotifier<DashboardState> {
 
   /// Refresh controls (pull-to-refresh)
   Future<void> refreshControls() async {
-    if (state.isRefreshing) return;
+    if (_repository == null || state.isRefreshing) return;
 
     state = state.copyWith(isRefreshing: true, clearError: true);
 
@@ -64,7 +71,7 @@ class DashboardViewModel extends StateNotifier<DashboardState> {
   /// Execute a control interaction
   Future<void> executeControl(
       Control control, Map<String, dynamic> payload) async {
-    if (control.id == null) return;
+    if (_repository == null || control.id == null) return;
 
     state = state.copyWith(executingControlId: control.id);
 
@@ -112,7 +119,7 @@ class DashboardViewModel extends StateNotifier<DashboardState> {
 
   /// Reorder controls
   Future<void> reorderControls(int oldIndex, int newIndex) async {
-    if (oldIndex == newIndex) return;
+    if (_repository == null || oldIndex == newIndex) return;
 
     // Adjust for removal
     if (newIndex > oldIndex) {
@@ -144,6 +151,8 @@ class DashboardViewModel extends StateNotifier<DashboardState> {
 
   /// Delete a control
   Future<void> deleteControl(int controlId) async {
+    if (_repository == null) return;
+
     try {
       await _repository.deleteControl(controlId);
 

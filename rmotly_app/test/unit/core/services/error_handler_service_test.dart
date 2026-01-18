@@ -23,7 +23,8 @@ void main() {
       expect(message, 'Invalid input');
     });
 
-    test('returns first field error for ValidationException with field errors', () {
+    test('returns first field error for ValidationException with field errors',
+        () {
       const exception = ValidationException(
         'Validation failed',
         fieldErrors: {'email': 'Invalid email format'},

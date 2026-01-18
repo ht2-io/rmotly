@@ -35,7 +35,8 @@ void main() {
   });
 
   group('Dashboard Integration Tests', () {
-    testWidgets('complete dashboard load and control execution flow', (tester) async {
+    testWidgets('complete dashboard load and control execution flow',
+        (tester) async {
       // Arrange
       final testControls = [
         Control(
@@ -140,7 +141,8 @@ void main() {
       when(() => mockRepository.getControls())
           .thenAnswer((_) async => [testControl]);
       when(() => mockRepository.sendControlEvent(any(), any(), any()))
-          .thenAnswer((_) async => Future.delayed(const Duration(milliseconds: 100)));
+          .thenAnswer(
+              (_) async => Future.delayed(const Duration(milliseconds: 100)));
 
       final container = ProviderContainer(
         overrides: [
@@ -165,7 +167,8 @@ void main() {
                 }
 
                 final control = dashboardState.controls.first;
-                final isExecuting = dashboardState.isControlExecuting(control.id!);
+                final isExecuting =
+                    dashboardState.isControlExecuting(control.id!);
 
                 return Scaffold(
                   body: Center(
@@ -198,8 +201,8 @@ void main() {
       // Assert - Execution completed
       final finalState = container.read(dashboardViewModelProvider);
       expect(finalState.executingControlId, isNull);
-      verify(() => mockRepository.sendControlEvent(1, 'button_press', {'pressed': true}))
-          .called(1);
+      verify(() => mockRepository
+          .sendControlEvent(1, 'button_press', {'pressed': true})).called(1);
 
       container.dispose();
     });
@@ -234,7 +237,8 @@ void main() {
                   );
                 }
 
-                return const Scaffold(body: Center(child: CircularProgressIndicator()));
+                return const Scaffold(
+                    body: Center(child: CircularProgressIndicator()));
               },
             ),
           ),
@@ -402,7 +406,8 @@ void main() {
                           title: Text(control.name),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete),
-                            onPressed: () => viewModel.deleteControl(control.id!),
+                            onPressed: () =>
+                                viewModel.deleteControl(control.id!),
                           ),
                         ),
                     ],
