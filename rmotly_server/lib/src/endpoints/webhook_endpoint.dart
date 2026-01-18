@@ -219,7 +219,13 @@ class WebhookEndpoint extends Endpoint {
     return '/api/notify/$topicId';
   }
 
-  /// Test webhook endpoint
+  /// Test webhook endpoint for development/testing.
+  ///
+  /// This is a convenience endpoint to test webhook delivery without
+  /// making actual HTTP requests. Returns a success response with the
+  /// test notification details.
+  ///
+  /// **Note**: This is for testing only and may be removed in production.
   Future<Map<String, dynamic>> testWebhook(
     Session session,
     int topicId, {
@@ -232,7 +238,7 @@ class WebhookEndpoint extends Endpoint {
       throw StateError('User not authenticated');
     }
 
-    // TODO: Verify topic and create test notification
+    // TODO: Verify topic ownership and create test notification
     return {
       'success': true,
       'message': 'Test webhook sent successfully',
