@@ -744,9 +744,11 @@ This document defines all tasks required to build the Rmotly system. Tasks are o
   - Authentication guide (existing in docs/API.md)
   - [x] Webhook integration guide (comprehensive guide added to docs/API.md)
 
-- [ ] **6.4.2** Write user documentation
-  - Getting started guide
-  - Feature documentation
+- [x] **6.4.2** Write user documentation
+  - Getting started guide (docs/GETTING_STARTED.md)
+  - Feature documentation (docs/USER_GUIDE.md)
+  - Control types guide (docs/CONTROLS_GUIDE.md)
+  - Troubleshooting guide (docs/TROUBLESHOOTING.md)
 
 - [ ] **6.4.3** Write developer documentation
   - Architecture overview
