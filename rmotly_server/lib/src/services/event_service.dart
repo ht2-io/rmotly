@@ -120,11 +120,15 @@ class EventService {
       return null;
     }
 
-    // Parse payload parameters
-    Map<String, dynamic>? parameters;
+    // Parse payload parameters and add event metadata
+    Map<String, dynamic> parameters = {
+      'eventType': eventType,
+      'controlId': controlId,
+    };
     if (payload != null && payload.isNotEmpty) {
       try {
-        parameters = jsonDecode(payload) as Map<String, dynamic>;
+        final payloadMap = jsonDecode(payload) as Map<String, dynamic>;
+        parameters.addAll(payloadMap);
       } catch (e) {
         session.log(
           'Failed to parse event payload: $e',
