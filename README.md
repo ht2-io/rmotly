@@ -237,6 +237,13 @@ serverpod apply-migrations
 
 ## Contributing
 
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
+
+- Setting up your development environment (see [Development Setup Guide](DEVELOPMENT.md))
+- Code style and conventions
+- Submitting pull requests
+- Reporting issues
+
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feat/amazing-feature`)
 3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
@@ -253,6 +260,8 @@ We use [Conventional Commits](https://www.conventionalcommits.org/):
 - `refactor:` Code refactoring
 - `test:` Adding tests
 - `chore:` Maintenance
+
+Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
 
 ## Security
 

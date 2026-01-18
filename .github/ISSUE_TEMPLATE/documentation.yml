@@ -1,0 +1,126 @@
+name: Documentation Issue
+description: Report issues with documentation or suggest documentation improvements
+title: "[Docs]: "
+labels: ["documentation", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Rmotly's documentation! Clear documentation benefits everyone.
+
+  - type: input
+    id: title
+    attributes:
+      label: Documentation Issue Title
+      description: A clear and concise title for the documentation issue
+      placeholder: "e.g., API.md missing authentication endpoint documentation"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: doc_type
+    attributes:
+      label: Documentation Type
+      description: What kind of documentation issue is this?
+      options:
+        - Missing documentation
+        - Incorrect/outdated information
+        - Unclear or confusing
+        - Enhancement/improvement
+        - Typo or formatting
+    validations:
+      required: true
+
+  - type: input
+    id: document
+    attributes:
+      label: Which Document?
+      description: Specify the file path or section that needs attention
+      placeholder: "e.g., docs/API.md, README.md section 'Getting Started', .claude/CONVENTIONS.md"
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: Issue Description
+      description: What needs to be fixed, added, or improved?
+      placeholder: |
+        The current documentation states...
+        This is incorrect because...
+        
+        OR
+        
+        There is no documentation for...
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestions
+    attributes:
+      label: Suggested Improvements
+      description: How would you improve or fix this documentation?
+      placeholder: |
+        The documentation should include...
+        
+        It would be clearer if...
+        
+        Example content:
+        ```
+        Add suggested documentation here
+        ```
+    validations:
+      required: false
+
+  - type: textarea
+    id: location
+    attributes:
+      label: Specific Location
+      description: If applicable, provide the specific section, line numbers, or heading
+      placeholder: "e.g., Lines 45-52, Under the 'Authentication' section, In the API endpoints table"
+    validations:
+      required: false
+
+  - type: textarea
+    id: related
+    attributes:
+      label: Related Documentation
+      description: Are there other related documents that should also be updated?
+      placeholder: |
+        - docs/API.md
+        - README.md
+        - .claude/CONVENTIONS.md
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How critical is this documentation issue?
+      options:
+        - Low - Minor improvement
+        - Medium - Affects understanding
+        - High - Blocking or misleading
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other information that would help address this documentation issue
+      placeholder: "This confusion arose when... / Users might expect... / Related to issue #..."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have checked that this documentation issue hasn't been reported before
+          required: true
+        - label: I have specified which document(s) need attention
+          required: true

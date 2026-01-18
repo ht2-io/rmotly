@@ -1,0 +1,138 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in Rmotly
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this bug! Please fill out the information below to help us investigate and fix the issue.
+
+  - type: input
+    id: title
+    attributes:
+      label: Bug Title
+      description: A clear and concise title for the bug
+      placeholder: "e.g., App crashes when submitting remote control command"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: "Describe the bug in detail..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: "I expected the app to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: "Instead, the app..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the behavior
+      placeholder: |
+        1. Open the app and navigate to...
+        2. Tap on the '...' button
+        3. Enter '...' in the field
+        4. See error
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which part of Rmotly is affected?
+      options:
+        - Flutter App
+        - Dart Server (Serverpod)
+        - Both App and Server
+        - Not sure
+    validations:
+      required: true
+
+  - type: input
+    id: flutter_version
+    attributes:
+      label: Flutter Version
+      description: Run `flutter --version` to get this information
+      placeholder: "e.g., Flutter 3.27.0"
+    validations:
+      required: true
+
+  - type: input
+    id: dart_version
+    attributes:
+      label: Dart Version
+      description: Run `dart --version` to get this information
+      placeholder: "e.g., Dart 3.6.0"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: What OS are you running?
+      placeholder: "e.g., Android 13, iOS 16.5, macOS 14.0"
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      description: What device are you using?
+      placeholder: "e.g., Pixel 7, iPhone 14, Samsung Galaxy S23"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Screenshots / Logs
+      description: |
+        Add screenshots or paste relevant logs here. This is optional but very helpful!
+        Tip: You can attach images by clicking this area or drag-and-drop.
+      placeholder: "Paste logs or drag images here..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here
+      placeholder: "This started happening after... / This only occurs when..."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to ensure this bug hasn't been reported before
+          required: true
+        - label: I have included all the required information above
+          required: true
