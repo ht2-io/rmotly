@@ -184,7 +184,8 @@ class SubscriptionManagerService {
 
   /// Mark a subscription as used
   Future<void> markUsed(Session session, int subscriptionId) async {
-    final subscription = await PushSubscription.db.findById(session, subscriptionId);
+    final subscription =
+        await PushSubscription.db.findById(session, subscriptionId);
     if (subscription != null) {
       subscription.lastUsedAt = DateTime.now();
       await PushSubscription.db.updateRow(session, subscription);
@@ -196,7 +197,8 @@ class SubscriptionManagerService {
   /// Increments the failure count. If it exceeds maxFailures,
   /// the subscription is disabled.
   Future<void> recordFailure(Session session, int subscriptionId) async {
-    final subscription = await PushSubscription.db.findById(session, subscriptionId);
+    final subscription =
+        await PushSubscription.db.findById(session, subscriptionId);
     if (subscription != null) {
       subscription.failureCount++;
       if (subscription.failureCount >= maxFailures) {
@@ -213,7 +215,8 @@ class SubscriptionManagerService {
 
   /// Reset failure count after successful delivery
   Future<void> resetFailures(Session session, int subscriptionId) async {
-    final subscription = await PushSubscription.db.findById(session, subscriptionId);
+    final subscription =
+        await PushSubscription.db.findById(session, subscriptionId);
     if (subscription != null && subscription.failureCount > 0) {
       subscription.failureCount = 0;
       subscription.updatedAt = DateTime.now();
@@ -231,8 +234,7 @@ class SubscriptionManagerService {
     // Find stale subscriptions where lastUsedAt is not null and before cutoff
     final stale = await PushSubscription.db.find(
       session,
-      where: (t) =>
-          t.lastUsedAt.notEquals(null) & (t.lastUsedAt < cutoff),
+      where: (t) => t.lastUsedAt.notEquals(null) & (t.lastUsedAt < cutoff),
     );
 
     // Delete them

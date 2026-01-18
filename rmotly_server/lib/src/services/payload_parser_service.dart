@@ -135,7 +135,8 @@ class PayloadParserService {
     final notification = body['notification'];
     if (notification is! Map<String, dynamic>) return false;
     // Must have at least title or body to be considered Firebase format
-    return notification.containsKey('title') || notification.containsKey('body');
+    return notification.containsKey('title') ||
+        notification.containsKey('body');
   }
 
   bool _isNtfyFormat(Map<String, dynamic> body) {
@@ -150,7 +151,8 @@ class PayloadParserService {
     // Pushover uses 'message' (not 'body') and has numeric priority (-2 to 2)
     if (!body.containsKey('message')) return false;
     final priority = body['priority'];
-    if (priority == null) return body.containsKey('user') || body.containsKey('token');
+    if (priority == null)
+      return body.containsKey('user') || body.containsKey('token');
     // Check if priority is int or parseable as int in range -2 to 2
     if (priority is int) {
       return priority >= -2 && priority <= 2;
@@ -300,7 +302,7 @@ class PayloadParserService {
       // Fallback for loosely typed maps
       extras = Map<String, dynamic>.from(body['extras'] as Map);
     }
-    
+
     String? imageUrl;
     String? actionUrl;
 
@@ -360,10 +362,8 @@ class PayloadParserService {
   /// Parse generic format
   NotificationPayload _parseGeneric(Map<String, dynamic> body) {
     // Try various common field names
-    final title = body['title'] ??
-        body['subject'] ??
-        body['header'] ??
-        'Notification';
+    final title =
+        body['title'] ?? body['subject'] ?? body['header'] ?? 'Notification';
 
     final message = body['body'] ??
         body['message'] ??
@@ -372,18 +372,20 @@ class PayloadParserService {
         body['description'] ??
         '';
 
-    final data = body['data'] ??
-        body['payload'] ??
-        body['extras'] ??
-        body['extra'];
+    final data =
+        body['data'] ?? body['payload'] ?? body['extras'] ?? body['extra'];
 
     return NotificationPayload(
       title: title.toString(),
       body: message.toString(),
       data: data is Map<String, dynamic> ? data : null,
       priority: _genericPriorityToString(body['priority']),
-      imageUrl: (body['image'] ?? body['imageUrl'] ?? body['image_url']) as String?,
-      actionUrl: (body['url'] ?? body['actionUrl'] ?? body['click_url'] ?? body['link']) as String?,
+      imageUrl:
+          (body['image'] ?? body['imageUrl'] ?? body['image_url']) as String?,
+      actionUrl: (body['url'] ??
+          body['actionUrl'] ??
+          body['click_url'] ??
+          body['link']) as String?,
       tags: body['tags'] is List ? (body['tags'] as List).cast<String>() : null,
       sourceFormat: PayloadFormat.generic,
     );
@@ -400,7 +402,8 @@ class PayloadParserService {
 
   String _pushoverPriorityToString(dynamic priority) {
     if (priority == null) return 'normal';
-    final p = priority is int ? priority : int.tryParse(priority.toString()) ?? 0;
+    final p =
+        priority is int ? priority : int.tryParse(priority.toString()) ?? 0;
     if (p <= -2) return 'low';
     if (p == -1) return 'low';
     if (p == 0) return 'normal';
@@ -410,7 +413,8 @@ class PayloadParserService {
 
   String _ntfyPriorityToString(dynamic priority) {
     if (priority == null) return 'normal';
-    final p = priority is int ? priority : int.tryParse(priority.toString()) ?? 3;
+    final p =
+        priority is int ? priority : int.tryParse(priority.toString()) ?? 3;
     if (p <= 1) return 'low';
     if (p == 2) return 'low';
     if (p == 3) return 'normal';
@@ -420,7 +424,8 @@ class PayloadParserService {
 
   String _gotifyPriorityToString(dynamic priority) {
     if (priority == null) return 'normal';
-    final p = priority is int ? priority : int.tryParse(priority.toString()) ?? 5;
+    final p =
+        priority is int ? priority : int.tryParse(priority.toString()) ?? 5;
     if (p <= 3) return 'low';
     if (p <= 6) return 'normal';
     if (p <= 8) return 'high';
@@ -439,7 +444,8 @@ class PayloadParserService {
     final p = priority.toString().toLowerCase();
     if (p == 'low' || p == 'min' || p == '1' || p == '2') return 'low';
     if (p == 'high' || p == '4' || p == 'important') return 'high';
-    if (p == 'urgent' || p == 'critical' || p == 'max' || p == '5') return 'urgent';
+    if (p == 'urgent' || p == 'critical' || p == 'max' || p == '5')
+      return 'urgent';
     return 'normal';
   }
 }

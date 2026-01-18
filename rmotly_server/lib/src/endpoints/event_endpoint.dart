@@ -237,7 +237,8 @@ class EventEndpoint extends Endpoint {
       final count = await Event.db.count(
         session,
         where: (t) {
-          var condition = t.userId.equals(userId) & t.sourceType.equals(sourceType);
+          var condition =
+              t.userId.equals(userId) & t.sourceType.equals(sourceType);
           if (since != null) {
             condition = condition & (t.timestamp > since);
           }

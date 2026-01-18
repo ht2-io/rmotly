@@ -320,7 +320,8 @@ class ControlEndpoint extends Endpoint {
       }
 
       if (control.userId != userId) {
-        throw ArgumentError('Control $controlId does not belong to user $userId');
+        throw ArgumentError(
+            'Control $controlId does not belong to user $userId');
       }
 
       control.position = newPosition;

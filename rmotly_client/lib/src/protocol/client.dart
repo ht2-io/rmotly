@@ -184,7 +184,7 @@ class EndpointAction extends _i1.EndpointRef {
   /// Parameters:
   /// - [session]: The current session
   /// - [actionId]: ID of the action to test
-  /// - [testParameters]: Parameters to use for template substitution
+  /// - [testParametersJson]: JSON string of parameters to use for template substitution
   ///
   /// Returns: Map containing execution result with keys:
   ///   - success: bool
@@ -194,17 +194,17 @@ class EndpointAction extends _i1.EndpointRef {
   ///   - executionTimeMs: int
   ///   - error: String? (if failed)
   ///
-  /// Throws: [ArgumentError] if action not found
+  /// Throws: [ArgumentError] if action not found or JSON is invalid
   _i2.Future<Map<String, dynamic>> testAction({
     required int actionId,
-    required Map<String, dynamic> testParameters,
+    required String testParametersJson,
   }) =>
       caller.callServerEndpoint<Map<String, dynamic>>(
         'action',
         'testAction',
         {
           'actionId': actionId,
-          'testParameters': testParameters,
+          'testParametersJson': testParametersJson,
         },
       );
 }

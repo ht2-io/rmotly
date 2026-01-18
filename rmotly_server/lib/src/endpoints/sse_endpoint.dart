@@ -72,7 +72,8 @@ class SseHandler {
     // }
 
     // Send initial connection event
-    _sendEvent(response, 'connected', {'userId': userId, 'timestamp': DateTime.now().toIso8601String()});
+    _sendEvent(response, 'connected',
+        {'userId': userId, 'timestamp': DateTime.now().toIso8601String()});
 
     // Send any queued notifications (SSE fallback queue)
     final queued = _notificationService.getSseQueue(userId);
@@ -95,13 +96,17 @@ class SseHandler {
     try {
       // Stream notifications to client
       await for (final notification in stream) {
-        _sendNotificationEvent(response, NotificationData(
-          userId: userId,
-          title: notification.title,
-          body: notification.body,
-          data: notification.data != null ? jsonDecode(notification.data!) : null,
-          priority: notification.priority,
-        ));
+        _sendNotificationEvent(
+            response,
+            NotificationData(
+              userId: userId,
+              title: notification.title,
+              body: notification.body,
+              data: notification.data != null
+                  ? jsonDecode(notification.data!)
+                  : null,
+              priority: notification.priority,
+            ));
       }
     } catch (e) {
       // Connection closed or error
@@ -139,14 +144,14 @@ class SseHandler {
       // 2. Validate token signature/session validity
       // 3. Check token expiration
       // 4. Verify user permissions
-      // 
+      //
       // Current implementation uses user ID directly which is NOT SECURE
       // and should only be used for development/testing
       final userId = int.tryParse(token);
       if (userId == null) {
         return null;
       }
-      
+
       // Basic validation - check if user exists
       // In production, add proper session token validation
       return userId;
@@ -164,7 +169,8 @@ class SseHandler {
   }
 
   /// Send an SSE event
-  void _sendEvent(HttpResponse response, String event, Map<String, dynamic> data) {
+  void _sendEvent(
+      HttpResponse response, String event, Map<String, dynamic> data) {
     final id = ++_eventIdCounter;
     response.write('id: $id\n');
     response.write('event: $event\n');
@@ -172,17 +178,18 @@ class SseHandler {
   }
 
   /// Send a notification event
-  void _sendNotificationEvent(HttpResponse response, NotificationData notification) {
+  void _sendNotificationEvent(
+      HttpResponse response, NotificationData notification) {
     final id = ++_eventIdCounter;
     response.write('id: $id\n');
     response.write('event: notification\n');
     response.write('data: ${jsonEncode({
-      'title': notification.title,
-      'body': notification.body,
-      'data': notification.data,
-      'priority': notification.priority,
-      'timestamp': DateTime.now().toIso8601String(),
-    })}\n\n');
+          'title': notification.title,
+          'body': notification.body,
+          'data': notification.data,
+          'priority': notification.priority,
+          'timestamp': DateTime.now().toIso8601String(),
+        })}\n\n');
   }
 
   /// Send a heartbeat to keep connection alive
@@ -221,7 +228,8 @@ class SseEndpoint extends Endpoint {
   ///
   /// This is used when the client connects and wants to retrieve
   /// any notifications that were queued while disconnected.
-  Future<List<Map<String, dynamic>>> getQueuedNotifications(Session session) async {
+  Future<List<Map<String, dynamic>>> getQueuedNotifications(
+      Session session) async {
     final authInfo = await session.authenticated;
     final userId = authInfo?.userId;
     if (userId == null) {
@@ -231,11 +239,13 @@ class SseEndpoint extends Endpoint {
     final notificationService = NotificationService();
     final queued = notificationService.getSseQueue(userId);
 
-    return queued.map((n) => {
-      'title': n.title,
-      'body': n.body,
-      'data': n.data,
-      'priority': n.priority,
-    }).toList();
+    return queued
+        .map((n) => {
+              'title': n.title,
+              'body': n.body,
+              'data': n.data,
+              'priority': n.priority,
+            })
+        .toList();
   }
 }

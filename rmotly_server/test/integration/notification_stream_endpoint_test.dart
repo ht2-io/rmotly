@@ -4,13 +4,16 @@ import 'package:test/test.dart';
 import 'test_tools/serverpod_test_tools.dart';
 
 void main() {
-  withServerpod('Given NotificationStreamEndpoint', (sessionBuilder, endpoints) {
+  withServerpod('Given NotificationStreamEndpoint',
+      (sessionBuilder, endpoints) {
     group('streamNotifications method', () {
-      test('when user is not authenticated then throws AuthenticationException', () async {
+      test('when user is not authenticated then throws AuthenticationException',
+          () async {
         // Act & Assert: Expect exception when streaming without authentication
         expect(
           () async {
-            await for (final _ in endpoints.notificationStream.streamNotifications(sessionBuilder)) {
+            await for (final _ in endpoints.notificationStream
+                .streamNotifications(sessionBuilder)) {
               // Should not reach here
             }
           },
@@ -25,7 +28,8 @@ void main() {
         );
 
         // Act: Start streaming (we'll just verify it starts without error)
-        final stream = endpoints.notificationStream.streamNotifications(authenticatedSession);
+        final stream = endpoints.notificationStream
+            .streamNotifications(authenticatedSession);
 
         // Assert: Stream should be created
         expect(stream, isA<Stream>());
@@ -47,11 +51,13 @@ void main() {
         final completer = Completer<bool>();
 
         // Act: Start streaming
-        final stream = endpoints.notificationStream.streamNotifications(authenticatedSession);
+        final stream = endpoints.notificationStream
+            .streamNotifications(authenticatedSession);
         final subscription = stream.listen((notification) {
           // Assert: Verify we received a notification
           expect(notification.title, equals('Test Notification'));
-          expect(notification.body, equals('This is a test notification from Rmotly.'));
+          expect(notification.body,
+              equals('This is a test notification from Rmotly.'));
           completer.complete(true);
         });
 
@@ -77,7 +83,8 @@ void main() {
     });
 
     group('getConnectionCount method', () {
-      test('when user is not authenticated then throws AuthenticationException', () async {
+      test('when user is not authenticated then throws AuthenticationException',
+          () async {
         // Act & Assert
         expect(
           () => endpoints.notificationStream.getConnectionCount(sessionBuilder),
@@ -92,7 +99,8 @@ void main() {
         );
 
         // Act
-        final count = await endpoints.notificationStream.getConnectionCount(authenticatedSession);
+        final count = await endpoints.notificationStream
+            .getConnectionCount(authenticatedSession);
 
         // Assert
         expect(count, equals(0));
@@ -104,14 +112,16 @@ void main() {
         final authenticatedSession = sessionBuilder.copyWith(
           authentication: AuthenticationOverride.authenticationInfo(userId, {}),
         );
-        final stream = endpoints.notificationStream.streamNotifications(authenticatedSession);
+        final stream = endpoints.notificationStream
+            .streamNotifications(authenticatedSession);
         final subscription = stream.listen((_) {});
 
         // Wait a bit for the stream to be registered
         await Future.delayed(Duration(milliseconds: 100));
 
         // Act
-        final count = await endpoints.notificationStream.getConnectionCount(authenticatedSession);
+        final count = await endpoints.notificationStream
+            .getConnectionCount(authenticatedSession);
 
         // Clean up
         await subscription.cancel();
@@ -122,7 +132,8 @@ void main() {
     });
 
     group('sendTestNotification method', () {
-      test('when user is not authenticated then throws AuthenticationException', () async {
+      test('when user is not authenticated then throws AuthenticationException',
+          () async {
         // Act & Assert
         expect(
           () => endpoints.notificationStream.sendTestNotification(
@@ -141,7 +152,8 @@ void main() {
         );
 
         // Act
-        final delivered = await endpoints.notificationStream.sendTestNotification(
+        final delivered =
+            await endpoints.notificationStream.sendTestNotification(
           authenticatedSession,
           title: 'Test Notification',
           body: 'This is a test notification from Rmotly.',
@@ -151,14 +163,16 @@ void main() {
         expect(delivered, equals(0));
       });
 
-      test('when user has active stream then notification is delivered', () async {
+      test('when user has active stream then notification is delivered',
+          () async {
         // Arrange: Create authenticated sessionBuilder and start a stream
         final userId = 1;
         final authenticatedSession = sessionBuilder.copyWith(
           authentication: AuthenticationOverride.authenticationInfo(userId, {}),
         );
-        final stream = endpoints.notificationStream.streamNotifications(authenticatedSession);
-        
+        final stream = endpoints.notificationStream
+            .streamNotifications(authenticatedSession);
+
         final receivedNotifications = <dynamic>[];
         final subscription = stream.listen((notification) {
           receivedNotifications.add(notification);
@@ -168,7 +182,8 @@ void main() {
         await Future.delayed(Duration(milliseconds: 100));
 
         // Act: Send test notification
-        final delivered = await endpoints.notificationStream.sendTestNotification(
+        final delivered =
+            await endpoints.notificationStream.sendTestNotification(
           authenticatedSession,
           title: 'Custom Test',
           body: 'Custom body',
@@ -189,19 +204,22 @@ void main() {
     });
 
     group('multiple connections', () {
-      test('when user has multiple streams then all receive notifications', () async {
+      test('when user has multiple streams then all receive notifications',
+          () async {
         // Arrange: Create authenticated sessionBuilder and start multiple streams
         final userId = 1;
         final authenticatedSession = sessionBuilder.copyWith(
           authentication: AuthenticationOverride.authenticationInfo(userId, {}),
         );
-        
-        final stream1 = endpoints.notificationStream.streamNotifications(authenticatedSession);
-        final stream2 = endpoints.notificationStream.streamNotifications(authenticatedSession);
-        
+
+        final stream1 = endpoints.notificationStream
+            .streamNotifications(authenticatedSession);
+        final stream2 = endpoints.notificationStream
+            .streamNotifications(authenticatedSession);
+
         final received1 = <dynamic>[];
         final received2 = <dynamic>[];
-        
+
         final subscription1 = stream1.listen((notification) {
           received1.add(notification);
         });
@@ -213,7 +231,8 @@ void main() {
         await Future.delayed(Duration(milliseconds: 100));
 
         // Act: Send test notification
-        final delivered = await endpoints.notificationStream.sendTestNotification(
+        final delivered =
+            await endpoints.notificationStream.sendTestNotification(
           authenticatedSession,
           title: 'Test Notification',
           body: 'This is a test notification from Rmotly.',

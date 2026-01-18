@@ -378,7 +378,7 @@ class _ActionEndpoint {
   _i3.Future<Map<String, dynamic>> testAction(
     _i1.TestSessionBuilder sessionBuilder, {
     required int actionId,
-    required Map<String, dynamic> testParameters,
+    required String testParametersJson,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -393,7 +393,7 @@ class _ActionEndpoint {
           methodName: 'testAction',
           parameters: _i1.testObjectToJson({
             'actionId': actionId,
-            'testParameters': testParameters,
+            'testParametersJson': testParametersJson,
           }),
           serializationManager: _serializationManager,
         );

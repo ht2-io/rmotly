@@ -247,7 +247,8 @@ class ActionEndpoint extends Endpoint {
       }
       // Validate URL template
       try {
-        final testUrl = urlTemplate.replaceAll(RegExp(r'\{\{[^}]+\}\}'), 'test');
+        final testUrl =
+            urlTemplate.replaceAll(RegExp(r'\{\{[^}]+\}\}'), 'test');
         Uri.parse(testUrl);
       } catch (e) {
         throw ArgumentError('Invalid URL template: $e');
@@ -337,7 +338,7 @@ class ActionEndpoint extends Endpoint {
   /// Parameters:
   /// - [session]: The current session
   /// - [actionId]: ID of the action to test
-  /// - [testParameters]: Parameters to use for template substitution
+  /// - [testParametersJson]: JSON string of parameters to use for template substitution
   ///
   /// Returns: Map containing execution result with keys:
   ///   - success: bool
@@ -347,15 +348,23 @@ class ActionEndpoint extends Endpoint {
   ///   - executionTimeMs: int
   ///   - error: String? (if failed)
   ///
-  /// Throws: [ArgumentError] if action not found
+  /// Throws: [ArgumentError] if action not found or JSON is invalid
   Future<Map<String, dynamic>> testAction(
     Session session, {
     required int actionId,
-    required Map<String, dynamic> testParameters,
+    required String testParametersJson,
   }) async {
     final action = await Action.db.findById(session, actionId);
     if (action == null) {
       throw ArgumentError('Action with ID $actionId not found');
+    }
+
+    // Parse test parameters from JSON
+    Map<String, dynamic> testParameters;
+    try {
+      testParameters = jsonDecode(testParametersJson) as Map<String, dynamic>;
+    } catch (e) {
+      throw ArgumentError('Invalid testParametersJson: must be valid JSON: $e');
     }
 
     session.log(

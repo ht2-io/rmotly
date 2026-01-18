@@ -85,7 +85,8 @@ void main() {
         }
       });
 
-      test('when action is created from operation then it has correct structure',
+      test(
+          'when action is created from operation then it has correct structure',
           () async {
         // Arrange
         final authenticatedSession = sessionBuilder.copyWith(
@@ -154,9 +155,9 @@ void main() {
         final result = await endpoints.action.testAction(
           authenticatedSession,
           actionId: action.id!,
-          testParameters: {
+          testParametersJson: jsonEncode({
             'value': 'hello-world',
-          },
+          }),
         );
 
         // Assert: Action executed successfully
@@ -204,11 +205,11 @@ void main() {
         final result = await endpoints.action.testAction(
           authenticatedSession,
           actionId: action.id!,
-          testParameters: {
+          testParametersJson: jsonEncode({
             'name': 'Fluffy',
             'category': 'Cat',
             'status': 'available',
-          },
+          }),
         );
 
         // Assert
@@ -256,9 +257,9 @@ void main() {
         final result = await endpoints.action.testAction(
           authenticatedSession,
           actionId: action.id!,
-          testParameters: {
+          testParametersJson: jsonEncode({
             'api_token': 'test-secret-token-123',
-          },
+          }),
         );
 
         // Assert
@@ -292,10 +293,10 @@ void main() {
         final result = await endpoints.action.testAction(
           authenticatedSession,
           actionId: action.id!,
-          testParameters: {
+          testParametersJson: jsonEncode({
             'resourceType': 'users',
             'resourceId': '42',
-          },
+          }),
         );
 
         // Assert
@@ -335,11 +336,11 @@ void main() {
         final result = await endpoints.action.testAction(
           authenticatedSession,
           actionId: action.id!,
-          testParameters: {
+          testParametersJson: jsonEncode({
             'limit': 20,
             'offset': 100,
             'query': 'test-search',
-          },
+          }),
         );
 
         // Assert
@@ -386,10 +387,10 @@ void main() {
         final result = await endpoints.action.testAction(
           authenticatedSession,
           actionId: action.id!,
-          testParameters: {
+          testParametersJson: jsonEncode({
             'id': '123',
             'name': 'Updated Name',
-          },
+          }),
         );
 
         // Assert
@@ -425,7 +426,7 @@ void main() {
         final result = await endpoints.action.testAction(
           authenticatedSession,
           actionId: action.id!,
-          testParameters: {},
+          testParametersJson: jsonEncode({}),
         );
 
         // Assert
@@ -515,19 +516,19 @@ void main() {
         final getResult = await endpoints.action.testAction(
           authenticatedSession,
           actionId: getAction.id!,
-          testParameters: {},
+          testParametersJson: jsonEncode({}),
         );
 
         final postResult = await endpoints.action.testAction(
           authenticatedSession,
           actionId: postAction.id!,
-          testParameters: {},
+          testParametersJson: jsonEncode({}),
         );
 
         final putResult = await endpoints.action.testAction(
           authenticatedSession,
           actionId: putAction.id!,
-          testParameters: {},
+          testParametersJson: jsonEncode({}),
         );
 
         // Assert: All succeeded

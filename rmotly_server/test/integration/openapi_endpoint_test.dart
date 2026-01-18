@@ -5,7 +5,9 @@ void main() {
   // Test helper for OpenApiEndpoint
   withServerpod('Given OpenApiEndpoint', (sessionBuilder, endpoints) {
     group('parseSpec method', () {
-      test('when called with valid OpenAPI 3.0 JSON URL then returns parsed spec', () async {
+      test(
+          'when called with valid OpenAPI 3.0 JSON URL then returns parsed spec',
+          () async {
         // This test would require a mock HTTP server or a real OpenAPI spec URL
         // For now, we'll test that the method exists and has the correct signature
         expect(endpoints.openApi.parseSpec, isA<Function>());
@@ -21,7 +23,8 @@ void main() {
     });
 
     group('listOperations method', () {
-      test('when called with valid spec URL then returns list of operations', () async {
+      test('when called with valid spec URL then returns list of operations',
+          () async {
         // This test would require a mock HTTP server or a real OpenAPI spec URL
         // For now, we'll test that the method exists and has the correct signature
         expect(endpoints.openApi.listOperations, isA<Function>());

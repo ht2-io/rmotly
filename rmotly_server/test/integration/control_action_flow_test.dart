@@ -144,7 +144,8 @@ void main() {
         expect(actionResult['error'], isNotNull);
       });
 
-      test('when control has no action then event is recorded without execution',
+      test(
+          'when control has no action then event is recorded without execution',
           () async {
         // Arrange
         final authenticatedSession = sessionBuilder.copyWith(

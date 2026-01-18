@@ -34,7 +34,8 @@ void main() {
         expect(topic.name, 'Test Topic');
         expect(topic.description, 'Topic for E2E testing');
         expect(topic.apiKey, isNotNull);
-        expect(topic.apiKey.length, greaterThan(20)); // API keys should be substantial
+        expect(topic.apiKey.length,
+            greaterThan(20)); // API keys should be substantial
         expect(topic.enabled, isTrue);
         expect(topic.userId, 1);
       });

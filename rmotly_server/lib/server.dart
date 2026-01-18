@@ -50,13 +50,13 @@ void run(List<String> args) async {
   // Setup a default page at the web root.
   pod.webServer.addRoute(RouteRoot(), '/');
   pod.webServer.addRoute(RouteRoot(), '/index.html');
-  
+
   // Add webhook endpoint for external notifications
   pod.webServer.addRoute(WebhookRoute(pod), '/api/notify/*');
-  
+
   // Add SSE endpoint for notification fallback
   pod.webServer.addRoute(SseRoute(pod), '/api/sse/notifications');
-  
+
   // Serve all files in the /static directory.
   pod.webServer.addRoute(
     RouteStaticDirectory(serverDirectory: 'static', basePath: '/'),
