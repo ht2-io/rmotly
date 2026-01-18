@@ -125,6 +125,29 @@ The app uses **Riverpod** for state management. All providers are defined with t
 - [TemplateParser](../docs/TEMPLATE_PARSER.md) - Template parsing utility documentation
 - [Deployment Guide](../docs/DEPLOYMENT.md) - Complete deployment guide for the backend API
 
+### Google Play Store Submission
+
+- [Play Store Submission Guide](../docs/PLAY_STORE_SUBMISSION.md) - Complete guide for submitting to Google Play Store
+- [Store Assets Guide](../docs/STORE_ASSETS_GUIDE.md) - How to create screenshots, icons, and graphics
+- [Play Store Checklist](../docs/PLAY_STORE_CHECKLIST.md) - Step-by-step checklist for submission
+- [Store Listing Content](../docs/STORE_LISTING.md) - App descriptions and metadata
+
+### Building for Release
+
+```bash
+# Build Android App Bundle (for Play Store)
+cd rmotly_app
+flutter build appbundle --release
+
+# Build APK (for direct installation)
+flutter build apk --release
+
+# Or use the build script
+./scripts/build-release.sh
+```
+
+**Note**: Release builds require signing configuration. See [Play Store Submission Guide](../docs/PLAY_STORE_SUBMISSION.md) for setup instructions.
+
 ## Contributing
 
 1. Follow the coding conventions in `.claude/CONVENTIONS.md`
